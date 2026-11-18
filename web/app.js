@@ -180,7 +180,8 @@ function historyList(entries) {
 // mistakes and essays marked for review, each one tap from the work itself.
 function home() {
   const now = Date.now(), summary = metrics();
-  const open = state.history.filter(entry => !entry.finished).slice(0, 2);
+  // All unfinished attempts are counted; the two most recent get a row.
+  const unfinished = state.history.filter(entry => !entry.finished), open = unfinished.slice(0, 2);
   const mistakes = new Map(), essaysDue = new Map();
   for (const id of state.progress.unresolved) { const question = questionLookup.get(id); if (question) mistakes.set(question.chapter, (mistakes.get(question.chapter) || 0) + 1); }
   for (const row of state.essays) if (row.status === 'review' && !row.learned) { const question = questionLookup.get(row.question); if (question) essaysDue.set(question.chapter, (essaysDue.get(question.chapter) || 0) + 1); }
@@ -194,7 +195,7 @@ function home() {
     const left = entry.deadline && !expired ? ' · còn ' + Math.ceil((entry.deadline - now) / 60000) + ' phút' : '';
     return taskRow('attempt/' + entry.id, esc(attemptModes[entry.mode] || 'Bài làm') + ' · ' + esc(chapterName(entry.chapter)),
       (total ? answered + '/' + total + ' câu đã trả lời' : 'Đang làm') + left + ' · bắt đầu ' + shortDate(entry.created), expired ? 'Xem kết quả' : 'Làm tiếp', 'is-resume');
-  }).join('');
+  }).join('') + (unfinished.length > open.length ? taskRow('stats', 'Còn ' + (unfinished.length - open.length) + ' bài đang làm dở khác', 'Xem tất cả trong lịch sử học tập', 'Xem') : '');
   const byCount = map => [...map].sort((a, b) => b[1] - a[1]);
   const mistakeRows = byCount(mistakes).map(([chapter, n]) => taskRow('quiz/' + chapter + '?mode=review', esc(chapterName(chapter)), n + ' câu còn sai · ' + esc(subjectName(chapterLookup.get(chapter)?.subject)), 'Ôn câu sai')).join('');
   const essayRows = byCount(essaysDue).map(([chapter, n]) => taskRow('essay/' + chapter + '?status=review', esc(chapterName(chapter)), n + ' câu đánh dấu cần ôn · ' + esc(subjectName(chapterLookup.get(chapter)?.subject)), 'Ôn lại')).join('');
@@ -203,7 +204,7 @@ function home() {
   const recentRows = (lastResult ? taskRow('attempt/' + lastResult.id, 'Kết quả gần nhất: ' + esc(attemptModes[lastResult.mode] || 'Bài làm') + ' · ' + scoreText(lastResult.result.score) + '/10', esc(chapterName(lastResult.chapter)) + ' · ' + lastResult.result.correct + '/' + lastResult.result.total + ' câu đúng · ' + shortDate(lastResult.created), 'Xem lại') : '')
     + recentEssays.map(row => { const question = questionLookup.get(row.question); const status = row.learned ? 'mastered' : row.status || 'unseen';
       return taskRow('essayitem/' + question.id + '?mode=answer', esc((question.code ? question.code + ' · ' : '') + question.prompt), esc(chapterName(question.chapter)) + ' · ' + studyStatuses[status], 'Mở', 'is-clamped'); }).join('');
-  const due = [open.length && open.length + ' bài đang làm dở', mistakeTotal && mistakeTotal + ' câu trắc nghiệm còn sai', essayTotal && essayTotal + ' câu tự luận cần ôn'].filter(Boolean);
+  const due = [unfinished.length && unfinished.length + ' bài đang làm dở', mistakeTotal && mistakeTotal + ' câu trắc nghiệm còn sai', essayTotal && essayTotal + ' câu tự luận cần ôn'].filter(Boolean);
   const name = state.user.name && state.user.name !== 'bạn' ? state.user.name : 'bạn';
   main.innerHTML = `<div class="home">
     <div class="heading home-head"><h1>Chào ${esc(name)}</h1><p class="muted">${due.length ? 'Hôm nay cần ôn: ' + due.join(' · ') + '.' : 'Chưa có gì cần ôn lại. Chọn một môn để bắt đầu.'}</p></div>
@@ -1010,6 +1011,41 @@ window.addEventListener('hashchange', async () => {
   window.scrollTo(0, 0);
 });
 const root = document.documentElement;
+// ChatGPT Sites can inject its own floating widget (e.g. "Edit site") into a
+// shadow root at the bottom-right. On phone layouts, when it sits over the
+// bottom bars, grow the bars by its height (CSS --site-lift) so "Câu tiếp" and
+// the navigation stay tappable. The widget itself is left untouched.
+function siteWidgetLift() {
+  let lift = 0;
+  if (innerWidth <= 900) {
+    for (const host of document.body.children) {
+      if (!host.shadowRoot) continue;
+      for (const element of host.shadowRoot.querySelectorAll('*')) {
+        const box = element.getBoundingClientRect();
+        if (!box.width || !box.height || box.width * box.height > innerWidth * innerHeight * 0.4) continue;
+        if (box.top < innerHeight && box.bottom > innerHeight - 140) lift = Math.max(lift, innerHeight - box.top + 6);
+      }
+    }
+  }
+  root.style.setProperty('--site-lift', Math.min(Math.round(lift), 96) + 'px');
+}
+let liftTimer;
+const scheduleLift = () => { clearTimeout(liftTimer); liftTimer = setTimeout(siteWidgetLift, 120); };
+const watchedHosts = new WeakSet();
+function watchSiteWidgets() {
+  for (const host of document.body.children) {
+    if (host.shadowRoot && !watchedHosts.has(host)) {
+      watchedHosts.add(host);
+      new MutationObserver(scheduleLift).observe(host.shadowRoot, {subtree:true, childList:true, attributes:true});
+    }
+  }
+  scheduleLift();
+}
+new MutationObserver(watchSiteWidgets).observe(document.body, {childList:true});
+window.addEventListener('resize', scheduleLift);
+watchSiteWidgets();
+setTimeout(siteWidgetLift, 1500);
+setTimeout(siteWidgetLift, 4000);
 function preference(name, fallback) {
   try { return localStorage.getItem(name) || fallback; }
   catch { return fallback; }

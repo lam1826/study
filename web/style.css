@@ -841,3 +841,8 @@ kbd { display:inline-block; min-width:1.5em; padding:0 .35rem; border:1px solid 
 .has-start-bar main > * { max-width:57.5rem; margin-inline:auto; }
 /* Answer cards use the frame's width, like the toolbar above them. */
 .answer-item.quiz-answer-card, .answer-item.chapter-answer, .answer-item.quiz-answer-card.is-revealed { max-width:none; }
+
+/* Two kinds of questions: main (from the chapter's quiz file) and advanced
+   (written from the textbook). Advanced questions carry a written badge. */
+.tier-badge { background:var(--example-bg); color:var(--example-ink); border:1px solid var(--example-edge); }
+.tier-choices { margin-top:-.25rem; }

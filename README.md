@@ -6,6 +6,13 @@ Website ôn tập cá nhân bằng tiếng Việt với ngân hàng câu hỏi, 
 
 Chạy `npm run check`, `npm test` và `npm run build` bằng Node.js 24. Bản dựng đặt tại `dist/server/index.js`. `npm run dev` dựng rồi chạy bản local tại http://localhost:8787 (chỉ máy này; thêm `--host=0.0.0.0` để thử bằng điện thoại cùng mạng) với D1 giả lập bằng SQLite (`.dev/`), R2 trong bộ nhớ và tài khoản thử; thêm `--admin` để đăng nhập với vai trò chủ trang, `--latency=60` để giả lập độ trễ D1. Bản local không có tệp tài liệu gốc. Worker cần binding `DB` (D1) và `BUCKET` (R2) và danh tính do ChatGPT Sites cấp. Cài đặt schema từ `drizzle/` khi xuất bản. Môi trường local và hosted dùng dữ liệu riêng.
 
+## Hai loại câu trắc nghiệm
+
+- **Câu hỏi chính** (`tier: "main"`): câu trong file đề trắc nghiệm của chương (đáp án tô đỏ).
+- **Câu hỏi nâng cao** (`tier: "extra"`): câu bổ sung, nâng cao soạn theo giáo trình của chương; có nhãn "Nâng cao".
+
+Khi chương có câu nâng cao, trang Trắc nghiệm hiện lựa chọn Câu hỏi chính / Câu hỏi nâng cao / Cả hai nhóm kèm số câu; trang đáp án tách hai nhóm; trang môn và chương ghi "30 chính · 10 nâng cao". Câu mới (cả hai loại) thêm vào `content/added/` theo hướng dẫn trong [content/added/README.md](content/added/README.md); website tự nhập một lần sau khi triển khai, `tests/added.mjs` kiểm tra định dạng trước.
+
 ## Nạp nội dung
 
 Vào **Quản trị dữ liệu** để bổ sung môn, chương, câu hỏi và tệp. Chọn chương chính xác trước khi nhập JSON. JSON xuất từ ngân hàng có thể nhập lại. Câu trùng nội dung trong cùng chương và loại được bỏ qua; một câu tự luận cần đáp án tham khảo.

@@ -11,7 +11,9 @@ const area = (name,value='',attrs='') => `<textarea name="${name}" ${attrs}>${es
 const title = (heading,desc='',cls='') => `<div class="heading ${cls}"><h1>${esc(heading)}</h1>${desc?`<p class="muted">${esc(desc)}</p>`:''}</div>`;
 const empty = msg => `<div class="card empty">${esc(msg)}</div>`;
 const date = value => new Date(value).toLocaleString('vi-VN');
-const tierLabel = tier => tier==='main'?'Câu hỏi chính':'Câu hỏi bổ sung';
+// Main = the questions in the owner's quiz files; extra = advanced questions
+// written from the course textbooks.
+const tierLabel = tier => tier==='main'?'Câu hỏi chính':'Câu hỏi nâng cao';
 const bar = n => `<div class="bar" role="progressbar" aria-label="Tiến độ" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${n}"><i style="width:${n}%"></i></div>`;
 let state, toastTimer, tick, viewGeneration=0, attemptIndex=0, wrongOnly=false, lastAttempt='';
 let filter={subject:'',chapter:'',tier:'all',search:''};
@@ -121,8 +123,7 @@ function controls(route) {
   if(route==='quiz'&&!hasExtra)filter.tier='all';
   return {chapter,html:`<div class="filters content-filters">
     ${field('Môn học',select('subject',(all?opt('','Tất cả môn học',subject):'')+subjects.map(s=>opt(s.id,s.title,subject)).join('')))}
-    ${field('Chương',select('chapter',(all?opt('','Tất cả chương',chapter):'')+chapters.map(c=>opt(c.id,c.title+(has(c.id)?'':' — chưa có câu'),chapter)).join('')))}
-    ${hasExtra?field('Nhóm câu hỏi',select('tier',opt('all','Cả hai nhóm',filter.tier)+opt('main','Câu hỏi chính',filter.tier)+opt('extra','Câu hỏi bổ sung',filter.tier))):''}</div>`};
+    ${field('Chương',select('chapter',(all?opt('','Tất cả chương',chapter):'')+chapters.map(c=>opt(c.id,c.title+(has(c.id)?'':' — chưa có câu'),chapter)).join('')))}</div>`};
 }
 function bindFilters() {
   on('.content-filters select','change',(_,el)=>{
@@ -239,16 +240,19 @@ function chapterRow(c) {
 }
 function chapterCounts(id) {
   const questions=state.questions.filter(q=>q.chapter===id);
-  return {quiz:questions.filter(q=>q.kind==='quiz').length, essay:questions.filter(q=>q.kind==='essay').length, docs:state.documents.filter(d=>d.chapter===id).length};
+  const count=(kind,tier)=>questions.filter(q=>q.kind===kind&&(!tier||q.tier===tier)).length;
+  return {quiz:count('quiz'), quizExtra:count('quiz','extra'), essay:count('essay'), essayExtra:count('essay','extra'), docs:state.documents.filter(d=>d.chapter===id).length};
 }
 // Actions grouped by kind (quiz, essay, documents). The chapter page gets one
 // primary action; a list of several chapters (subject page) gets none.
 function chapterActions(id,n=chapterCounts(id),primary=true) {
   const lead=primary?'primary':'';
+  // "30 câu", or "30 chính · 10 nâng cao" once a chapter has advanced questions.
+  const split=(total,extra)=>extra?(total-extra)+' chính · '+extra+' nâng cao':total+' câu';
   const row=(label,count,buttons,cls='')=>`<div class="action-row ${cls}"><span class="action-label">${label}<small>${count}</small></span><div class="action-buttons">${buttons}</div></div>`;
   const rows=[
-    n.quiz&&row('Trắc nghiệm',n.quiz+' câu',link('quiz/'+id,'Làm bài',lead)+link('quizanswers/'+id,'Xem đáp án')),
-    n.essay&&row('Tự luận',n.essay+' câu',link('essay/'+id,'Học từng câu',n.quiz?'':lead)+link('essayanswers/'+id,'Đáp án cả chương')),
+    n.quiz&&row('Trắc nghiệm',split(n.quiz,n.quizExtra||0),link('quiz/'+id,'Làm bài',lead)+link('quizanswers/'+id,'Xem đáp án')),
+    n.essay&&row('Tự luận',split(n.essay,n.essayExtra||0),link('essay/'+id,'Học từng câu',n.quiz?'':lead)+link('essayanswers/'+id,'Đáp án cả chương')),
     n.docs&&row('Tài liệu',n.docs+' tệp',link('docs/'+id,'Mở tài liệu','link'),'docs-row')
   ].filter(Boolean);
   return `<div class="chapter-actions">${rows.join('')||'<p class="muted">Chương đang chờ bổ sung nội dung.</p>'}</div>`;
@@ -262,6 +266,11 @@ function quiz() {
   const isExam = quizSettings.mode === 'exam';
   const chapterQuiz = state.questions.filter(question => question.chapter === selection.chapter && question.kind === 'quiz').length;
   const modes = [['practice','Luyện tập','Biết đúng/sai và đọc giải thích ngay khi chọn; lựa chọn đầu tiên được tính.'],['review','Ôn câu sai','Chỉ các câu bạn vẫn còn làm sai trong chương.'],['exam','Thi thử','Đếm giờ; đáp án chỉ hiện sau khi nộp bài.']];
+  // Two kinds of questions: main (from the chapter's quiz file) and advanced
+  // (written from the textbook). The choice shows once a chapter has both.
+  const inChapter = tier => state.questions.filter(question => question.chapter === selection.chapter && question.kind === 'quiz' && (tier === 'all' || question.tier === tier)).length;
+  const tiers = [['main','Câu hỏi chính','Câu trong file đề của chương.'],['extra','Câu hỏi nâng cao','Câu bổ sung theo giáo trình.'],['all','Cả hai nhóm','Câu chính trước, câu nâng cao sau.']];
+  const tierChoice = inChapter('extra') ? `<fieldset class="mode-choices tier-choices"><legend>Nhóm câu hỏi</legend>${tiers.map(([value,label,hint]) => `<label class="mode-choice"><input type="radio" name="tier" value="${value}" ${filter.tier === value ? 'checked' : ''}><span><strong>${label} · ${inChapter(value)}</strong><small>${hint}</small></span></label>`).join('')}</fieldset>` : '';
   document.body.classList.add('has-start-bar');
   // The chapter shows as one line; the subject/chapter pickers open on demand.
   main.innerHTML = `<nav class="study-crumbs" aria-label="Điều hướng">${chapter ? link('chapter/'+chapter.id,'← '+chapterShort(chapter),'link') : link('subjects','← Môn học','link')}</nav>
@@ -276,6 +285,7 @@ function quiz() {
           ${modes.map(([value,label,hint]) => `<label class="mode-choice"><input type="radio" name="mode" value="${value}" ${quizSettings.mode === value ? 'checked' : ''}><span><strong>${label}</strong><small>${hint}</small></span></label>`).join('')}
           <p class="mode-hint">${modes.find(([value]) => value === quizSettings.mode)?.[2] || ''}</p>
         </fieldset>
+        ${tierChoice}
         <div class="filters">
           ${field('Số câu hỏi', input('count', selectedCount || '', 'number', `min="1" max="${Math.min(100, count) || 1}" inputmode="numeric" required ${count ? '' : 'disabled'}`))}
           <label id="time-field" ${isExam ? '' : 'hidden'}>Thời gian thi (phút)
@@ -291,6 +301,10 @@ function quiz() {
       <p class="setup-links">${state.user.isAdmin ? link('admin', 'Quản trị câu hỏi', 'link') : ''}${state.documents.some(d=>d.chapter===selection.chapter) ? link('docs/' + selection.chapter, 'Tài liệu của chương', 'link') : ''}</p>
     </section>`;
   bindFilters();
+  on('#start [name=tier]', 'change', (_, element) => {
+    filter.tier = element.value;
+    quiz();
+  });
   on('#start [name=mode]', 'change', (_, element) => {
     quizSettings.mode = element.value;
     quiz();
@@ -545,6 +559,7 @@ function renderQuestion() {
   main.querySelector('#question-card').innerHTML = `
     <div class="qa-main"><div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
       ${question.selectionCount > 1 ? `<span class="badge multi-badge">Chọn ${question.selectionCount} đáp án</span>` : ''}
+      ${question.tier === 'extra' ? '<span class="badge tier-badge">Nâng cao</span>' : ''}
       ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button type="button" class="icon flag-button" id="flag" aria-pressed="${flagged}" ${submitting ? 'disabled' : ''}>${flagged ? '⚑ Đã đánh dấu' : '⚐ Đánh dấu'}</button>`}
     </div>
     <h2 class="question-title" id="question-title" tabindex="-1">${esc(question.prompt)}</h2>
@@ -857,7 +872,7 @@ async function admin(id,generation) {
   <section class="card form-card"><h2>${q?'Sửa câu hỏi':'Thêm câu hỏi'}</h2><form id="question">
   <div class="filters">${field('Chương',select('chapter',chapterOptions(q?.chapter)))}
   ${field('Loại',select('kind',opt('quiz','Trắc nghiệm',q?.kind)+opt('essay','Tự luận',q?.kind)))}
-  ${field('Nhóm',select('tier',opt('main','Câu hỏi chính',q?.tier)+opt('extra','Câu hỏi bổ sung',q?.tier)))}</div>
+  ${field('Nhóm',select('tier',opt('main','Câu hỏi chính',q?.tier)+opt('extra','Câu hỏi nâng cao',q?.tier)))}</div>
   ${field('Nội dung câu hỏi',area('prompt',q?.prompt,'required maxlength="16000"'))}
   <div id="options-fields" class="filters">${Array.from({length:Math.max(4,q?.options.length||0)},(_,i)=>i).map(i=>field('Phương án '+'ABCDEF'[i],input('option'+i,q?.options[i]?.text,'text','maxlength="3000"'))).join('')}
   <fieldset class="correct-choices"><legend>Đáp án đúng (có thể chọn nhiều)</legend>${Array.from({length:Math.max(4,q?.options.length||0)},(_,i)=>`<label><input type="checkbox" name="correct" value="${i}" ${q && answerIds(q.correct).includes(q.options[i]?.id)?'checked':''}> ${'ABCDEF'[i]}</label>`).join('')}</fieldset></div>
@@ -903,7 +918,7 @@ async function admin(id,generation) {
   });
   mountStudyAdmin();
   let bankPage = 0;
-  main.querySelector('#bank-list').insertAdjacentHTML('beforebegin',`<div class="filters">${field('Nhóm',select('bank-tier',opt('main','Câu chính')+opt('extra','Câu bổ sung')))}${field('Chương',select('bank-chapter',opt('','Tất cả')+chapterOptions('')))}${field('Loại',select('bank-kind',opt('','Tất cả')+opt('quiz','Trắc nghiệm')+opt('essay','Tự luận')))}</div>`);
+  main.querySelector('#bank-list').insertAdjacentHTML('beforebegin',`<div class="filters">${field('Nhóm',select('bank-tier',opt('main','Câu chính')+opt('extra','Câu nâng cao')))}${field('Chương',select('bank-chapter',opt('','Tất cả')+chapterOptions('')))}${field('Loại',select('bank-kind',opt('','Tất cả')+opt('quiz','Trắc nghiệm')+opt('essay','Tự luận')))}</div>`);
   on('[name=bank-tier],[name=bank-chapter],[name=bank-kind]','change',()=>{bankPage=0;renderBank();});
   let bankTerm = '';
   function renderBank(term = bankTerm) {

@@ -1,0 +1,3 @@
+[
+  {"tier": "main", "prompt": "Câu của chương trùng tên phải bị bỏ qua?", "options": ["Có", "Không"], "correct": 0, "explanation": "Chương history-x trùng tên với Bài 1 nên không được tạo; câu của nó bị bỏ qua thay vì làm hỏng lượt nhập.\n\nNguồn đối chiếu: tệp thử nghiệm.", "sources": [], "from": "fixture"}
+]

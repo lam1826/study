@@ -40,7 +40,8 @@ const multi=bank.filter(q=>Array.isArray(q.correct));
 assert.equal(multi.length,7);
 assert.equal(bank.filter(q=>q.kind==='quiz' && q.options.length===3).length,1);
 assert.ok(bank.every(q=>q.explanation && q.sources.length));
-assert.equal(sqlite.prepare('SELECT count(*) AS n FROM content_imports').get().n,3);
+// Four import markers: course, reviewed explanations, essay guides, added questions.
+assert.equal(sqlite.prepare('SELECT count(*) AS n FROM content_imports').get().n,4);
 await call('api/state');
 assert.equal(sqlite.prepare('SELECT count(*) AS n FROM questions').get().n,346);
 // A complete chapter includes all seven types of saved option IDs regardless of order.

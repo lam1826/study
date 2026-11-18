@@ -1,0 +1,10 @@
+{
+  "name": "on-tap-viet-quiz",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check worker/index.mjs && node --check worker/study.mjs && node --check web/app.js && node --check web/study.js",
+    "test": "node tests/quiz.mjs"
+  }
+}

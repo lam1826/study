@@ -1,0 +1,176 @@
+import assert from 'node:assert/strict';
+import { DatabaseSync } from 'node:sqlite';
+import { readFileSync } from 'node:fs';
+import worker from '../dist/server/index.js';
+const sqlite=new DatabaseSync(':memory:');
+sqlite.exec(readFileSync('drizzle/0000_quiz.sql','utf8'));
+sqlite.exec(readFileSync('drizzle/0001_content_imports.sql','utf8'));
+sqlite.exec(readFileSync('drizzle/0002_study_workspace.sql','utf8'));
+const db={prepare(query){return {bind(...params){
+  const s=sqlite.prepare(query);
+  return {all:async()=>({results:s.all(...params)}),first:async()=>s.get(...params),run:async()=>/^\s*(SELECT|PRAGMA)/i.test(query)?{results:s.all(...params)}:{meta:s.run(...params)}};
+}};},async batch(statements){
+  sqlite.exec('BEGIN');
+  try {const result=[];for(const s of statements) result.push(await s.run());sqlite.exec('COMMIT');return result;}
+  catch(e){sqlite.exec('ROLLBACK');throw e;}
+}};
+const files=new Map();
+const bucket={put:async(k,v)=>files.set(k,v),get:async k=>files.has(k)?{body:files.get(k)}:null,delete:async k=>files.delete(k)};
+async function call(path,method='GET',data,identity='u',expected=200){
+  const res=await worker.fetch(new Request('https://example.test/'+path,{method,headers:{...(identity?{'oai-authenticated-user-id':identity,'oai-authenticated-user-email':identity==='u'?'owner@example.test':'student@example.test'}:{}),Origin:'https://example.test'},body:data instanceof FormData?data:data===undefined?undefined:JSON.stringify(data)}),{DB:db,BUCKET:bucket,QUIZ_OWNER_EMAIL:'owner@example.test'});
+  const text=await res.text();
+  assert.equal(res.status,expected,text.slice(0,400));
+  return res.headers.get('content-type').includes('application/json')?JSON.parse(text):text;
+}
+const state=await call('api/state?compact=1');
+assert.equal(state.questions.length,346);
+assert.equal(state.questions.filter(q=>q.kind==='quiz').length,118);
+assert.equal(state.questions.filter(q=>q.kind==='essay').length,228);
+assert.ok(state.questions.every(q=>!('correct' in q)&&!('options' in q)));
+await call('api/state','GET',undefined,'',401);
+await call('api/bank','GET',undefined,'other',403);
+const bank=await call('api/bank');
+assert.ok(bank.filter(q=>q.kind==='quiz').every(q=>q.explanation.length>200 && !q.explanation.startsWith('Đáp án theo phần được đánh dấu')));
+const multi=bank.filter(q=>Array.isArray(q.correct));
+assert.equal(multi.length,7);
+assert.equal(bank.filter(q=>q.kind==='quiz' && q.options.length===3).length,1);
+assert.ok(bank.every(q=>q.explanation && q.sources.length));
+assert.equal(sqlite.prepare('SELECT count(*) AS n FROM content_imports').get().n,3);
+await call('api/state');
+assert.equal(sqlite.prepare('SELECT count(*) AS n FROM questions').get().n,346);
+// A complete chapter includes all seven types of saved option IDs regardless of order.
+const cfg={chapter:'distributed-2',tier:'main',mode:'practice',count:15};
+const start=await call('api/attempt','POST',cfg);
+const attempt=await call('api/attempt/'+start.id);
+assert.equal(attempt.items.length,15);
+assert.ok(attempt.items.every(q=>q.correct && q.explanation));
+assert.equal(attempt.items.filter(q=>q.selectionCount===2).length,4);
+await call('api/attempt/'+start.id,'GET',undefined,'other',404);
+const keys=new Map(bank.map(q=>[q.id,q.correct]));
+const changes=attempt.items.map(q=>({question:q.id,option:Array.isArray(keys.get(q.id))?[...keys.get(q.id)].reverse():keys.get(q.id)}));
+const ack=await call('api/attempt/'+start.id+'?compact=1','PATCH',{changes});
+assert.deepEqual(ack,{ok:true,id:start.id,finished:null});
+assert.ok(JSON.stringify(ack).length<120);
+const result=await call('api/attempt/'+start.id,'POST',{});
+assert.equal(result.result.score,10);
+assert.equal(result.result.correct,15);
+assert.equal((await call('api/state?compact=1')).progress.learned.length,15);
+// Selecting only one of two answers is wrong, not partially correct.
+const partial=await call('api/attempt','POST',cfg);
+const partialItems=await call('api/attempt/'+partial.id);
+const m=partialItems.items.find(q=>q.selectionCount===2);
+await call('api/attempt/'+partial.id,'PATCH',{question:m.id,option:[keys.get(m.id)[0]]});
+const graded=await call('api/attempt/'+partial.id,'POST',{});
+assert.equal(graded.result.wrong,1);
+assert.equal(graded.result.unanswered,14);
+assert.equal(graded.result.correct,0);
+const retry=await call('api/attempt','POST',{...cfg,previous:partial.id,ids:[]});
+assert.equal((await call('api/attempt/'+retry.id)).items.length,15);
+// Deselecting everything is unanswered; foreign and duplicate options are rejected.
+const blank=await call('api/attempt','POST',cfg);
+const blankItems=await call('api/attempt/'+blank.id);
+const mq=blankItems.items.find(q=>q.selectionCount===2);
+await call('api/attempt/'+blank.id,'PATCH',{question:mq.id,option:[]});
+await call('api/attempt/'+blank.id,'PATCH',{question:mq.id,option:['foreign']},'u',400);
+await call('api/attempt/'+blank.id,'PATCH',{question:mq.id,option:[mq.options[0].id,mq.options[0].id]},'u',400);
+assert.equal((await call('api/attempt/'+blank.id,'POST',{})).result.unanswered,15);
+const source=JSON.parse(readFileSync('content/course.json','utf8'));
+for(const doc of source.documents) sqlite.prepare('INSERT INTO documents VALUES (?,?,?,?,?,?)').run(doc.id,doc.chapter,doc.title,doc.filename,doc.mime,doc.storage_key);
+// Admin roundtrip retains both keys and option identities.
+const original=multi[0];
+await call('api/bank','POST',original);
+const edited=(await call('api/bank')).find(q=>q.id===original.id);
+assert.deepEqual(edited.correct,original.correct);
+assert.deepEqual(edited.options,original.options);
+// Source answers and student drafts are isolated.
+const essay=bank.find(q=>q.kind==='essay');
+assert.ok((await call('api/essay/'+essay.id)).explanation.includes('Nguồn'));
+assert.ok(bank.filter(q=>q.kind==='essay').every(q=>q.key_points.length>=2&&q.code&&q.explanation.includes('##')));
+await call('api/essay/'+essay.id,'POST',{draft:'Nội dung cá nhân',learned:true});
+assert.equal((await call('api/essay/'+essay.id,'GET',undefined,'other')).draft,'');
+await call('api/content-import?id=x','PUT',undefined,'',403);
+console.log('PASS: 346 imported questions, source-marked answers, seven multi-answer questions, batch saves, grading, retry, admin roundtrip, source authorization and private drafts.');
+
+// Practice feedback uses snapshot keys immediately, but an active exam never
+// exposes keys or explanations, even through non-compact save responses.
+const examStart=await call('api/attempt','POST',{...cfg,mode:'exam',minutes:10});
+const exam=await call('api/attempt/'+examStart.id);
+assert.ok(exam.items.every(q=>!('correct' in q)&&!('explanation' in q)));
+const examSaved=await call('api/attempt/'+examStart.id,'PATCH',{question:exam.items[0].id,option:exam.items[0].options[0].id});
+assert.ok(examSaved.items.every(q=>!('correct' in q)&&!('explanation' in q)));
+const examFinished=await call('api/attempt/'+examStart.id,'POST',{});
+assert.ok(examFinished.items.every(q=>q.correct && q.explanation));
+assert.deepEqual(attempt.items.find(q=>q.selectionCount===2).correct,keys.get(attempt.items.find(q=>q.selectionCount===2).id));
+console.log('PASS: instant practice feedback keys, correct multi-answer IDs, exam keys hidden until submission.');
+// Partial progress writes must never erase a long draft or another account's work.
+const longDraft='Bài tự luận đầy đủ. '.repeat(1500);
+await call('api/essay/'+essay.id,'POST',{draft:longDraft,status:'answered'});
+await call('api/essay/'+essay.id,'POST',{status:'review',viewed:true});
+let restoredEssay=await call('api/essay/'+essay.id);
+assert.equal(restoredEssay.draft,longDraft.trim());assert.equal(restoredEssay.status,'review');assert.ok(restoredEssay.answered_at&&restoredEssay.viewed_at);
+await call('api/essay/'+essay.id,'POST',{draft:'x'.repeat(500001)},'u',400);
+assert.equal((await call('api/essay/'+essay.id)).draft,longDraft.trim());
+assert.equal((await call('api/essay/'+essay.id,'GET',undefined,'other')).draft,'');
+const completeAnswer='## Nội dung đầy đủ\n'+('Giải thích có căn cứ. '.repeat(2000));
+await call('api/bank','POST',{...essay,explanation:completeAnswer,code:'QA-1',key_points:['Nêu khái niệm','Phân tích ví dụ']});
+restoredEssay=await call('api/essay/'+essay.id);assert.equal(restoredEssay.explanation,completeAnswer.trim());assert.equal(restoredEssay.key_points.length,2);
+await call('api/essay/'+essay.id,'POST',{assessment:[true,false]});assert.deepEqual((await call('api/essay/'+essay.id)).assessment,[true,false]);
+await call('api/essay/'+essay.id,'POST',{assessment:[true,false,true]},'u',400);
+// Global mistake review contains only unresolved mistakes and clears correct retries.
+const reviewStart=await call('api/attempt','POST',{...cfg,mode:'review',count:100});
+const review=await call('api/attempt/'+reviewStart.id);const wrongIds=(await call('api/mistakes?chapter='+cfg.chapter)).ids;
+assert.ok(review.items.length>0&&review.items.every(q=>wrongIds.includes(q.id)));
+await call('api/attempt/'+review.id,'PATCH',{changes:review.items.map(q=>({question:q.id,option:keys.get(q.id)}))});
+await call('api/attempt/'+review.id,'POST',{});assert.equal((await call('api/mistakes?chapter='+cfg.chapter)).ids.length,0);
+await call('api/attempt','POST',{...cfg,mode:'review'},'u',400);
+// Ordering and editing cannot cross subjects; nonempty chapters are protected.
+const originalChapters=state.chapters.filter(c=>c.subject==='distributed').map(c=>c.id);
+await call('api/chapters/order','PATCH',{subject:'distributed',ids:[...originalChapters].reverse()});
+assert.deepEqual((await call('api/state')).chapters.filter(c=>c.subject==='distributed').map(c=>c.id),[...originalChapters].reverse());
+await call('api/chapters/order','PATCH',{subject:'distributed',ids:['history-1',...originalChapters.slice(1)]},'u',400);
+await call('api/chapters/distributed-1','DELETE',undefined,'u',409);
+await call('api/chapters/distributed-1','PATCH',{title:'Chương QA',overview:'## Kiến thức\nÝ chính'});
+await call('api/subjects/distributed','PATCH',{title:'Phát triển ứng dụng phân tán',description:'Môn học về hệ thống phân tán',icon:'◇'});
+await call('api/subjects/distributed','DELETE',undefined,'u',409);
+await call('api/documents/'+source.documents[0].id,'PATCH',{title:'Tài liệu QA'});
+await call('api/backups','GET',undefined,'other',403);
+// A backup preserves every file body and restores original records without deleting new ones.
+for(const d of source.documents)files.set(d.storage_key,'original-file-'+d.id);
+const backup=await call('api/backups','POST',{});
+const manifest=await call('api/backups/'+backup.id);
+assert.equal(Object.keys(manifest.files).length,47);
+assert.equal(manifest.data.questions.length,346);
+await call('api/essay/'+essay.id,'POST',{draft:'bị thay đổi',status:'learning'});
+await call('api/chapters/distributed-1','PATCH',{title:'Đổi sau sao lưu',overview:''});
+await call('api/backups/'+backup.id+'/restore','POST',{});
+assert.equal((await call('api/essay/'+essay.id)).draft,longDraft.trim());
+assert.equal((await call('api/state')).chapters.find(c=>c.id==='distributed-1').title,'Chương QA');
+const restoredDoc=sqlite.prepare('SELECT storage_key FROM documents WHERE id=?').get(source.documents[0].id);
+assert.equal(files.get(restoredDoc.storage_key),'original-file-'+source.documents[0].id);
+assert.equal((await call('api/backups')).length,2);
+assert.equal((await call('api/state')).questions.length,346);
+console.log('PASS: long essays without truncation, partial autosave, checklist, account isolation, global mistake resolution, chapter protection/order, complete file backup and checkpointed restore.');
+const chapterAnswers=await call('api/essay-answers?chapter=distributed-1','GET',undefined,'other');
+assert.equal(chapterAnswers.length,36);
+assert.ok(chapterAnswers.every(q=>Array.isArray(q.key_points)&&Array.isArray(q.sources)));
+assert.equal(chapterAnswers.find(q=>q.id===essay.id).explanation,completeAnswer.trim());
+assert.ok(chapterAnswers.every(q=>q.explanation&&!('draft' in q)&&!('correct' in q)));
+assert.equal((await call('api/essay-answers?chapter=history-1')).length,0);
+await call('api/essay-answers?chapter=missing','GET',undefined,'u',404);
+await call('api/essay-answers?chapter=distributed-1','GET',undefined,'',401);
+console.log('PASS: chapter answer view only exposes that chapter’s essay model answers to signed-in learners.');
+// Study answer view keeps source option IDs, supports multiple correct answers,
+// stays within its chapter, and never changes attempts or scores.
+const attemptsBefore=sqlite.prepare('SELECT count(*) AS n FROM attempts').get().n;
+let answerTotal=0;
+for(const chapter of state.chapters){
+ const answers=await call('api/quiz-answers?chapter='+chapter.id,'GET',undefined,'other');
+ const expected=bank.filter(q=>q.kind==='quiz'&&q.chapter===chapter.id);
+ assert.equal(answers.length,expected.length);answerTotal+=answers.length;
+ for(const q of answers){const source=expected.find(x=>x.id===q.id);assert.deepEqual(q.correct,source.correct);assert.deepEqual(q.options,source.options);assert.ok(q.explanation);assert.equal(q.chapter,chapter.id);assert.ok(!('draft' in q));}
+}
+assert.equal(answerTotal,118);
+assert.equal(sqlite.prepare('SELECT count(*) AS n FROM attempts').get().n,attemptsBefore);
+await call('api/quiz-answers?chapter=missing','GET',undefined,'u',404);
+await call('api/quiz-answers?chapter=distributed-2','GET',undefined,'',401);
+console.log('PASS: all 118 quiz answer keys and option IDs match the bank, chapter scope, learner access and no progress mutations.');

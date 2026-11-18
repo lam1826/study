@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7fc">
+  <meta name="description" content="Ôn tập trắc nghiệm, luyện tự luận và đọc tài liệu theo từng môn học.">
+  <title>Ôn Tập Việt Quiz</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Đến nội dung</a>
+  <button id="menu-backdrop" aria-label="Đóng menu" tabindex="-1" hidden></button>
+  <aside id="sidebar" aria-label="Menu chính">
+    <div class="sidebar-top">
+      <a class="logo" href="#home">
+        <span class="brand" aria-hidden="true">V</span>
+        <span>Việt Quiz<small>KHÔNG GIAN ÔN TẬP</small></span>
+      </a>
+      <button class="icon mobile" id="close-menu" aria-label="Đóng menu">×</button>
+    </div>
+    <nav id="primary-nav" aria-label="Điều hướng chính"></nav>
+    <a class="profile" href="#account">
+      <span class="avatar" id="avatar" aria-hidden="true">V</span>
+      <span><strong id="profile">Hồ sơ cá nhân</strong><small>Tài khoản của bạn</small></span>
+      <span aria-hidden="true">›</span>
+    </a>
+  </aside>
+  <div class="layout">
+    <header class="topbar">
+      <div class="row">
+        <button class="icon mobile" id="menu" aria-label="Mở menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+        <span id="crumb">Tổng quan</span>
+      </div>
+      <div class="tools">
+        <details id="appearance">
+          <summary class="icon" aria-label="Điều chỉnh cỡ chữ">Aa</summary>
+          <div class="appearance-panel">
+            <span>Cỡ chữ</span>
+            <button class="icon" id="smaller" aria-label="Giảm cỡ chữ">A−</button>
+            <output id="font-size" aria-live="polite">16</output>
+            <button class="icon" id="larger" aria-label="Tăng cỡ chữ">A+</button>
+          </div>
+        </details>
+        <button class="icon" id="theme" aria-label="Bật chế độ tối" aria-pressed="false">◐</button>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <div class="loading" role="status"><span class="spinner" aria-hidden="true"></span>Đang tải không gian ôn tập…</div>
+    </main>
+  </div>
+  <nav id="mobile-nav" aria-label="Điều hướng điện thoại"></nav>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

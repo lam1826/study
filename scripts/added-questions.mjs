@@ -26,7 +26,8 @@ export async function loadAddedQuestions(dir = 'content/added') {
   const raw = [JSON.stringify(index)], questions = [];
   for (const file of files) {
     const text = await readFile(dir + '/' + file, 'utf8');
-    raw.push(file, text);
+    // Line endings do not change the revision (Windows and Linux checkouts agree).
+    raw.push(file, text.replace(/\r\n/g, '\n'));
     const chapter = file.replace(/\.json$/, '');
     for (const q of JSON.parse(text)) {
       const prompt = String(q.prompt).trim();

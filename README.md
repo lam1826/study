@@ -35,10 +35,19 @@ Bộ kiểm thử dùng Node.js 24 với SQLite tích hợp. Chi tiết đối c
 
 ## Xem đáp án từng câu hoặc cả chương
 
-Trong Tự luận, nút **Xem đáp án** mở nội dung của một câu, có **Câu trước / Câu tiếp**. Nút **Xem toàn bộ đáp án chương** mở tất cả câu và đáp án đầy đủ của chương trên một trang, phân nhóm chính/bổ sung, có mục lục chuyển tới từng câu và mở/thu gọn toàn bộ. Không giới hạn ở 20 câu của danh sách; không ảnh hưởng bài làm đã lưu. Không có chức năng giọng đọc.
+Trong Tự luận, nút **Xem đáp án** mở nội dung của một câu, có **Câu trước / Câu tiếp**. Nút **Xem toàn bộ đáp án chương** mở tất cả câu của chương trên một trang, phân nhóm chính/bổ sung: mỗi câu hiện đề và **Ý chính cần nhớ**; đáp án đầy đủ thu gọn, bấm **Xem đáp án đầy đủ** để mở (chỉ dựng khi mở), hoặc **Mở tất cả đáp án / Thu gọn tất cả**. Trên điện thoại có thanh Câu trước · chọn câu · Câu tiếp ở cuối màn hình. Không giới hạn ở 20 câu của danh sách; chỉ đọc, không đổi trạng thái học hay bài làm đã lưu. Không có chức năng giọng đọc.
 
 ### Xem đáp án trắc nghiệm
 Vào Trắc nghiệm → chọn môn/chương → Xem đáp án trắc nghiệm. Trang `#quizanswers/<chapter>` hỗ trợ xem từng câu hoặc cả chương, lọc nhóm chính/bổ sung, hiện/ẩn đáp án, đánh dấu đủ các phương án đúng và hiển thị giải thích/nguồn. Xem đáp án không ghi lượt làm hay thay đổi tiến độ; chế độ thi thử vẫn chỉ trả đáp án sau khi nộp bài.
+
+## Cải tiến chức năng và bố cục (vòng 4, 18/11/2026)
+
+- **Màu theo loại nội dung**, giống nhau ở mọi trang và luôn có nhãn chữ: Đáp án (xanh lá), Giải thích (xanh dương), Ví dụ (vàng), Lưu ý (cam), Nguồn (xám). Khối có nền dịu và viền 1 px; trang đáp án có dòng chú thích màu. Câu trong lời giải trắc nghiệm bắt đầu bằng "Lưu ý:" được tách thành khối Lưu ý (hàm thuần `noteParts`, có test chứng minh không mất chữ).
+- **Làm bài**: sau khi hiện đáp án, trang tự đưa dòng kết luận và "Vì sao" vào tầm nhìn; màn ≥ 1200 px chia hai cột (phương án bên trái, kết luận và giải thích bên phải). Phím tắt trên máy tính: 1–6 hoặc A–F chọn, Enter nút chính, ← → chuyển câu, M đánh dấu.
+- **Đáp án trắc nghiệm**: khi "Che đáp án", chạm một phương án để đoán trước; trang đếm "Tự kiểm tra: đúng x/y" và có nút **Luyện lại các câu đoán sai** (tạo lượt luyện tập chỉ gồm các câu đó; API `POST /api/attempt` nhận thêm trường tùy chọn `questionIds`). Màn ≥ 1100 px chia hai cột khi đã hiện đáp án.
+- **Danh sách tự luận**: dòng chương với Đổi chương, ô tìm kiếm, chip trạng thái có số câu; mỗi câu là một hàng gọn (Xem đáp án · Tự viết · Đánh dấu đã thuộc). **Tự viết** có bộ đếm chữ và ô **Xem ý chính** bên cạnh (mở ô này được tính là đã xem đáp án).
+- **Tài liệu** gom theo chương, mỗi tệp một hàng (tên · Tải xuống), bộ lọc môn/chương/sắp xếp nằm trong "Lọc và sắp xếp". **Thống kê**: một dòng tóm tắt (điểm dùng dấu phẩy thập phân), tiến độ dạng danh sách, mỗi câu hay sai có liên kết tới đáp án và "Ôn câu sai"; lịch sử ghi chế độ và điểm.
+- Mỗi màn hình chỉ một nút chính; Tự luận, Tài liệu, Thống kê có đường quay lại; trang đáp án bỏ khung lồng trong thẻ.
 
 ## Màn hình học (bản cải tiến 18/11/2026)
 

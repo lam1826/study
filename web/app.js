@@ -301,8 +301,16 @@ function quiz() {
     location.hash = 'attempt/' + result.id;
   });
 }
+// Readable name for a source document: titles imported from file names
+// ("Phát-triển-phân-tán-bài-1", "chapter08") get spaces and their file type.
+// The stored title is unchanged; the owner can rename it in Quản trị.
+function docLabel(doc) {
+  const kind = doc.mime === 'application/pdf' ? 'PDF' : doc.mime?.includes('wordprocessingml') ? 'Word' : doc.mime?.startsWith('image/') ? 'Ảnh' : 'Văn bản';
+  const name = String(doc.title || doc.filename || 'Tài liệu').replace(/\.(pdf|docx?|txt|md|png|jpe?g|webp)$/i, '').replace(/[_-]+/g, ' ').replace(/(\p{L})(\d)/gu, '$1 $2').replace(/\s+/g, ' ').trim();
+  return name.charAt(0).toLocaleUpperCase('vi') + name.slice(1) + ' · ' + kind;
+}
 function sourceLinks(ids) {
-  return ids.map(id=>state.documents.find(d=>d.id===id)).filter(Boolean).map(doc=>link('doc/'+doc.id,doc.title,'link')).join('');
+  return ids.map(id=>state.documents.find(d=>d.id===id)).filter(Boolean).map(doc=>link('doc/'+doc.id,docLabel(doc),'link')).join('');
 }
 async function attempt(id, generation) {
   const cached = attemptSessions.get(id);
@@ -681,7 +689,7 @@ function docs() {
   const update=()=>{
     const term=filter.search.toLocaleLowerCase('vi');
     const docs=state.documents.filter(q=>matches(q)&&[q.title,q.filename].some(s=>s.toLocaleLowerCase('vi').includes(term))).sort((a,b)=>(main.querySelector('[name=doc-sort]').value==='chapter'?chapterName(a.chapter).localeCompare(chapterName(b.chapter),'vi',{numeric:true}):0)||a.title.localeCompare(b.title,'vi',{numeric:true}));
-    main.querySelector('#doclist').innerHTML=docs.map(q=>`<article class="card listitem"><div><h3>${esc(q.title)}</h3><small>${esc(chapterName(q.chapter))} · ${esc(q.filename)}</small></div><div class="actions">${link('doc/'+q.id,'Xem tài liệu','link')}<a class="btn" href="/api/documents/${q.id}?download">Tải xuống</a></div></article>`).join('')||empty('Chưa có tài liệu phù hợp.');
+    main.querySelector('#doclist').innerHTML=docs.map(q=>`<article class="card listitem"><div><h3>${esc(docLabel(q))}</h3><small>${esc(chapterName(q.chapter))} · ${esc(q.filename)}</small></div><div class="actions">${link('doc/'+q.id,'Xem tài liệu','link')}<a class="btn" href="/api/documents/${q.id}?download">Tải xuống</a></div></article>`).join('')||empty('Chưa có tài liệu phù hợp.');
   };
   update();bindFilters();on('[name=doc-sort]','change',update);
   on('[name=search]','input',(_,el)=>{filter.search=el.value;update();});
@@ -745,7 +753,7 @@ async function doc(id,generation) {
     catch(error) {preview=empty(error.message+' Bạn có thể tải xuống để mở tệp.');}
   }
   if(generation!==viewGeneration) return;
-  main.innerHTML=`${title(d.title,chapterName(d.chapter))}<div class="actions"><a class="btn primary" href="${path}?download">Tải xuống</a>${link('docs','Về thư viện')}</div><div class="section">${preview||empty('Tải tệp DOCX xuống để đọc trong Word hoặc trình đọc tương thích.')}</div>`;
+  main.innerHTML=`${title(docLabel(d),chapterName(d.chapter))}<div class="actions"><a class="btn primary" href="${path}?download">Tải xuống</a>${link('docs','Về thư viện')}</div><div class="section">${preview||empty('Tải tệp DOCX xuống để đọc trong Word hoặc trình đọc tương thích.')}</div>`;
 }
 function stats() {
   const m=metrics();

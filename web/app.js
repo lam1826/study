@@ -8,7 +8,7 @@ const field = (label,control) => `<label>${label}${control}</label>`;
 const input = (name,value='',type='text',attrs='') => `<input name="${name}" type="${type}" value="${esc(value)}" ${attrs}>`;
 const select = (name,options) => `<select name="${name}">${options}</select>`;
 const area = (name,value='',attrs='') => `<textarea name="${name}" ${attrs}>${esc(value)}</textarea>`;
-const title = (heading,desc='') => `<div class="heading"><h1>${esc(heading)}</h1>${desc?`<p class="muted">${esc(desc)}</p>`:''}</div>`;
+const title = (heading,desc='',cls='') => `<div class="heading ${cls}"><h1>${esc(heading)}</h1>${desc?`<p class="muted">${esc(desc)}</p>`:''}</div>`;
 const empty = msg => `<div class="card empty">${esc(msg)}</div>`;
 const date = value => new Date(value).toLocaleString('vi-VN');
 const tierLabel = tier => tier==='main'?'Câu hỏi chính':'Câu hỏi bổ sung';
@@ -24,11 +24,6 @@ let learnedQuestions = new Set();
 let chapterLookup = new Map();
 let questionLookup = new Map();
 const attemptSessions = new Map();
-const answerIds = value => Array.isArray(value) ? value : value ? [value] : [];
-const answerMatches = (value, correct) => {
-  const a=answerIds(value), b=answerIds(correct);
-  return a.length>0 && a.length===b.length && a.every(id=>b.includes(id));
-};
 function sessionFor(attempt) {
   if(!attemptSessions.has(attempt.id)) attemptSessions.set(attempt.id,{attempt,pending:new Map(),saving:null,error:'',finishing:false,checked:new Set()});
   return attemptSessions.get(attempt.id);
@@ -53,6 +48,7 @@ async function loadState(force = false) {
   if(bootState) {
     const initial=bootState;bootState=null;
     if(initial.signedOut) throw Object.assign(new Error('Vui lòng đăng nhập ChatGPT để tiếp tục.'),{status:401});
+    if(initial.error) throw new Error(initial.error);
     return applyState(initial);
   }
   if (!force && state && Date.now() - stateLoadedAt < 120000) return state;
@@ -111,11 +107,17 @@ function controls(route) {
   const subjects=state.subjects;
   const subject=all?filter.subject:filter.subject||subjects[0]?.id;
   const chapters=state.chapters.filter(c=>!subject||c.subject===subject);
-  const chapter=all?filter.chapter:chapters.some(c=>c.id===filter.chapter)?filter.chapter:chapters[0]?.id;
+  // Quiz and essay pickers mark chapters that have nothing of that kind yet
+  // and default to the first chapter that does.
+  const kind={quiz:'quiz',essay:'essay'}[route];
+  const has=id=>!kind||state.questions.some(q=>q.chapter===id&&q.kind===kind);
+  const chapter=all?filter.chapter:chapters.some(c=>c.id===filter.chapter)?filter.chapter:(chapters.find(c=>has(c.id))||chapters[0])?.id;
+  const hasExtra=route==='quiz'&&state.questions.some(q=>q.chapter===chapter&&q.kind==='quiz'&&q.tier==='extra');
+  if(route==='quiz'&&!hasExtra)filter.tier='all';
   return {chapter,html:`<div class="filters content-filters">
     ${field('Môn học',select('subject',(all?opt('','Tất cả môn học',subject):'')+subjects.map(s=>opt(s.id,s.title,subject)).join('')))}
-    ${field('Chương',select('chapter',(all?opt('','Tất cả chương',chapter):'')+chapters.map(c=>opt(c.id,c.title,chapter)).join('')))}
-    ${route!=='quiz'?'':field('Nhóm câu hỏi',select('tier',opt('all','Cả hai nhóm',filter.tier)+opt('main','Câu hỏi chính',filter.tier)+opt('extra','Câu hỏi bổ sung',filter.tier)))}</div>`};
+    ${field('Chương',select('chapter',(all?opt('','Tất cả chương',chapter):'')+chapters.map(c=>opt(c.id,c.title+(has(c.id)?'':' — chưa có câu'),chapter)).join('')))}
+    ${hasExtra?field('Nhóm câu hỏi',select('tier',opt('all','Cả hai nhóm',filter.tier)+opt('main','Câu hỏi chính',filter.tier)+opt('extra','Câu hỏi bổ sung',filter.tier))):''}</div>`};
 }
 function bindFilters() {
   on('.content-filters select','change',(_,el)=>{
@@ -190,7 +192,25 @@ function subject(id) {
   const sub=state.subjects.find(s=>s.id===id);
   if(!sub) return main.innerHTML=empty('Không tìm thấy môn học.');
   const chapters=state.chapters.filter(c=>c.subject===id);
-  main.innerHTML=`${title(sub.title,'Chọn chương và hình thức ôn tập.')}<div class="list chapter-list">${chapters.map(c=>`<article class="card listitem"><div><h3>${esc(c.title)}</h3><small>Tiến độ ${coverage([c])}%</small></div><div class="actions">${link('chapter/'+c.id,'Tổng quan')}${['quiz','essay','docs'].map((t,i)=>link(t+'/'+c.id,['Trắc nghiệm','Tự luận','Tài liệu'][i])).join('')}</div></article>`).join('')||empty('Môn này chưa có chương.')}</div>`;
+  main.innerHTML=`${title(sub.title,'Chọn chương, rồi làm bài hoặc xem đáp án.')}<div class="list chapter-list">${chapters.map(c=>{
+    const n=chapterCounts(c.id), progress=coverage([c]);
+    return `<article class="card chapter-row"><div class="chapter-row-head"><h3><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a></h3>
+      <small>${[n.quiz&&n.quiz+' trắc nghiệm',n.essay&&n.essay+' tự luận',n.docs&&n.docs+' tài liệu'].filter(Boolean).join(' · ')||'Chưa có câu hỏi'}${n.quiz||n.essay?' · Tiến độ '+progress+'%':''}</small>
+      ${n.quiz||n.essay?bar(progress):''}</div>${chapterActions(c.id,n)}</article>`;
+  }).join('')||empty('Môn này chưa có chương.')}</div>`;
+}
+function chapterCounts(id) {
+  const questions=state.questions.filter(q=>q.chapter===id);
+  return {quiz:questions.filter(q=>q.kind==='quiz').length, essay:questions.filter(q=>q.kind==='essay').length, docs:state.documents.filter(d=>d.chapter===id).length};
+}
+// Only offer what the chapter actually has, most direct actions first.
+function chapterActions(id,n=chapterCounts(id)) {
+  const actions=[
+    n.quiz&&link('quiz/'+id,'Làm trắc nghiệm','primary'), n.quiz&&link('quizanswers/'+id,'Đáp án trắc nghiệm'),
+    n.essay&&link('essay/'+id,'Học tự luận',n.quiz?'':'primary'), n.essay&&link('essayanswers/'+id,'Đáp án tự luận'),
+    n.docs&&link('docs/'+id,'Tài liệu ('+n.docs+')','link')
+  ].filter(Boolean);
+  return `<div class="actions chapter-actions">${actions.join('')||'<small class="muted">Chương đang chờ bổ sung nội dung.</small>'}</div>`;
 }
 function quiz() {
   const selection = controls('quiz');
@@ -198,23 +218,28 @@ function quiz() {
     && (filter.tier === 'all' || question.tier === filter.tier) && (quizSettings.mode!=='review'||state.progress.unresolved.includes(question.id))).length;
   const selectedCount = Math.min(quizSettings.count, count);
   const isExam = quizSettings.mode === 'exam';
-  main.innerHTML = `${title('Trắc nghiệm', 'Chọn nội dung ôn tập và bắt đầu bài làm của bạn.')}
+  const chapterQuiz = state.questions.filter(question => question.chapter === selection.chapter && question.kind === 'quiz').length;
+  const modes = [['practice','Luyện tập','Biết đúng/sai và đọc giải thích ngay khi chọn.'],['review','Ôn câu sai','Chỉ các câu bạn vẫn còn làm sai trong chương.'],['exam','Thi thử','Đếm giờ; đáp án chỉ hiện sau khi nộp bài.']];
+  main.innerHTML = `${title('Trắc nghiệm', 'Chọn chương, rồi làm bài hoặc xem đáp án.')}
     <section class="card form-card">
-      <div class="form-section"><h2>Nội dung ôn tập</h2>${selection.html}<div class="actions section">${link('quizanswers/'+selection.chapter+'?tier='+filter.tier,'Xem đáp án trắc nghiệm','primary')}</div></div>
+      <div class="form-section">${selection.html}</div>
       <form id="start" class="form-section">
-        <h2>Cách làm bài</h2><p class="muted">Luyện tập: xem đúng/sai ngay khi chọn. Thi thử: xem đáp án sau khi nộp bài.</p>
+        <fieldset class="mode-choices"><legend>Cách làm bài</legend>
+          ${modes.map(([value,label,hint]) => `<label class="mode-choice"><input type="radio" name="mode" value="${value}" ${quizSettings.mode === value ? 'checked' : ''}><span><strong>${label}</strong><small>${hint}</small></span></label>`).join('')}
+          <p class="mode-hint">${modes.find(([value]) => value === quizSettings.mode)?.[2] || ''}</p>
+        </fieldset>
         <div class="filters">
-          ${field('Chế độ', select('mode', opt('practice', 'Luyện tập', quizSettings.mode) + opt('review','Ôn các câu còn sai',quizSettings.mode) + opt('exam', 'Thi thử có đếm giờ', quizSettings.mode)))}
           ${field('Số câu hỏi', input('count', selectedCount || '', 'number', `min="1" max="${Math.min(100, count) || 1}" inputmode="numeric" required ${count ? '' : 'disabled'}`))}
           <label id="time-field" ${isExam ? '' : 'hidden'}>Thời gian thi (phút)
             ${input('minutes', quizSettings.minutes, 'number', `min="1" max="180" inputmode="numeric" required ${isExam ? '' : 'disabled'}`)}
           </label>
         </div>
         <p class="muted">${count
-          ? count + ' câu phù hợp. Câu hỏi và phương án sẽ được xáo trộn trong mỗi lượt làm.'
+          ? count + ' câu phù hợp. Câu hỏi và phương án được xáo trộn mỗi lượt; đáp án đúng luôn đi cùng nội dung của nó.'
           : quizSettings.mode==='review'?'Bạn không còn câu sai cần ôn trong bộ lọc này.':'Chương này đang chờ bổ sung câu hỏi.'}</p>
         <div class="actions form-submit"><button class="primary" ${count ? '' : 'disabled'}>Bắt đầu làm bài →</button>
-          ${state.user.isAdmin ? link('admin', 'Quản trị câu hỏi') : link('docs/' + selection.chapter, 'Đọc tài liệu')}</div>
+          ${chapterQuiz ? link('quizanswers/'+selection.chapter+'?tier='+filter.tier,'Xem đáp án trắc nghiệm') : ''}
+          ${state.user.isAdmin ? link('admin', 'Quản trị câu hỏi', 'link') : link('docs/' + selection.chapter, 'Đọc tài liệu', 'link')}</div>
       </form>
     </section>`;
   bindFilters();
@@ -231,7 +256,8 @@ function quiz() {
       chapter:selection.chapter, tier:filter.tier, mode:data.get('mode'),
       count:Number(data.get('count')), minutes:Number(data.get('minutes') || quizSettings.minutes), previous
     });
-    stateLoadedAt = 0;
+    // The new attempt comes back with the response; opening it needs no extra request.
+    rememberAttempt(result);
     location.hash = 'attempt/' + result.id;
   });
 }
@@ -251,137 +277,212 @@ async function attempt(id, generation) {
   sessionFor(result);
   drawAttempt(result);
 }
+const attemptModes = {practice:'Luyện tập', review:'Ôn câu sai', exam:'Thi thử'};
+// Keep the new attempt locally (session + history) instead of reloading all state.
+function rememberAttempt(result) {
+  if (!result.attempt) { stateLoadedAt = 0; return; }
+  sessionFor(result.attempt);
+  if (!state.history.some(entry => entry.id === result.id)) state.history.unshift({id:result.id, chapter:result.attempt.chapter, created:result.attempt.created, finished:null, result:null});
+}
+function attemptItems(attempt) {
+  return wrongOnly ? attempt.items.filter(question => !answerMatches(attempt.answers[question.id],question.correct)) : attempt.items;
+}
+function attemptMounted(attempt) {
+  return main.querySelector('#attempt-view')?.dataset.attempt === attempt?.id;
+}
+// Options with their reveal state. Labels carry the meaning; colour only repeats it.
+function optionList(question, chosenValue, revealed, disabled) {
+  const chosen = answerIds(chosenValue);
+  return lettered(question).map(option => {
+    const picked = chosen.includes(option.id);
+    const state = revealed ? option.correct ? 'is-key' : picked ? 'is-wrong' : 'is-dim' : picked ? 'is-chosen' : '';
+    const status = revealed
+      ? option.correct ? '✓ Đáp án đúng' + (picked ? ' · Bạn chọn' : '') : picked ? '✕ Bạn chọn · Sai' : ''
+      : picked ? '● Đã chọn' : '';
+    return `<button type="button" class="option ${state}" aria-pressed="${picked}" data-option="${esc(option.id)}" ${disabled ? 'disabled' : ''}>
+      <span class="option-letter" aria-hidden="true">${option.letter}</span>
+      <span class="option-text">${esc(option.text)}${status ? `<span class="option-status">${status}</span>` : ''}</span>
+    </button>`;
+  }).join('');
+}
+// "Vì sao đúng" block shared by practice feedback, results and answer pages.
+function whyBlock(question) {
+  const keys = lettered(question).filter(option => option.correct);
+  const parts = explanationParts(question.explanation, keys.map(option => option.text));
+  const letters = joinLetters(keys.map(option => option.letter));
+  const paragraphs = parts.why ? parts.why.split(/\n\s*\n/).map(text => `<p>${esc(text.trim())}</p>`).join('') : '<p>Chưa có giải thích cho câu này.</p>';
+  return `<section class="why" aria-label="Giải thích đáp án">
+    <h3><span class="why-mark" aria-hidden="true">✓</span>Vì sao ${letters ? (keys.length > 1 ? 'các đáp án ' : 'đáp án ') + letters : 'đáp án này'} đúng?</h3>
+    ${paragraphs}
+    ${parts.source ? `<p class="why-source"><strong>Nguồn đối chiếu:</strong> ${esc(parts.source)}</p>` : ''}
+  </section>`;
+}
+function verdict(question, value, completed) {
+  const picked = chosenLetters(question, value), key = joinLetters(keyLetters(question));
+  if (!picked.length) return `<div class="verdict neutral" role="status"><strong>— Chưa trả lời</strong><span>Đáp án đúng: ${key}.</span></div>`;
+  return answerMatches(value, question.correct)
+    ? `<div class="verdict good" role="status"><strong>✓ Chính xác</strong><span>Bạn chọn ${joinLetters(picked)}${completed ? '' : ' — đúng đáp án'}.</span></div>`
+    : `<div class="verdict bad" role="status"><strong>✕ Chưa đúng</strong><span>Bạn chọn ${joinLetters(picked)}; đáp án đúng: ${key}.</span></div>`;
+}
 function drawAttempt(attempt) {
   clearInterval(tick);
   activeAttempt = attempt;
   const completed = !!attempt.finished;
-  const session=sessionFor(attempt);
-  const attemptSaving=!!session.saving || !!session.pending.size;
-  const attemptSaveError=session.error;
-  const submitting=session.finishing;
+  const result = attempt.result;
   document.body.classList.toggle('taking-quiz', !completed);
   document.body.classList.toggle('review-quiz', completed);
-  const items = wrongOnly ? attempt.items.filter(question => !answerMatches(attempt.answers[question.id],question.correct)) : attempt.items;
+  const items = attemptItems(attempt);
   if (attemptIndex >= items.length) attemptIndex = 0;
-  const question = items[attemptIndex];
-  const practice=attempt.config.mode!=='exam';
-  const selected=answerIds(attempt.answers[question?.id]);
-  const feedback=!!question && !completed && practice && (question.selectionCount>1 ? session.checked.has(question.id) : selected.length>0);
-  const revealed=completed || feedback;
-  const correctFeedback=feedback && answerMatches(attempt.answers[question.id],question.correct);
-  const answered = Object.values(attempt.answers).filter(a=>answerIds(a).length).length;
-  const result = attempt.result;
-  const header = completed
-    ? `${title('Kết quả bài làm', chapterName(attempt.chapter))}
+  const previousSheet = main.querySelector('#answer-sheet');
+  const sheetOpen = previousSheet ? previousSheet.open : matchMedia('(min-width: 681px)').matches;
+  const summary = completed ? `<section class="result-summary">
+      ${title('Kết quả bài làm', chapterName(attempt.chapter))}
       <div class="grid metrics">${metric('Điểm', result.score + '/10')}${metric('Đúng', result.correct)}${metric('Sai', result.wrong)}${metric('Chưa trả lời', result.unanswered)}${metric('Chính xác',Math.round(result.correct/result.total*100)+'%')}</div>
       <p class="muted">${result.total} câu · ${Math.floor(result.seconds / 60)} phút ${result.seconds % 60} giây</p>
       <div class="actions"><button id="retry" class="primary">Làm lại bài</button>
       <button id="retry-wrong" ${result.wrong + result.unanswered ? '' : 'disabled'}>Luyện lại câu chưa đúng</button>
-      <button id="wrong-only">${wrongOnly ? 'Xem toàn bài' : 'Chỉ xem câu chưa đúng'}</button>${link('chapter/'+attempt.chapter,'Về chương')}</div>`
-    : `${title(attempt.config.mode === 'exam' ? 'Thi thử' : 'Luyện tập trắc nghiệm', chapterName(attempt.chapter))}
-      <div class="quiz-status"><div><small>${answered}/${attempt.items.length} câu đã trả lời</small>${bar(Math.round(answered / attempt.items.length * 100))}</div>
-      ${attempt.deadline ? '<p class="timer" id="timer" aria-label="Thời gian còn lại"></p>' : '<span class="badge">Luyện tập</span>'}</div>`;
-  main.innerHTML = header + (question ? `
-    <div class="quizgrid section">
-      <section class="card question-card">
-        <div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
-          ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button class="icon" id="flag" aria-pressed="${attempt.flags.includes(question.id)}" ${submitting ? 'disabled' : ''}>${attempt.flags.includes(question.id) ? '⚑ Đã đánh dấu' : '⚑ Đánh dấu'}</button>`}
-        </div>
-        <h2 class="question-title" id="question-title" tabindex="-1">${esc(question.prompt)}</h2>
-        ${question.selectionCount>1?'<p class="muted multi-hint">Chọn '+question.selectionCount+' đáp án đúng. Chỉ tính đúng khi chọn đủ và không chọn thừa.</p>':''}
-        <div class="options" role="group" aria-labelledby="question-title">
-          ${question.options.map((option, index) => {
-            const chosen = answerIds(attempt.answers[question.id]).includes(option.id);
-            const correct = revealed && answerIds(question.correct).includes(option.id);
-            const style = correct ? 'correct' : chosen ? revealed ? 'wrong' : 'selected' : '';
-            const status = correct ? 'Đáp án đúng' + (chosen ? ' · Bạn đã chọn' : '') : revealed && chosen ? 'Bạn đã chọn · Sai' : '';
-            return `<button class="option ${style}" aria-pressed="${chosen}" data-option="${option.id}" ${completed || submitting ? 'disabled' : ''}>
-              <span class="option-letter">${'ABCDEF'[index]}</span>
-              <span class="option-text">${esc(option.text)}${status ? `<span class="option-result">${status}</span>` : ''}</span>
-            </button>`;
-          }).join('')}
-        </div>
-        ${!completed && practice && question.selectionCount>1 ? `<div class="actions practice-check"><button id="check-answer" ${selected.length!==question.selectionCount?'disabled':''}>Kiểm tra đáp án</button><small class="muted">Đã chọn ${selected.length}/${question.selectionCount}</small></div>` : ''}
-        ${feedback ? `<div class="answer-feedback ${correctFeedback?'correct':'wrong'}" role="status"><strong>${correctFeedback?'✓ Chính xác!':'✕ Chưa đúng'}</strong><span>${correctFeedback?'Bạn đã chọn đúng đáp án.':'Đáp án đúng được tô màu xanh bên trên.'}</span></div>` : ''}
-        ${revealed ? `<div class="explanation"><strong>Giải thích</strong><p class="content">${esc(question.explanation || 'Chưa có giải thích cho câu này.')}</p></div>` : ''}
-        ${!completed ? `<span class="save-status ${attemptSaveError ? 'notice' : ''}" role="status">${attemptSaveError || (attemptSaving ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : answered ? 'Đã lưu bài làm' : 'Chọn phương án để trả lời')}</span>${attemptSaveError?'<button id="retry-save" class="link">Thử lưu lại</button>':''}` : ''}
-        <div class="actions source-links">${sourceLinks(question.sources)}</div>
-        <div class="question-actions">
-          <button id="prev" ${attemptIndex === 0 || submitting ? 'disabled' : ''}>← Câu trước</button>
-          <button id="next" class="primary" ${attemptIndex === items.length - 1 || submitting ? 'disabled' : ''}>Câu tiếp →</button>
-        </div>
-      </section>
-      <section class="card attempt-side">
-        <details id="answer-sheet" ${matchMedia('(min-width: 681px)').matches ? 'open' : ''}>
+      <button id="wrong-only" aria-pressed="${wrongOnly}">${wrongOnly ? 'Xem toàn bài' : 'Chỉ xem câu chưa đúng'}</button>${link('chapter/'+attempt.chapter,'Về chương')}</div>
+    </section>` : '';
+  main.innerHTML = `<div id="attempt-view" data-attempt="${esc(attempt.id)}">${summary}
+    <div class="attempt-bar ${!completed && attempt.deadline ? 'has-timer' : ''}">
+      <div class="attempt-meta">${completed ? `<strong>${attemptModes[attempt.config.mode] || 'Bài làm'} · Xem lại</strong>` : `<h1 class="attempt-heading">${attemptModes[attempt.config.mode] || 'Bài làm'}</h1>`}<small class="attempt-chapter">${esc(chapterName(attempt.chapter))}</small><small id="attempt-count"></small></div>
+      <div class="attempt-progress" aria-hidden="true"><div class="bar"><i id="attempt-fill"></i></div></div>
+      ${!completed && attempt.deadline ? '<p class="timer" id="timer" role="timer" aria-label="Thời gian còn lại"></p>' : ''}
+      ${completed ? '' : '<button class="primary" id="finish" type="button">Nộp bài</button>'}
+    </div>
+    ${items.length ? `<div class="quizgrid">
+      <div class="question-column">
+      <section class="card question-card" id="question-card"></section>
+      <nav class="question-actions" aria-label="Chuyển câu">
+        <button type="button" id="prev" data-key-prev><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></button>
+        <span class="question-position" id="question-position" aria-live="polite"></span>
+        <button type="button" id="next" class="primary" data-key-next><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></button>
+      </nav>
+      </div>
+      <aside class="card attempt-side">
+        <details id="answer-sheet" ${sheetOpen ? 'open' : ''}>
           <summary>${completed ? 'Xem lại từng câu' : 'Danh sách câu hỏi'} · ${items.length}</summary>
-          <div class="tiles">${items.map((entry, index) => {
-            const chosen = answerIds(attempt.answers[entry.id]).length>0;
-            const checked=completed || (practice && chosen && (entry.selectionCount<=1 || session.checked.has(entry.id)));
-            const status = checked ? answerMatches(attempt.answers[entry.id],entry.correct) ? 'correct' : 'wrong' : chosen ? 'selected' : '';
-            return `<button data-index="${index}" class="${status} ${index === attemptIndex ? 'current' : ''} ${attempt.flags.includes(entry.id) ? 'flagged' : ''}"
-              aria-label="Câu ${index + 1}${chosen ? ', đã trả lời' : ', chưa trả lời'}${attempt.flags.includes(entry.id) ? ', đã đánh dấu' : ''}"
-              ${index === attemptIndex ? 'aria-current="step"' : ''} ${submitting ? 'disabled' : ''}>${index + 1}</button>`;
-          }).join('')}</div>
-          <div class="tile-legend"><span>Đã trả lời</span><span class="flag-legend">Đánh dấu</span></div>
+          <div class="tiles">${items.map((_, index) => `<button type="button" data-index="${index}">${index + 1}</button>`).join('')}</div>
+          <div class="tile-legend">${completed || attempt.config.mode !== 'exam' ? '<span class="legend-good">✓ Đúng</span><span class="legend-bad">✕ Sai</span>' : ''}<span class="legend-chosen">● Đã chọn</span><span class="legend-flag">⚑ Đánh dấu</span></div>
         </details>
-        ${completed ? '' : `<button class="primary" id="finish" ${submitting ? 'disabled' : ''}>Nộp bài</button>`}
-      </section>
-    </div>` : empty('Không có câu nào trong danh sách này.'));
-  function move(index) {
-    attemptIndex = index;
-    drawAttempt(activeAttempt);
-    document.querySelector('#question-title')?.focus({preventScroll:true});
-    if (matchMedia('(max-width: 680px)').matches) document.querySelector('.question-card')?.scrollIntoView({block:'start'});
-  }
-  on('[data-index]', 'click', (_, element) => move(Number(element.dataset.index)));
-  on('#prev', 'click', () => move(attemptIndex - 1));
-  on('#next', 'click', () => move(attemptIndex + 1));
-  on('[data-option]', 'click', (_, element) => {
-    const id=element.dataset.option, selected=answerIds(attempt.answers[question.id]);
-    const option=question.selectionCount>1 ? selected.includes(id)?selected.filter(value=>value!==id):[...selected,id] : id;
-    return saveAttempt({question:question.id,option},'PATCH');
-  });
-  on('#check-answer','click',()=>{session.checked.add(question.id);drawAttempt(attempt);});
-  on('#retry-save','click',()=>flushAttempt(session));
-  on('#flag', 'click', () => saveAttempt({question:question.id, flag:!attempt.flags.includes(question.id)}, 'PATCH'));
-  on('#finish', 'click', () => {
-    const remaining = attempt.items.length - answered;
-    const message = remaining ? `Bạn còn ${remaining} câu chưa trả lời. Nộp bài để xem kết quả?` : 'Nộp bài và xem kết quả?';
-    if (confirm(message)) return saveAttempt({}, 'POST');
-  });
-  on('#wrong-only', 'click', () => { wrongOnly = !wrongOnly; move(0); });
-  async function retry(wrong, element) {
-    element.disabled = true;
+      </aside>
+    </div>` : empty('Không có câu nào trong danh sách này.')}
+  </div>`;
+  const view = main.querySelector('#attempt-view');
+  // One delegated listener per drawn attempt; switching questions only
+  // replaces the question card and updates the tiles in place.
+  view.addEventListener('click', async event => {
+    const target = event.target.closest('button');
+    if (!target || target.disabled || !view.contains(target)) return;
+    const session = sessionFor(activeAttempt);
+    const current = attemptItems(activeAttempt)[attemptIndex];
     try {
-      const result = await api('attempt', {...attempt.config, previous:attempt.id, ...(wrong ? {ids:[], mode:'practice', count:attempt.items.length} : {})});
-      stateLoadedAt = 0;
-      location.hash = 'attempt/' + result.id;
-    } finally { element.disabled = false; }
-  }
-  on('#retry', 'click', (_, element) => retry(false, element));
-  on('#retry-wrong', 'click', (_, element) => retry(true, element));
+      if (target.dataset.index !== undefined) moveAttempt(Number(target.dataset.index));
+      else if (target.id === 'prev') moveAttempt(attemptIndex - 1);
+      else if (target.id === 'next') moveAttempt(attemptIndex + 1);
+      else if (target.dataset.option !== undefined) {
+        const id = target.dataset.option, selected = answerIds(activeAttempt.answers[current.id]);
+        const option = current.selectionCount > 1 ? selected.includes(id) ? selected.filter(value => value !== id) : [...selected, id] : id;
+        await saveAttempt({question:current.id, option}, 'PATCH');
+      }
+      else if (target.id === 'check-answer') { session.checked.add(current.id); renderQuestion(); main.querySelector('.verdict')?.scrollIntoView({block:'nearest'}); }
+      else if (target.id === 'retry-save') await flushAttempt(session);
+      else if (target.id === 'flag') await saveAttempt({question:current.id, flag:!activeAttempt.flags.includes(current.id)}, 'PATCH');
+      else if (target.id === 'finish') {
+        const remaining = activeAttempt.items.length - Object.values(activeAttempt.answers).filter(value => answerIds(value).length).length;
+        if (confirm(remaining ? `Bạn còn ${remaining} câu chưa trả lời. Nộp bài để xem kết quả?` : 'Nộp bài và xem kết quả?')) await saveAttempt({}, 'POST');
+      }
+      else if (target.id === 'wrong-only') { wrongOnly = !wrongOnly; attemptIndex = 0; drawAttempt(activeAttempt); }
+      else if (target.id === 'retry' || target.id === 'retry-wrong') await retryAttempt(target.id === 'retry-wrong', target);
+    } catch (error) { toast(error.message); }
+  });
+  renderQuestion();
   if (!completed && attempt.deadline) {
     const update = () => {
       const seconds = Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000));
       const timer = main.querySelector('#timer');
       if (timer) {
-        timer.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+        timer.textContent = '⏱ ' + Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
         timer.classList.toggle('urgent', seconds <= 60);
       }
-      if (!seconds && !submitting && !attemptSaveError) {
+      const session = sessionFor(attempt);
+      if (!seconds && !session.finishing && !session.error) {
         clearInterval(tick);
         saveAttempt({}, 'POST').catch(() => {});
       }
     };
     tick = setInterval(update, 1000);
-    // Defer expiry submission until controls are rendered.
+    // Show the time at once; expiry is submitted by the interval after the controls exist.
     const seconds = Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000));
     const timer = main.querySelector('#timer');
-    if (timer) timer.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+    if (timer) timer.textContent = '⏱ ' + Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
   }
 }
+function renderQuestion() {
+  const attempt = activeAttempt;
+  if (!attemptMounted(attempt)) return;
+  const session = sessionFor(attempt);
+  const completed = !!attempt.finished, submitting = session.finishing, practice = attempt.config.mode !== 'exam';
+  const items = attemptItems(attempt);
+  const question = items[attemptIndex];
+  const answered = Object.values(attempt.answers).filter(value => answerIds(value).length).length;
+  main.querySelector('#attempt-count').textContent = answered + '/' + attempt.items.length + ' câu đã trả lời';
+  main.querySelector('#attempt-fill').style.width = Math.round(answered / attempt.items.length * 100) + '%';
+  const finish = main.querySelector('#finish');
+  if (finish) finish.disabled = submitting;
+  if (!question) return;
+  const selected = answerIds(attempt.answers[question.id]);
+  const feedback = !completed && practice && (question.selectionCount > 1 ? session.checked.has(question.id) : selected.length > 0);
+  const revealed = completed || feedback;
+  const flagged = attempt.flags.includes(question.id);
+  const saveText = session.error || (session.saving || session.pending.size ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : answered ? 'Đã lưu bài làm' : 'Chọn phương án để trả lời');
+  main.querySelector('#question-card').innerHTML = `
+    <div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
+      ${question.selectionCount > 1 ? `<span class="badge multi-badge">Chọn ${question.selectionCount} đáp án</span>` : ''}
+      ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button type="button" class="icon flag-button" id="flag" aria-pressed="${flagged}" ${submitting ? 'disabled' : ''}>${flagged ? '⚑ Đã đánh dấu' : '⚐ Đánh dấu'}</button>`}
+    </div>
+    <h2 class="question-title" id="question-title" tabindex="-1">${esc(question.prompt)}</h2>
+    ${question.selectionCount > 1 && !revealed ? `<p class="multi-hint">Câu này có ${question.selectionCount} đáp án đúng. Chỉ tính đúng khi chọn đủ và không chọn thừa.</p>` : ''}
+    <div class="options" role="group" aria-labelledby="question-title">${optionList(question, attempt.answers[question.id], revealed, completed || submitting)}</div>
+    ${!completed && practice && question.selectionCount > 1 && !feedback ? `<div class="actions practice-check"><button type="button" id="check-answer" class="primary" ${selected.length !== question.selectionCount ? 'disabled' : ''}>Kiểm tra đáp án</button><small class="muted">Đã chọn ${selected.length}/${question.selectionCount}</small></div>` : ''}
+    ${revealed ? verdict(question, attempt.answers[question.id], completed) + whyBlock(question) : ''}
+    ${!completed ? `<span class="save-status ${session.error ? 'notice' : ''}" role="status">${esc(saveText)}</span>${session.error ? '<button type="button" id="retry-save" class="link">Thử lưu lại</button>' : ''}` : ''}
+    ${question.sources?.length ? `<div class="actions source-links">${sourceLinks(question.sources)}</div>` : ''}`;
+  main.querySelectorAll('.tiles [data-index]').forEach(button => {
+    const index = Number(button.dataset.index), entry = items[index];
+    const chosen = answerIds(attempt.answers[entry.id]).length > 0;
+    const checked = completed || (practice && chosen && (entry.selectionCount <= 1 || session.checked.has(entry.id)));
+    const status = checked ? answerMatches(attempt.answers[entry.id], entry.correct) ? 'correct' : 'wrong' : chosen ? 'selected' : '';
+    const flaggedEntry = attempt.flags.includes(entry.id);
+    button.className = [status, index === attemptIndex ? 'current' : '', flaggedEntry ? 'flagged' : ''].filter(Boolean).join(' ');
+    button.setAttribute('aria-label', 'Câu ' + (index + 1) + ({correct:', đúng', wrong:', sai', selected:', đã trả lời'}[status] || ', chưa trả lời') + (flaggedEntry ? ', đã đánh dấu' : ''));
+    if (index === attemptIndex) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current');
+    button.disabled = submitting;
+  });
+  main.querySelector('#question-position').textContent = (attemptIndex + 1) + '/' + items.length;
+  main.querySelector('#prev').disabled = attemptIndex === 0 || submitting;
+  main.querySelector('#next').disabled = attemptIndex === items.length - 1 || submitting;
+}
+function moveAttempt(index) {
+  const items = attemptItems(activeAttempt);
+  if (index < 0 || index >= items.length) return;
+  attemptIndex = index;
+  renderQuestion();
+  const card = main.querySelector('#question-card');
+  document.querySelector('#question-title')?.focus({preventScroll:true});
+  if (card && (matchMedia('(max-width: 680px)').matches || card.getBoundingClientRect().top < 0)) card.scrollIntoView({block:'start'});
+}
+async function retryAttempt(wrong, element) {
+  element.disabled = true;
+  try {
+    const config = activeAttempt.config;
+    const result = await api('attempt', {...config, previous:activeAttempt.id, ...(wrong ? {ids:[], mode:'practice', count:activeAttempt.items.length} : {})});
+    rememberAttempt(result);
+    location.hash = 'attempt/' + result.id;
+  } finally { element.disabled = false; }
+}
 function updateSaveStatus(session) {
-  if(location.hash!=='#attempt/'+session.attempt.id) return;
+  if(!attemptMounted(session.attempt) || location.hash!=='#attempt/'+session.attempt.id) return;
   const label=main.querySelector('.save-status');
   if(label) {
     label.textContent=session.error || (session.saving || session.pending.size ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : 'Đã lưu bài làm');
@@ -406,7 +507,7 @@ async function flushAttempt(session) {
       } catch(error) {
         for(const change of changes) session.pending.set(change.question,{...change,...session.pending.get(change.question)});
         session.error='Chưa lưu được. Bài làm vẫn ở đây; hãy thử lưu lại.';
-        if(location.hash==='#attempt/'+session.attempt.id) drawAttempt(session.attempt);
+        if(location.hash==='#attempt/'+session.attempt.id) renderQuestion();
         toast(error.message);
         throw error;
       }
@@ -426,24 +527,22 @@ async function saveAttempt(data, method) {
     if(typeof data.flag==='boolean') session.attempt.flags=data.flag?[...new Set([...session.attempt.flags,data.question])]:session.attempt.flags.filter(id=>id!==data.question);
     session.pending.set(data.question,{...session.pending.get(data.question),...data});
     session.error='';
-    const sheetOpen=main.querySelector('#answer-sheet')?.open;
-    drawAttempt(session.attempt);
-    const sheet=main.querySelector('#answer-sheet');
-    if(sheet) sheet.open=sheetOpen;
+    renderQuestion();
     if(data.option!==undefined) {
       const focused=Array.isArray(data.option)?data.option.at(-1):data.option;
-      if(focused) main.querySelector('[data-option="'+focused+'"]')?.focus({preventScroll:true});
-    }
+      if(focused) main.querySelector('[data-option="'+CSS.escape(focused)+'"]')?.focus({preventScroll:true});
+    } else main.querySelector('#flag')?.focus({preventScroll:true});
     clearTimeout(session.timer);
     session.timer=setTimeout(()=>flushAttempt(session).catch(()=>{}),120);
     return;
   }
   session.finishing=true;
-  drawAttempt(session.attempt);
+  renderQuestion();
   try {
     await flushAttempt(session);
     const saved=session.attempt.finished?session.attempt:await api('attempt/'+session.attempt.id,{},'POST');
     session.attempt=saved;
+    session.finishing=false;
     stateLoadedAt=0;
     loadState(true).catch(()=>{});
     if(location.hash==='#attempt/'+saved.id) {
@@ -453,10 +552,13 @@ async function saveAttempt(data, method) {
       window.scrollTo(0,0);
     }
   } finally {
-    session.finishing=false;
-    if(location.hash==='#attempt/'+session.attempt.id) drawAttempt(session.attempt);
+    if(session.finishing) {
+      session.finishing=false;
+      if(location.hash==='#attempt/'+session.attempt.id) renderQuestion();
+    }
   }
 }
+
 
 function docs() {
   const c=controls('docs');
@@ -723,7 +825,7 @@ async function render() {
   const route = current || 'home';
   const group = parents[route] || route;
   document.body.classList.toggle('taking-quiz', route === 'attempt' && activeAttempt?.id === id && !activeAttempt.finished);
-  document.body.classList.remove('review-quiz');
+  document.body.classList.remove('review-quiz', 'focus-study');
   renderNavigation(group);
   if (previousHash !== location.hash) {
     if (['quiz','essay','docs'].includes(previousGroup)) filterMemory[previousGroup] = {...filter};
@@ -762,6 +864,7 @@ async function render() {
   }
 }
 async function refresh() {
+  clearStudyCaches();
   await loadState(true);
   await render();
 }
@@ -812,6 +915,12 @@ document.addEventListener('click', event => {
   if (!event.target.closest('#appearance')) document.querySelector('#appearance').open = false;
 });
 window.addEventListener('keydown', event => {
+  // ← / → move between questions when focus is not in a form field.
+  if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey
+    && !event.target.closest?.('input, textarea, select, [contenteditable="true"]') && !document.body.classList.contains('open')) {
+    const control = main.querySelector(event.key === 'ArrowLeft' ? '[data-key-prev]' : '[data-key-next]');
+    if (control && !control.disabled && !control.hasAttribute('aria-disabled')) { event.preventDefault(); control.click(); }
+  }
   if (event.key === 'Escape') {
     setMenu(false);
     document.querySelector('#appearance').open = false;
@@ -850,7 +959,9 @@ window.addEventListener('beforeunload', event => {
     event.returnValue = '';
   }
 });
-refresh().catch(error => {
+// First render: nothing cached yet, and study.js declarations finish loading
+// before the awaited state resolves.
+loadState(true).then(render).catch(error => {
   if (error.status === 401) {
     document.body.classList.add('signed-out');
     document.querySelector('#crumb').textContent = 'Ôn Tập Việt Quiz';

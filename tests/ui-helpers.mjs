@@ -1,0 +1,88 @@
+// Checks the pure display helpers in web/answer-key.js against the real course
+// content: answer letters after shuffling, explanation splitting, and essay
+// sections that must not lose any text.
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+
+// Values from the vm context have another realm's Array prototype; compare as JSON.
+const same = (actual, expected, message) => assert.deepEqual(JSON.parse(JSON.stringify(actual)), JSON.parse(JSON.stringify(expected)), message);
+const helpers = {};
+vm.createContext(helpers);
+vm.runInContext(readFileSync('web/answer-key.js', 'utf8'), helpers);
+const {answerIds, answerMatches, lettered, keyLetters, chosenLetters, joinLetters, explanationParts, answerSections} = helpers;
+const course = JSON.parse(readFileSync('content/course.json', 'utf8'));
+const explanations = JSON.parse(readFileSync('content/explanations.json', 'utf8'));
+const guides = JSON.parse(readFileSync('content/essay-guides.json', 'utf8'));
+const quiz = course.questions.filter(q => q.kind === 'quiz');
+const essays = course.questions.filter(q => q.kind === 'essay');
+const keyTexts = q => answerIds(q.correct).map(id => q.options.find(o => o.id === id).text).sort();
+const shuffle = items => {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; }
+  return result;
+};
+
+// 1. Letters follow the shown order; the key travels with its option text.
+assert.equal(quiz.length, 118);
+assert.equal(quiz.filter(q => Array.isArray(q.correct)).length, 7);
+for (let round = 0; round < 200; round++) {
+  for (const q of quiz) {
+    const shown = {...q, options:shuffle(q.options)};
+    const options = lettered(shown);
+    same(options.map(o => o.letter), 'ABCDEF'.slice(0, q.options.length).split(''));
+    same(options.filter(o => o.correct).map(o => o.text).sort(), keyTexts(q), q.id);
+    const letters = keyLetters(shown);
+    assert.equal(letters.length, answerIds(q.correct).length);
+    for (const letter of letters) assert.ok(keyTexts(q).includes(shown.options['ABCDEF'.indexOf(letter)].text));
+  }
+}
+const multi = quiz.find(q => Array.isArray(q.correct));
+assert.ok(answerMatches([...multi.correct].reverse(), multi.correct), 'order of a multi-answer selection does not matter');
+assert.ok(!answerMatches([multi.correct[0]], multi.correct), 'one of two answers is not correct');
+assert.ok(!answerMatches([...multi.correct, multi.options.find(o => !multi.correct.includes(o.id)).id], multi.correct), 'an extra option is not correct');
+assert.ok(!answerMatches([], multi.correct));
+same(chosenLetters({options:multi.options, correct:multi.correct}, [multi.options[3].id, multi.options[0].id]), ['A', 'D']);
+assert.equal(joinLetters(['A']), 'A');
+assert.equal(joinLetters(['A', 'D']), 'A và D');
+assert.equal(joinLetters(['A', 'B', 'D']), 'A, B và D');
+console.log('PASS: answer letters and keys stay with their option text across 200 shuffles of all 118 questions (7 multi-answer).');
+
+// 2. Explanations: reasoning and source split, nothing else dropped.
+let restated = 0;
+for (const q of quiz) {
+  const text = explanations[q.id];
+  const parts = explanationParts(text, keyTexts(q));
+  assert.ok(parts.why.length > 80, q.id);
+  assert.ok(parts.source.length > 5, 'every reviewed explanation keeps its source: ' + q.id);
+  if (/^Đáp án đúng:/m.test(text)) { restated++; assert.ok(!parts.why.includes('Đáp án đúng:'), q.id); }
+  // Every word of the original survives, except the restated key line and labels.
+  const original = text.replace(/^Đáp án đúng:.*$/m, '').replace(/Vì sao đúng:|Nguồn đối chiếu:/g, '');
+  const kept = (parts.why + ' ' + parts.source).replace(/\s+/g, ' ').trim();
+  assert.equal(kept.replace(/\s/g, ''), original.replace(/\s/g, ''), 'explanation text preserved: ' + q.id);
+}
+assert.equal(restated, 30);
+// A key line that disagrees with the stored key stays visible.
+const odd = explanationParts('Đáp án đúng: Một nội dung khác.\n\nVì sao đúng: Lý do.\n\nNguồn đối chiếu: Bài 1.pdf, tr. 2.', ['Nội dung đúng']);
+assert.ok(odd.why.startsWith('Đáp án đúng: Một nội dung khác.'));
+assert.equal(odd.source, 'Bài 1.pdf, tr. 2.');
+// Legacy explanations ("Nguồn:") still split.
+assert.equal(explanationParts('• A\n\nNguồn: Bài-1.docx, câu 1.').source, 'Bài-1.docx, câu 1.');
+console.log('PASS: 118 explanations split into reasoning + source without losing text; a mismatching key line is never hidden.');
+
+// 3. Essay answers: answer first, every line kept, sources recognised.
+for (const q of essays) {
+  const text = guides[q.id].explanation;
+  const sections = answerSections(text);
+  same(sections.map(s => s.kind), ['main', 'explain', 'example', 'source'], q.id);
+  // Bodies together equal the original minus headings and the source label.
+  const bodies = sections.map(s => s.body).join('').replace(/\s/g, '');
+  const original = text.replace(/^#{1,4}\s+.*$/gm, '').replace(/^\s*\*\*Nguồn(?: đối chiếu)?:?\*\*:?/m, '').replace(/\s/g, '');
+  assert.equal(bodies, original, q.id);
+  assert.ok(/^Trả lời/.test(sections[0].title), q.id);
+  assert.ok(guides[q.id].key_points.length >= 2);
+}
+// Content without headings stays one "main" section; code fences are not split.
+same(answerSections('Chỉ một đoạn.').map(s => s.kind), ['main']);
+assert.equal(answerSections('### Trả lời\n```\n### không phải tiêu đề\n```').length, 1);
+console.log('PASS: 228 essay answers keep every line and show answer → explanation → example → source.');

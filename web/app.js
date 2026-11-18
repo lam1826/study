@@ -152,7 +152,6 @@ function coverage(chapters) {
     ? Math.round(questions.filter(question => learnedQuestions.has(question.id)).length / questions.length * 100)
     : 0;
 }
-const metric = (name, value, detail = '') => `<article class="card metric"><small>${name}</small><strong>${value}</strong>${detail ? `<small class="metric-detail">${detail}</small>` : ''}</article>`;
 // Scores use the Vietnamese decimal comma (7,5/10).
 const scoreText = value => String(value).replace('.', ',');
 const shortDate = value => { const d = new Date(value), two = n => String(n).padStart(2, '0'); return two(d.getHours()) + ':' + two(d.getMinutes()) + ' ' + two(d.getDate()) + '/' + two(d.getMonth() + 1); };
@@ -173,8 +172,14 @@ function subjectCards() {
       <span class="row-end">Mở<span aria-hidden="true"> →</span></span></a>`;
   }).join('')}</div>`;
 }
+// One row per attempt: mode and score first, then chapter, answers and time.
 function historyList(entries) {
-  return entries.length?`<div class="list">${entries.map(a=>`<article class="card listitem"><div><h3>${esc(chapterName(a.chapter))}</h3><small>${shortDate(a.created)} · ${a.result?`${scoreText(a.result.score)}/10 · ${a.result.correct}/${a.result.total} câu đúng`:'Đang làm'}</small></div>${link('attempt/'+a.id,a.result?'Xem kết quả':'Tiếp tục','link')}</article>`).join('')}</div>`:empty('Các bài làm sẽ xuất hiện ở đây.');
+  return entries.length?`<div class="panel">${entries.map(a=>{
+    const mode=esc(attemptModes[a.mode]||'Bài làm');
+    const head=a.result?`${mode} · ${scoreText(a.result.score)}/10`:`${mode} · đang làm`;
+    const detail=a.result?`${a.result.correct}/${a.result.total} câu đúng`:a.total?`${a.answered||0}/${a.total} câu đã trả lời`:'';
+    return taskRow('attempt/'+a.id,head,[esc(chapterName(a.chapter)),detail,shortDate(a.created)].filter(Boolean).join(' · '),a.result?'Xem kết quả':'Làm tiếp');
+  }).join('')}</div>`:empty('Các bài làm sẽ xuất hiện ở đây.');
 }
 // Home leads with what to review now: unfinished attempts, unresolved quiz
 // mistakes and essays marked for review, each one tap from the work itself.
@@ -439,6 +444,7 @@ function drawAttempt(attempt) {
         <span class="question-position" id="question-position" aria-live="polite"></span>
         <button type="button" id="next" class="primary" data-key-next><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></button>
       </nav>
+      <p class="kbd-hint">Phím tắt: <kbd>1</kbd>–<kbd>4</kbd> hoặc <kbd>A</kbd>–<kbd>D</kbd> chọn · <kbd>Enter</kbd> nút chính · <kbd>←</kbd> <kbd>→</kbd> chuyển câu · <kbd>M</kbd> đánh dấu</p>
       </div>
       <aside class="card attempt-side">
         <details id="answer-sheet" ${sheetOpen ? 'open' : ''}>
@@ -579,7 +585,15 @@ function revealChecked(question) {
   if (answerIds(activeAttempt.answers[question.id]).length !== question.selectionCount) return;
   session.checked.add(question.id);
   renderQuestion();
-  main.querySelector('.verdict')?.scrollIntoView({block:'nearest'});
+  showVerdict();
+}
+// After an answer is shown, bring the verdict and the start of "Vì sao" into
+// view (on phones it otherwise sits under the bottom bar). Wide screens show
+// them beside the options, so they only scroll when still out of view.
+function showVerdict() {
+  const box = main.querySelector('#question-card .verdict');
+  if (!box) return;
+  box.scrollIntoView({block:matchMedia('(min-width: 1200px)').matches ? 'nearest' : 'start'});
 }
 // In-page submit sheet: what is unanswered or flagged, with jumps back to it.
 function openSubmitSheet() {
@@ -674,7 +688,7 @@ async function saveAttempt(data, method) {
     renderQuestion();
     if(revealNow) {
       // The answer and "why" appear below the options: bring the verdict into view.
-      main.querySelector('.verdict')?.scrollIntoView({block:'nearest'});
+      showVerdict();
       main.querySelector('#next')?.focus({preventScroll:true});
     } else if(data.option!==undefined) {
       const focused=Array.isArray(data.option)?data.option.at(-1):data.option;
@@ -784,10 +798,18 @@ function stats() {
   const m=metrics();
   const misses = new Map(Object.entries(state.progress.mistakes));
   const frequent=[...misses].filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
-  main.innerHTML=`${title('Thống kê học tập')}<div class="grid metrics">${metric('Bài đã làm',m.h.length)}${metric('Câu đã trả lời',m.answered)}${metric('Tổng câu đúng',m.correct)}${metric('Tổng câu sai',m.wrong)}${metric('Tỷ lệ chính xác',m.accuracy+'%')}${metric('Điểm trung bình',m.average+'/10')}${metric('Câu sai từ 2 lần',frequent.length)}</div>
-  <div class="split"><section class="card"><h2>Tiến độ theo môn và chương</h2>${state.subjects.map(s=>{const chapters=state.chapters.filter(c=>c.subject===s.id), n=coverage(chapters);return `<details class="section"><summary>${esc(s.title)} · ${n}%</summary>${bar(n)}${chapters.map(c=>`<small>${esc(c.title)} · ${coverage([c])}%</small>${bar(coverage([c]))}`).join('')}</details>`;}).join('')}</section><section class="card"><h2>Câu thường trả lời sai</h2>${frequent.length?`<ol>${frequent.map(([id,n])=>`<li>${esc(questionLookup.get(id)?.prompt||'Câu hỏi đã xóa')} · ${n} lần</li>`).join('')}</ol>`:'<p class="muted">Chưa có câu nào sai từ hai lần.</p>'}</section></div>
+  // One summary line instead of number tiles; each frequent mistake opens its
+  // answer and the chapter's "Ôn câu sai" practice.
+  const summary=m.h.length?`${m.h.length} bài đã nộp · ${m.answered} câu đã trả lời · đúng ${m.accuracy}% (${m.correct}/${m.answered} câu) · điểm trung bình ${scoreText(m.average)}/10`:'Chưa nộp bài nào.';
+  const mistakeRow=([id,n])=>{const q=questionLookup.get(id);
+    return q?`<div class="list-row"><a class="row-link is-clamped" href="#quizanswers/${esc(q.chapter)}?q=${esc(q.id)}"><strong>${esc(q.prompt)}</strong><small>Sai ${n} lần · ${esc(chapterName(q.chapter))}</small></a><a class="row-side" href="#quiz/${esc(q.chapter)}?mode=review">Ôn câu sai</a></div>`
+      :`<div class="list-row"><span class="row-link"><strong>Câu hỏi đã xóa</strong><small>Sai ${n} lần</small></span></div>`;};
+  const progress=state.subjects.map(s=>{const chapters=state.chapters.filter(c=>c.subject===s.id), n=coverage(chapters);
+    return `<details class="progress-group"><summary><span>${esc(s.title)}</span><span class="progress-value">${bar(n)}<small>${n}%</small></span></summary><ul class="progress-list">${chapters.map(c=>{const v=coverage([c]);return `<li><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a><span class="progress-value">${bar(v)}<small>${v}%</small></span></li>`;}).join('')}</ul></details>`;}).join('');
+  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('home','← Tổng quan','link')}</nav>${title('Thống kê học tập','','compact-heading')}<p class="stats-summary">${summary}${frequent.length?` · ${frequent.length} câu sai từ 2 lần`:''}</p>
+  <div class="split stats-split"><section><h2>Tiến độ theo môn và chương</h2><div class="panel progress-panel">${progress}</div></section><section><h2>Câu thường trả lời sai</h2>${frequent.length?`<div class="panel">${frequent.map(mistakeRow).join('')}</div>`:'<p class="muted">Chưa có câu nào sai từ hai lần.</p>'}</section></div>
+  ${studyStats()}
   <section class="section"><h2>Lịch sử học tập</h2>${historyList(state.history.slice(0,historyLimit))}${state.history.length>historyLimit?'<div class="pager"><button id="more-history">Xem thêm bài làm</button></div>':''}</section>`;
-  main.insertAdjacentHTML('beforeend',studyStats());
   on('#more-history','click',()=>{historyLimit+=20;stats();});
 }
 function account() {
@@ -1107,6 +1129,25 @@ window.addEventListener('keydown', event => {
     && !event.target.closest?.('input, textarea, select, [contenteditable="true"]') && !document.body.classList.contains('open')) {
     const control = main.querySelector(event.key === 'ArrowLeft' ? '[data-key-prev]' : '[data-key-next]');
     if (control && !control.disabled && !control.hasAttribute('aria-disabled')) { event.preventDefault(); control.click(); }
+  }
+  // Desktop shortcuts on question screens: 1–6 or A–F pick an option, Enter
+  // presses the main button (check / next / submit / reveal), M flags.
+  if (!event.target.closest?.('input, textarea, select, [contenteditable="true"]') && !event.altKey && !event.ctrlKey && !event.metaKey
+    && !document.body.classList.contains('open') && !document.querySelector('dialog[open]')) {
+    const attemptCard = main.querySelector('#question-card');
+    const scope = attemptCard || (main.querySelector('#quiz-answer-list[data-mode="single"]') && main.querySelector('.quiz-answer-card'));
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    const pick = '123456'.includes(key) ? '123456'.indexOf(key) : 'abcdef'.includes(key) ? 'abcdef'.indexOf(key) : -1;
+    if (scope && pick >= 0 && !event.shiftKey) {
+      const option = scope.querySelectorAll('[data-option], [data-guess-option]')[pick];
+      if (option && !option.disabled) { event.preventDefault(); option.click(); }
+    } else if (scope && key === 'Enter' && (!event.target.closest?.('button, a, summary') || event.target.closest('[data-option], [data-guess-option]'))) {
+      const action = attemptCard ? main.querySelector('#next') : (main.querySelector('.study-nav [data-reveal]') || main.querySelector('.study-nav [data-key-next]'));
+      if (action && !action.disabled) { event.preventDefault(); action.click(); }
+    } else if (attemptCard && key === 'm') {
+      const flag = main.querySelector('#flag');
+      if (flag && !flag.disabled) { event.preventDefault(); flag.click(); }
+    }
   }
   if (event.key === 'Escape') {
     setMenu(false);

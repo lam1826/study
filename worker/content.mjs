@@ -1,8 +1,17 @@
 // Idempotent source import. Dataset lives outside schema migrations.
 let contentReady;
+const explanationsRevision='explanations-2026-11-16-v1', essayGuidesRevision='study-guides-2026-11-17-v1';
 export async function ensureCourseContent(env) {
   if (contentReady) return contentReady;
-  contentReady = importCourse(env).then(()=>updateExplanations(env)).then(()=>updateEssayGuides(env)).catch(error => {contentReady = null; throw error;});
+  // A new isolate checks every revision in one D1 round trip; each import
+  // still re-checks its own marker, so concurrent isolates stay idempotent.
+  contentReady = (async () => {
+    const revisions = [courseContent.revision, explanationsRevision, essayGuidesRevision];
+    const done = new Set((await env.DB.prepare('SELECT revision FROM content_imports WHERE revision IN (?,?,?)').bind(...revisions).all()).results.map(row => row.revision));
+    if (!done.has(revisions[0])) await importCourse(env);
+    if (!done.has(revisions[1])) await updateExplanations(env);
+    if (!done.has(revisions[2])) await updateEssayGuides(env);
+  })().catch(error => {contentReady = null; throw error;});
   return contentReady;
 }
 async function importCourse(env) {
@@ -41,7 +50,7 @@ export async function importSourceDocument(request,env) {
 }
 
 async function updateExplanations(env) {
-  const revision='explanations-2026-11-16-v1';
+  const revision=explanationsRevision;
   const sql=(q,...args)=>env.DB.prepare(q).bind(...args);
   if(await sql('SELECT revision FROM content_imports WHERE revision=?',revision).first()) return;
   const statements=courseContent.questions.filter(q=>q.kind==='quiz' && courseExplanations[q.id]).map(q=>sql('UPDATE questions SET explanation=? WHERE id=? AND normalized=?',courseExplanations[q.id],q.id,q.normalized));
@@ -52,7 +61,7 @@ async function updateExplanations(env) {
 }
 
 async function updateEssayGuides(env) {
- const revision='study-guides-2026-11-17-v1';
+ const revision=essayGuidesRevision;
  const sql=(q,...args)=>env.DB.prepare(q).bind(...args);
  if(await sql('SELECT revision FROM content_imports WHERE revision=?',revision).first())return;
  await sql("UPDATE essays SET status=CASE WHEN learned=1 THEN 'mastered' WHEN length(trim(draft))>0 THEN 'answered' ELSE status END WHERE status='unseen'").run();

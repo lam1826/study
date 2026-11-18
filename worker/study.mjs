@@ -9,20 +9,22 @@ async function unresolvedQuestions(db,owner,chapter) {
 async function studyApi(request,env,path,owner,isAdmin) {
   const method=request.method, [group,id,action]=path.split('/');
   const sql=(q,...args)=>env.DB.prepare(q).bind(...args);
+  // Read-only views fetch the existence check and rows in one D1 round trip.
+  const pair=async(first,second)=>(await env.DB.batch([first,second])).map(result=>result.results||[]);
   if(group==='quiz-answers'&&method==='GET'){
     const chapter=new URL(request.url).searchParams.get('chapter');
-    needed(await sql('SELECT id FROM chapters WHERE id=?',chapter).first(),'Không tìm thấy chương.',404);
-    const rows=await list(sql("SELECT id,chapter,tier,prompt,options,correct,explanation,sources FROM questions WHERE chapter=? AND kind='quiz' ORDER BY CASE tier WHEN 'main' THEN 0 ELSE 1 END,rowid",chapter));
+    const [found,rows]=await pair(sql('SELECT id FROM chapters WHERE id=?',chapter),sql("SELECT id,chapter,tier,prompt,options,correct,explanation,sources FROM questions WHERE chapter=? AND kind='quiz' ORDER BY CASE tier WHEN 'main' THEN 0 ELSE 1 END,rowid",chapter));
+    needed(found.length,'Không tìm thấy chương.',404);
     return json(rows.map(q=>({...q,options:parse(q.options),correct:decodedCorrect(q.correct),sources:parse(q.sources)})));
   }
   if(group==='essay-answers'&&method==='GET'){
     const chapter=new URL(request.url).searchParams.get('chapter');
-    needed(await sql('SELECT id FROM chapters WHERE id=?',chapter).first(),'Không tìm thấy chương.',404);
-    return json((await list(sql("SELECT id,code,tier,prompt,explanation,key_points,sources FROM questions WHERE chapter=? AND kind='essay' ORDER BY CASE tier WHEN 'main' THEN 0 ELSE 1 END,rowid",chapter))).map(q=>({...q,key_points:parse(q.key_points),sources:parse(q.sources)})));
+    const [found,rows]=await pair(sql('SELECT id FROM chapters WHERE id=?',chapter),sql("SELECT id,code,tier,prompt,explanation,key_points,sources FROM questions WHERE chapter=? AND kind='essay' ORDER BY CASE tier WHEN 'main' THEN 0 ELSE 1 END,rowid",chapter));
+    needed(found.length,'Không tìm thấy chương.',404);
+    return json(rows.map(q=>({...q,key_points:parse(q.key_points),sources:parse(q.sources)})));
   }
   if(group==='essay'&&id){
-    const q=await sql("SELECT * FROM questions WHERE id=? AND kind='essay'",id).first();needed(q,'Không tìm thấy câu tự luận.',404);
-    const old=await sql('SELECT * FROM essays WHERE owner=? AND question=?',owner,id).first();
+    const [[q],[old]]=await pair(sql("SELECT * FROM questions WHERE id=? AND kind='essay'",id),sql('SELECT * FROM essays WHERE owner=? AND question=?',owner,id));needed(q,'Không tìm thấy câu tự luận.',404);
     if(method==='GET')return json({...q,key_points:parse(q.key_points),sources:parse(q.sources),draft:old?.draft||'',learned:old?.learned||0,status:old?.learned?'mastered':old?.status||'unseen',viewed_at:old?.viewed_at,answered_at:old?.answered_at,assessment:parse(old?.assessment||'[]')});
     if(method==='POST'){
       const data=await request.json(), now=Date.now();

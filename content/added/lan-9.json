@@ -1,0 +1,334 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Trong cùng VLAN 10, SW-A có priority cấu hình 8192 và MAC 00ff.0000.0001; SW-B có priority 16384 và MAC 0001.0000.0001. Chỉ có hai switch này tham gia. Switch nào trở thành Root Bridge?",
+    "options": [
+      "SW-A vì priority thấp hơn được so trước MAC",
+      "SW-B vì MAC thấp hơn luôn thắng priority",
+      "Cả hai đồng thời là root trong cùng cây",
+      "Switch có cổng tốc độ cao hơn, không cần xét BID"
+    ],
+    "correct": 0,
+    "explanation": "STP so Bridge ID theo priority trước, rồi mới so MAC khi priority bằng nhau. Hai switch cùng VLAN nên cùng phần Extended System ID; priority 8192 thắng 16384 dù MAC của SW-A lớn hơn. Tốc độ cổng ảnh hưởng cost đường đi, không trực tiếp quyết định root.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 7–8, mục 9.2.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "SW1 cấu hình spanning-tree vlan 20 priority 8192. Khi Extended System ID được sử dụng, phần priority hiển thị trong Bridge ID của VLAN 20 là bao nhiêu?",
+    "options": [
+      "8192",
+      "8212",
+      "32788",
+      "20"
+    ],
+    "correct": 1,
+    "explanation": "Priority hiển thị bằng priority cấu hình cộng số hiệu VLAN: 8192 + 20 = 8212. 8192 chưa gồm Extended System ID; 32788 là trường hợp priority mặc định 32768 cộng VLAN 20, không phải cấu hình đã cho.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 7, mục 9.2.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "A, B, C nối thành tam giác bằng ba liên kết cost 19. A là root; BID của B nhỏ hơn C. B và C đều có một đường trực tiếp tới A. Sau khi hội tụ, cổng nào trên liên kết B–C bị chặn?",
+    "options": [
+      "Cổng của B vì B có BID nhỏ hơn",
+      "Cả hai cổng trên liên kết B–C",
+      "Cổng của C vì B thắng bầu Designated Port trên đoạn này",
+      "Một cổng của A vì root phải có Root Port"
+    ],
+    "correct": 2,
+    "explanation": "B và C đều có Root Path Cost 19 qua đường trực tiếp tới A. Trên đoạn B–C, cost bằng nhau nên BID nhỏ hơn của B thắng Designated Port; đầu C không phải Root Port nên bị chặn. Root Bridge không có Root Port và các cổng hoạt động bình thường của root là designated.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "X có hai đường về root: một đường trực tiếp FastEthernet cost 19; một đường qua Y gồm hai chặng GigabitEthernet, mỗi chặng cost 4. Không có cấu hình cost khác. X ưu tiên đường nào?",
+    "options": [
+      "Đường trực tiếp vì STP chỉ đếm số switch đi qua",
+      "Đường trực tiếp vì cost 19 lớn hơn 8",
+      "Hai đường luôn cùng forwarding cho cùng VLAN",
+      "Đường qua Y vì tổng cost 8 nhỏ hơn 19"
+    ],
+    "correct": 3,
+    "explanation": "STP chọn tổng Root Path Cost thấp nhất, không phải chỉ số hop thấp nhất. Hai chặng cost 4 cộng thành 8, nên đường qua Y tốt hơn đường trực tiếp cost 19. Liên kết dư thừa không tự được đồng thời forwarding chỉ vì có hai lựa chọn.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 8–9, mục 9.2.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "A là root; B và C nối trực tiếp A, đồng thời B nối C. Ban đầu, mỗi cổng trên cả ba liên kết đều có cost 19. Nếu tăng cost cổng B→A lên 39, còn các cổng khác giữ nguyên, B chọn đường nào về root?",
+    "options": [
+      "B→C→A với tổng cost 38",
+      "B→A với cost 39 vì đó là đường trực tiếp",
+      "B không còn đường nào vì cost lớn hơn 19 là không hợp lệ",
+      "B trở thành root để tránh đường cost cao"
+    ],
+    "correct": 0,
+    "explanation": "Đường gián tiếp có cost 19 + 19 = 38, thấp hơn 39 của đường trực tiếp, nên B đổi Root Port sang hướng C. Điều chỉnh cost không thay đổi Bridge ID để B tự thành root; giá trị 39 là một cost có thể cấu hình.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 17, mục 9.3.1.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "X nhận hai BPDU cùng Root BID và có cùng tổng chi phí về root sau khi cộng cost cổng nhận. Một BPDU đến từ Y có BID thấp hơn Z. Tiêu chí nào quyết định Root Port trước khi xét Sender Port ID?",
+    "options": [
+      "Số VLAN có giá trị lớn hơn",
+      "Sender BID thấp hơn của Y",
+      "Địa chỉ IP quản lý của X",
+      "Số cổng vật lý trên X có giá trị lớn hơn"
+    ],
+    "correct": 1,
+    "explanation": "Khi Root Path Cost bằng nhau, STP so BID của switch gửi BPDU; chỉ khi BID đó cũng bằng nhau mới xét Sender Port ID. IP quản lý hay số VLAN không tham gia thứ tự này. Cần tính tổng cost trước, không bỏ qua tiêu chí chi phí.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "X nối song song với root R: X Fa0/1 nối R Fa0/8; X Fa0/2 nối R Fa0/3. Cả hai đường có cùng cost và port-priority phía R đều 128. Root Port của X là cổng nào?",
+    "options": [
+      "Fa0/1 vì số cổng phía X nhỏ hơn",
+      "Cả Fa0/1 và Fa0/2 đều là Root Port",
+      "Fa0/2 vì nhận BPDU từ Sender Port ID 128.3 nhỏ hơn 128.8",
+      "Không cổng nào vì liên kết song song luôn bị tắt"
+    ],
+    "correct": 2,
+    "explanation": "Hai BPDU có cùng root, chi phí và Sender BID, nên Sender Port ID phân xử. Cổng R Fa0/3 có Port ID 128.3 thấp hơn 128.8; vì nó nối X Fa0/2, Fa0/2 được chọn. Không chọn chỉ theo số hiệu cổng cục bộ của X.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "X có hai liên kết cùng cost tới root R. X Fa0/7 nối R Fa0/6; X Fa0/8 nối R Fa0/5. Hai cổng phía R đang port-priority 128. Muốn X ưu tiên Fa0/7 bằng port-priority, nên chỉnh ở đâu?",
+    "options": [
+      "Giảm port-priority của X Fa0/7, luôn đủ để thắng Sender Port ID",
+      "Tăng bridge priority của X lên lớn hơn R",
+      "Tăng port-priority của R Fa0/6 từ 128 lên 240",
+      "Giảm port-priority của R Fa0/6 xuống 0"
+    ],
+    "correct": 3,
+    "explanation": "Với cùng chi phí và cùng hàng xóm, X so Port ID của bên gửi BPDU là R. Hạ priority của R Fa0/6 làm đường nối tới X Fa0/7 thắng. Chỉnh priority cổng ở X không thay đổi Sender Port ID nhận từ R; tăng priority R Fa0/6 lại làm đường đó kém ưu tiên.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 9, 24, mục 9.2.2 và 9.4.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong quá trình hội tụ STP 802.1D, một cổng đã bắt đầu ghi nhận MAC nguồn nhưng chưa chuyển frame dữ liệu người dùng. Cổng đang ở trạng thái nào?",
+    "options": [
+      "Learning",
+      "Listening",
+      "Blocking",
+      "Disabled"
+    ],
+    "correct": 0,
+    "explanation": "Learning cho phép học MAC nhưng chưa chuyển dữ liệu. Listening xử lý BPDU để xác định vai trò nhưng chưa học MAC; Blocking không học MAC và không chuyển dữ liệu; Disabled không tham gia hoạt động cổng như tình huống mô tả.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 10–11, mục 9.2.3.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một switch chạy STP 802.1D với timer mặc định, không có cơ chế tăng tốc. Root Port mất liên kết trực tiếp và cổng dự phòng được chọn để thay thế. Nếu phải đi qua đủ Listening và Learning, thời gian chờ xấp xỉ là bao lâu?",
+    "options": [
+      "2 giây",
+      "30 giây",
+      "15 phút",
+      "Không có thời gian chờ trong mọi trường hợp"
+    ],
+    "correct": 1,
+    "explanation": "Sự cố trực tiếp được phát hiện ngay, nhưng STP cổ điển vẫn chờ Listening 15 giây và Learning 15 giây, tổng khoảng 30 giây. Hello 2 giây là chu kỳ BPDU, không phải tổng thời gian hai trạng thái này. RSTP là cơ chế khác, đã bị loại khỏi giả thiết.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 11, mục 9.2.3.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "STP 802.1D mặc định gặp sự cố gián tiếp: cổng dự phòng không thấy mất link mà phải chờ thông tin BPDU cũ hết hạn 20 giây, rồi qua Listening và Learning, mỗi trạng thái 15 giây. Tổng thời gian theo mô hình này là bao nhiêu?",
+    "options": [
+      "15 giây",
+      "30 giây",
+      "50 giây",
+      "20 giây"
+    ],
+    "correct": 2,
+    "explanation": "Theo các khoảng chờ đã cho, tổng là 20 + 15 + 15 = 50 giây. Chỉ tính 30 giây bỏ qua thời gian max age; 20 giây mới là lúc thông tin cũ hết hạn, chưa hoàn tất chuyển trạng thái của STP cổ điển.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 11, mục 9.2.3.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "SW1 đã chạy lệnh spanning-tree vlan 10 root primary và trở thành root. Sau đó SW2 được đặt priority VLAN 10 thấp hơn SW1. Nhận định nào đúng?",
+    "options": [
+      "SW1 tự giảm priority liên tục để giữ vai trò root",
+      "SW1 giữ root vĩnh viễn vì root primary là khóa vai trò",
+      "Cả SW1 và SW2 đều thành root vì cấu hình xung đột",
+      "SW2 có thể trở thành root vì root primary chỉ tính priority khi nhập lệnh"
+    ],
+    "correct": 3,
+    "explanation": "root primary là thao tác đặt priority dựa trên tình trạng lúc cấu hình, không phải cơ chế giữ quyền root vĩnh viễn. Sau đó, STP vẫn so BID bình thường; một switch có priority thấp hơn có thể thắng. Muốn kiểm chứng cần xem Root ID và Bridge ID.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 14, mục 9.3.1.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cổng access nối PC bật PortFast và BPDU Guard. Nhân viên cắm một switch vào cổng này, làm cổng err-disabled. Trình tự khôi phục phù hợp nhất là gì?",
+    "options": [
+      "Gỡ switch gây BPDU, nối lại thiết bị hợp lệ, rồi shutdown/no shutdown cổng",
+      "Tắt STP toàn mạng để không còn BPDU",
+      "Giữ switch lạ và liên tục no shutdown mà không xử lý nguyên nhân",
+      "Đặt cổng thành trunk để bỏ qua BPDU Guard"
+    ],
+    "correct": 0,
+    "explanation": "BPDU Guard đưa cổng vào err-disabled khi nhận BPDU. Phải loại bỏ nguyên nhân trước rồi bật lại cổng; nếu thiết bị gửi BPDU vẫn còn, lỗi có thể tái diễn. Tắt STP hoặc đổi thành trunk không phải cách sửa an toàn cho cổng người dùng.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 18, 25, mục 9.3.2 và 9.4.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một VLAN có 4 switch kết nối thành một mạng liên thông với 6 liên kết điểm–điểm riêng biệt giữa switch; không có EtherChannel, không có cổng lỗi. Để cây chuyển tiếp chỉ còn 3 liên kết, STP phải chặn bao nhiêu đầu cổng trên các liên kết dư thừa?",
+    "options": [
+      "1",
+      "3",
+      "6",
+      "4"
+    ],
+    "correct": 1,
+    "explanation": "Một cây nối 4 đỉnh có 4 − 1 = 3 liên kết hoạt động. Mạng có 6 liên kết nên 3 liên kết là dư; mỗi liên kết dư bị ngăn chuyển tiếp bởi một đầu cổng blocked/alternate trong giả thiết này. Không cần tắt toàn bộ cả hai đầu của mọi đường.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 23, mục 9.4.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Mạng chạy PVST+ có VLAN 10 và VLAN 20, cùng đi qua hai uplink dự phòng. Muốn tận dụng các uplink theo từng VLAN mà vẫn tránh vòng lặp, phương án nào phù hợp?",
+    "options": [
+      "Tắt STP trên cả hai VLAN",
+      "Bắt mọi cổng forwarding trong cùng một cây",
+      "Thiết kế Root Bridge khác nhau cho hai VLAN và kiểm tra cây của từng VLAN",
+      "Chỉ tăng hello time để tự chia tải"
+    ],
+    "correct": 2,
+    "explanation": "PVST+ duy trì cây riêng theo VLAN. Chọn vị trí root khác nhau có thể làm một đường bị chặn ở VLAN này nhưng được dùng ở VLAN kia, từ đó chia tải theo VLAN. Tắt bảo vệ vòng lặp hoặc ép mọi cổng forwarding không phải cách chia tải hợp lệ.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 13, 21, mục 9.2.4 và 9.4.1.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai đường song song giữa SW1 và SW2 đã được gộp thành một EtherChannel đúng cấu hình và đang hoạt động. STP nhìn cấu trúc này như thế nào?",
+    "options": [
+      "Hai cây độc lập, một cho từng dây vật lý",
+      "Hai Root Port bắt buộc cùng có trên SW2 trong một VLAN",
+      "Không cần STP ở bất kỳ phần nào còn lại của mạng",
+      "Một cổng logic Port-channel để tính vai trò và đường đi"
+    ],
+    "correct": 3,
+    "explanation": "STP xử lý Port-channel như một liên kết logic, thay vì chặn riêng một thành viên chỉ vì có hai dây song song. STP vẫn cần xử lý các đường dư khác của mạng. Khi mất thành viên, Port-channel có thể còn up; không nên suy ra rằng mọi thay đổi băng thông/cost đều không ảnh hưởng cây.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 26–28, mục 9.4.3.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi vô tình tạo vòng lặp lớp 2, switch ghi nhận cùng một MAC nguồn luân phiên trên hai cổng và lưu lượng ARP tăng mạnh. Hai kết luận nào phù hợp? (Chọn 2 đáp án đúng)",
+    "options": [
+      "MAC flapping có thể do frame quay vòng khiến switch học lại MAC ở cổng khác",
+      "Giảm TTL của gói IP chắc chắn loại bỏ mọi vòng lặp Ethernet",
+      "Bão quảng bá có thể xuất hiện vì frame broadcast bị nhân bản và quay vòng",
+      "Chỉ frame broadcast chịu ảnh hưởng; unknown unicast không bao giờ bị lặp"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Vòng lặp làm bản sao frame tới qua các cổng khác nhau, khiến bảng MAC không ổn định; broadcast có thể được nhân bản thành bão. Ethernet không có TTL riêng và switch lớp 2 không giảm IP TTL khi chuyển frame. Unknown unicast bị flood nên cũng có thể bị lặp.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 3–4, mục 9.1.1 và 9.1.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhóm đề xuất chỉ dùng storm control rồi tắt STP trên mạng có đường dự phòng. Hai nhận xét nào phản biện đúng đề xuất này? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Storm control tự bầu Root Bridge thay cho STP",
+      "Storm control giới hạn lưu lượng bão nhưng không loại bỏ topology vòng lặp",
+      "STP chỉ bảo vệ gói IP, không liên quan frame Ethernet",
+      "STP chặn các đường dư trong cây để duy trì cấu trúc logic không vòng lặp"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Storm control áp ngưỡng để giảm tác động của lượng broadcast quá lớn, không dựng cây chống vòng lặp. STP thực hiện bầu root/chọn vai trò cổng và chặn đường dư ở lớp 2. Hai cơ chế có thể bổ trợ nhau, nhưng giới hạn bão không thay thế việc loại bỏ vòng lặp logic.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 4–6, mục 9.1.2 và 9.2.1.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai switch chạy Rapid PVST+ nối điểm–điểm full-duplex, và một cổng access khác chỉ nối tới PC. Hai đặc điểm nào hỗ trợ hội tụ/chuyển tiếp nhanh trong thiết kế này? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Cơ chế proposal–agreement trên liên kết điểm–điểm",
+      "Bắt mọi cổng chờ đủ max age trước mỗi frame",
+      "Dùng một Root Bridge riêng cho từng frame dữ liệu",
+      "Cổng biên có thể vào forwarding nhanh mà không chờ hai forward delay"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "RSTP dùng proposal–agreement trên liên kết điểm–điểm và nhận biết cổng biên để rút ngắn chuyển trạng thái. Nó không tạo root theo từng frame, cũng không bắt đợi max age cho từng frame. Thiết kế và cấu hình đúng vẫn cần thiết; không phải mọi topology đều có thời gian hội tụ cố định.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 12–13, mục 9.2.4.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Doanh nghiệp muốn PC nhận mạng nhanh sau khi cắm cáp và ngăn việc cắm switch lạ vào cổng người dùng. Hai cấu hình nào phù hợp trên các cổng access chỉ nối thiết bị đầu cuối? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Bật PortFast trên mọi đường trunk giữa switch",
+      "spanning-tree portfast",
+      "spanning-tree bpduguard enable",
+      "no spanning-tree vlan 1-4094"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "PortFast tránh thời gian chờ Listening/Learning trên cổng người dùng; BPDU Guard vô hiệu hóa cổng nếu thiết bị phía sau gửi BPDU bất thường. PortFast cho đường nối switch và tắt STP diện rộng có thể làm mất cơ chế phòng vòng lặp, không đáp ứng mục tiêu bảo vệ.\n\nNguồn đối chiếu: chapter09(1).pdf, trang PDF 13–14, 18, mục 9.2.4 và 9.3.2.",
+    "sources": [
+      "854b5a23-265b-54c6-a68e-2c593e0ada05"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 9"
+  }
+]

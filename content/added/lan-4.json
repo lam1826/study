@@ -1,0 +1,334 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Bảng MAC có hai dòng cùng địa chỉ 00aa.bbcc.0001: một dòng thuộc VLAN 10 ở Gi1/0/1, dòng còn lại thuộc VLAN 20 ở Gi1/0/2. Chỉ từ dữ liệu này, kết luận nào hợp lý nhất?",
+    "options": [
+      "Hai dòng có thể cùng tồn tại vì khóa tra cứu còn gồm VLAN",
+      "Switch chắc chắn đã bị vòng lặp lớp 2",
+      "Switch bắt buộc chuyển cả hai dòng về cùng một cổng",
+      "Phải xóa một dòng vì MAC chỉ được xuất hiện một lần trên toàn switch"
+    ],
+    "correct": 0,
+    "explanation": "Switch tra cứu theo cặp VLAN và địa chỉ MAC. Cùng một chuỗi MAC ở hai VLAN là hai ngữ cảnh chuyển tiếp khác nhau; riêng quan sát này chưa đủ kết luận có vòng lặp hay cần xóa bản ghi.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 3–5, mục 4.1.1.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC dự kiến thuộc VLAN 10 nhưng bảng MAC học đúng MAC của PC ở đúng cổng Gi1/0/3, thuộc VLAN 20. Bước xử lý phù hợp nhất là gì?",
+    "options": [
+      "Xóa toàn bộ bảng MAC rồi chờ switch tự chuyển PC sang VLAN 10",
+      "Đối chiếu cấu hình access VLAN của Gi1/0/3 và sửa về VLAN theo thiết kế",
+      "Tăng aging time để giữ MAC của PC lâu hơn",
+      "Tạo MAC tĩnh ở VLAN 20 để cố định lỗi hiện tại"
+    ],
+    "correct": 1,
+    "explanation": "MAC đúng cổng nhưng sai VLAN hướng tới cấu hình VLAN của cổng. Xóa bảng MAC không thay đổi access VLAN; tăng aging hoặc cố định MAC ở VLAN sai không giải quyết nguyên nhân.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 6, mục 4.1.1.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ có MAC tĩnh ánh xạ VLAN 10 → Gi1/0/1 vừa chuyển sang Gi1/0/5 cùng VLAN 10. Cáp và IP đều đúng nhưng máy chủ mất kết nối. Nguyên nhân cần kiểm tra trước là gì?",
+    "options": [
+      "MAC tĩnh tự chuyển thành MAC động khi cáp được rút",
+      "Switch cần tăng maximum Port Security trên tất cả cổng",
+      "Ánh xạ tĩnh cũ vẫn hướng khung đích tới Gi1/0/1",
+      "Bản ghi tĩnh chưa hết aging time nên phải chờ 300 giây"
+    ],
+    "correct": 2,
+    "explanation": "MAC tĩnh không tự học lại vị trí và không chịu aging như MAC động. Cần xóa ánh xạ cũ, kiểm tra VLAN cổng mới, khai báo lại rồi xác minh; chờ aging hoặc đổi maximum không sửa ánh xạ.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 7–9, mục 4.1.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trên switch đang phục vụ nhiều phòng, quản trị viên chỉ muốn buộc học lại MAC động 00aa.bbcc.0001 sau khi thiết bị đổi cổng. Lệnh nào có phạm vi tác động nhỏ nhất?",
+    "options": [
+      "clear mac address-table dynamic",
+      "clear mac address-table dynamic vlan 10",
+      "clear mac address-table dynamic interface gigabitEthernet 1/0/1",
+      "clear mac address-table dynamic address 00aa.bbcc.0001"
+    ],
+    "correct": 3,
+    "explanation": "Xóa theo address chỉ nhắm MAC cần kiểm tra. Xóa toàn bộ, theo VLAN hoặc theo interface có thể làm mất thêm các bản ghi động khác và gây flood unknown unicast trong thời gian học lại.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 7, mục 4.1.2.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi giảm aging time quá mạnh, các máy ít phát dữ liệu thường xuyên bị xóa khỏi bảng MAC. Hệ quả có khả năng tăng lên là gì?",
+    "options": [
+      "Flood unknown unicast trong VLAN khi đích chưa được học lại",
+      "Broadcast tự động bị biến thành unicast",
+      "MAC tĩnh tự hết hạn cùng MAC động",
+      "Các VLAN tự hợp nhất thành một miền quảng bá"
+    ],
+    "correct": 0,
+    "explanation": "Khi bản ghi động bị loại quá sớm, switch có thể chưa biết cổng tới MAC đích và phải flood unknown unicast trong VLAN. Aging không hợp nhất VLAN, không đổi loại khung và không áp dụng như vậy cho MAC tĩnh.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 6–7, mục 4.1.2.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một kỹ thuật viên dùng mac address-table static để ràng buộc vị trí máy chủ, rồi cho rằng mọi MAC nguồn lạ trên cổng đó sẽ bị chặn. Nhận xét nào chính xác?",
+    "options": [
+      "Đúng, mọi ánh xạ MAC tĩnh đều tự bật Port Security",
+      "Sai, ánh xạ MAC tĩnh điều khiển chuyển tiếp; cần Port Security để kiểm soát MAC nguồn được phép trên cổng",
+      "Đúng, MAC tĩnh tự xác thực tài khoản người dùng",
+      "Sai, vì MAC tĩnh chỉ dùng được trên cổng lớp 3"
+    ],
+    "correct": 1,
+    "explanation": "MAC tĩnh thông thường và static secure MAC là hai cơ chế khác nhau. mac address-table static tạo ánh xạ MAC–VLAN–cổng; Port Security mới quản lý tập MAC nguồn, giới hạn và hành động vi phạm. Cả hai đều không tự xác thực tài khoản.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 8–9, mục 4.1.3 và 4.2.1.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cổng kết nối thiết bị quan trọng cần chặn khung từ MAC lạ nhưng vẫn duy trì lưu lượng của MAC hợp lệ, đồng thời tăng bộ đếm vi phạm để giám sát. Nên chọn violation mode nào?",
+    "options": [
+      "shutdown",
+      "protect",
+      "restrict",
+      "Chỉ tăng maximum lên số rất lớn"
+    ],
+    "correct": 2,
+    "explanation": "Restrict giữ cổng hoạt động, loại khung vi phạm và tăng bộ đếm, có thể phát log/trap tùy cấu hình. Protect có khả năng quan sát thấp hơn; shutdown làm gián đoạn cả MAC hợp lệ; tăng maximum không đáp ứng yêu cầu chặn MAC lạ.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 12–14, mục 4.2.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cổng Port Security đã chuyển err-disabled do mode shutdown. Người dùng tháo máy lạ và cắm lại đúng PC có MAC được phép, nhưng chưa thực hiện khôi phục. Điều gì hợp lý nhất?",
+    "options": [
+      "PC hợp lệ luôn tự khôi phục cổng ngay khi gửi khung",
+      "Switch tự chuyển violation mode sang protect",
+      "Chỉ khung của máy lạ bị chặn, PC hợp lệ hoạt động ngay",
+      "PC hợp lệ vẫn bị gián đoạn cho tới khi cổng được khôi phục theo cơ chế đã cấu hình"
+    ],
+    "correct": 3,
+    "explanation": "Ở shutdown, trạng thái err-disabled ngừng mọi lưu lượng qua cổng. Loại bỏ máy lạ là điều kiện cần; sau đó phải khôi phục thủ công hoặc chờ cơ chế recovery đã cấu hình. Việc cắm lại PC không tự đổi mode.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 13–14, 22–23, mục 4.2.3 và 4.3.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cổng đặt maximum 1, đã học MAC của PC-A, mode protect. PC-B dùng MAC khác thay vào cổng và không truy cập được, nhưng cổng vẫn connected. Giải thích nào đúng nhất?",
+    "options": [
+      "Protect loại khung vi phạm mà không buộc cổng chuyển err-disabled",
+      "Trạng thái connected chứng minh Port Security chưa bật",
+      "PC-B được phép vì cổng vật lý vẫn up",
+      "Mọi lỗi Port Security đều bắt buộc làm cổng down"
+    ],
+    "correct": 0,
+    "explanation": "Protect chặn lưu lượng từ MAC vi phạm nhưng giữ cổng up. Vì vậy trạng thái link không chứng minh PC-B được phép; cần xem cấu hình secure MAC và trạng thái Port Security để chẩn đoán.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 10, 12–14, mục 4.2.1 và 4.2.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Switch đã học sticky MAC mới trong running-config nhưng chưa lưu kể từ trước lúc học. Sau khi reload, địa chỉ vừa học có thể không còn. Thao tác nào đã bị bỏ sót?",
+    "options": [
+      "clear mac address-table dynamic",
+      "copy running-config startup-config sau khi xác nhận MAC hợp lệ",
+      "Đặt native VLAN bằng số MAC đã học",
+      "Chuyển tất cả cổng sang trunk"
+    ],
+    "correct": 1,
+    "explanation": "Sticky đưa MAC vào running-config nhưng không tự lưu startup-config. Muốn giữ MAC qua reload phải xác minh thiết bị rồi lưu; clear MAC động, đổi native VLAN hay đổi mode trunk không lưu cấu hình sticky.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 11–12, 15, mục 4.2.2 và 4.2.4.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cổng dùng dynamic secure MAC, maximum 1, chưa học địa chỉ nào. Khi bật cổng, máy không được phép đang cắm sẵn gửi khung đầu tiên. Rủi ro nào phù hợp với cơ chế này?",
+    "options": [
+      "MAC của máy luôn bị từ chối vì chưa được nhập thủ công",
+      "Switch tự xác minh chủ sở hữu qua địa chỉ IP",
+      "MAC của máy có thể được học vào tập secure vì vẫn còn chỗ trong giới hạn",
+      "Switch tự đổi maximum về 0 để bảo vệ cổng"
+    ],
+    "correct": 2,
+    "explanation": "Dynamic secure MAC học tự động khi còn dung lượng, nên có rủi ro thiết bị đầu tiên được học dù không đúng chủ đích. Cần kiểm soát đầu cuối trước khi học; Port Security không tự xác minh danh tính qua IP.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 11, 15, mục 4.2.2 và 4.2.4.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cổng có maximum 1 và đã khai báo một static secure MAC. Quản trị viên bật thêm sticky để nhận một thiết bị hợp lệ thứ hai. Nhận định nào đúng?",
+    "options": [
+      "Sticky không được tính vào giới hạn maximum",
+      "Bật sticky tự xóa static secure MAC cũ",
+      "Bật sticky tự tăng maximum lên 2",
+      "Cần xem lại thiết kế và điều chỉnh tập MAC/maximum; chỉ bật sticky không tạo thêm chỗ"
+    ],
+    "correct": 3,
+    "explanation": "Giới hạn maximum áp dụng cho tập secure MAC của cổng. Một static secure MAC đã chiếm giới hạn 1 thì sticky không tự tăng giới hạn hoặc xóa địa chỉ đó; phải xác nhận số thiết bị hợp lệ rồi cấu hình nhất quán.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 11–12, mục 4.2.2.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cổng cứ tự khôi phục sau 300 giây rồi lại err-disabled ngay vì PC có MAC không được phép vẫn gửi khung. Cách xử lý đúng trọng tâm là gì?",
+    "options": [
+      "Xác minh và loại bỏ nguyên nhân MAC vi phạm hoặc cập nhật danh sách hợp lệ trước khi khôi phục",
+      "Giảm recovery interval xuống 1 giây để hết lỗi",
+      "Xóa bảng MAC động liên tục nhưng giữ nguyên secure MAC",
+      "Tăng aging time toàn switch để tự cho phép PC"
+    ],
+    "correct": 0,
+    "explanation": "Errdisable recovery chỉ bật lại cổng, không sửa tập secure MAC. Nếu nguyên nhân vẫn tồn tại, lỗi lặp lại. Thay chu kỳ recovery, aging bảng MAC hay xóa MAC động không giải quyết chính sách secure đang sai.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 14, mục 4.2.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC mới đã được phê duyệt thay PC cũ trên cổng sticky maximum 1. Sticky MAC cũ đã được lưu. Quy trình nào phù hợp?",
+    "options": [
+      "Chỉ rút PC cũ, vì sticky luôn tự thay bằng MAC mới",
+      "Xóa đúng sticky MAC cũ, khôi phục cổng nếu cần, học/khai báo MAC mới rồi kiểm tra và lưu",
+      "Tăng maximum không giới hạn để mọi máy đều kết nối được",
+      "Xóa toàn bộ VLAN trên switch để bỏ sticky"
+    ],
+    "correct": 1,
+    "explanation": "Sticky đã lưu không tự thay khi đổi máy. Cần xác nhận thay thế, xóa đúng dòng MAC cũ, học hoặc khai báo MAC mới, kiểm tra secure-up và lưu; mở giới hạn tùy tiện hoặc xóa VLAN vượt quá mục tiêu.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 16, 23, mục 4.2.4 và 4.3.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Quản trị viên chỉ muốn gỡ Port Security nhưng giữ mô tả cổng và VLAN hiện có. Vì sao default interface không phải lựa chọn phù hợp nhất?",
+    "options": [
+      "Lệnh chỉ xóa secure MAC nên chắc chắn không ảnh hưởng gì khác",
+      "Lệnh làm switch không thể học MAC nữa",
+      "Lệnh có thể xóa cả các cấu hình hợp lệ khác trên giao diện",
+      "Lệnh tự động mã hóa toàn bộ lưu lượng cổng"
+    ],
+    "correct": 2,
+    "explanation": "Default interface đưa nhiều thuộc tính của cổng về mặc định, có thể mất description và VLAN. Nên gỡ tính năng bằng lệnh phù hợp rồi kiểm tra các dòng con còn lại trong running-config, thay vì reset toàn giao diện.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 16, mục 4.2.4.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cổng được thiết kế nối điện thoại IP và PC phía sau, thực tế có hai MAC hợp lệ cần được chấp nhận trên nền tảng hỗ trợ. Giới hạn maximum 1 gây vi phạm. Cách quyết định cấu hình phù hợp là gì?",
+    "options": [
+      "Bỏ Port Security trên toàn bộ switch",
+      "Coi MAC thứ hai luôn là giả mạo dù đã xác minh thiết bị",
+      "Tăng maximum lên giá trị bất kỳ rất lớn",
+      "Xác nhận số MAC hợp lệ theo thiết kế rồi đặt maximum đủ cho các MAC đó"
+    ],
+    "correct": 3,
+    "explanation": "Giới hạn phải phù hợp số đầu cuối thực tế; mô hình điện thoại IP và PC có thể cần hơn một MAC. Cần xác minh và đặt giới hạn vừa đủ, thay vì bỏ kiểm soát hoặc tăng tùy tiện để né vi phạm.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 9–10, mục 4.2.1.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trước khi lưu cấu hình sticky vừa học trên cổng người dùng, những việc nào giúp tránh giữ nhầm MAC? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Đối chiếu secure MAC đã học với MAC của thiết bị được phép",
+      "Kiểm tra trạng thái cổng và bộ đếm vi phạm cùng kết nối thực tế",
+      "Lưu ngay mà không cần xem thiết bị nào đã gửi khung đầu tiên",
+      "Xóa mọi VLAN khác để bảo đảm chỉ còn một MAC"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Xác minh danh tính thiết bị qua hồ sơ MAC và kiểm tra trạng thái/kết nối giúp phát hiện học nhầm trước khi lưu. Sticky không bảo đảm thiết bị đầu tiên là hợp lệ; xóa VLAN khác không phải bước xác minh MAC.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 15–16, mục 4.2.4.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một đơn vị muốn dùng riêng Port Security để thay toàn bộ cơ chế xác thực truy cập. Hai nhận định nào chỉ ra giới hạn của đề xuất này? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Port Security tự xác minh tài khoản người dùng bằng mật khẩu",
+      "MAC không thể bị giả mạo nên không cần cơ chế khác",
+      "Kiểm tra MAC không đồng nghĩa xác thực danh tính con người",
+      "MAC có thể bị giả mạo; cần phối hợp các lớp kiểm soát phù hợp"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Port Security kiểm soát MAC nguồn tại cổng, không xác minh con người, và MAC có thể bị giả mạo. Do đó nó bổ sung chứ không thay thế 802.1X/NAC hoặc các cơ chế bảo vệ khác.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 9, mục 4.2.1.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi thay máy trên cổng sticky, cần kiểm tra MAC bảo mật đang được chấp nhận và các dòng sticky sẽ được lưu. Hai lệnh nào trực tiếp trả lời hai yêu cầu này? (Chọn 2 đáp án đúng)",
+    "options": [
+      "show port-security address",
+      "show interfaces trunk",
+      "show running-config interface gigabitEthernet 1/0/1",
+      "show vtp status"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Show port-security address liệt kê secure MAC và cổng; running-config interface cho thấy dòng sticky cụ thể đang được lưu trong cấu hình chạy. Show interfaces trunk và show vtp status chủ yếu kiểm tra trunk/VTP, không trả lời hai yêu cầu trên.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 12, 15–16, mục 4.2.2 và 4.2.4.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Quản trị viên cần phân biệt việc xóa MAC động và gỡ MAC tĩnh thông thường. Hai phát biểu nào đúng? (Chọn 2 đáp án đúng)",
+    "options": [
+      "clear mac address-table dynamic luôn xóa mọi dòng sticky trong running-config",
+      "MAC tĩnh do mac address-table static tạo thường cần gỡ bằng dạng no của lệnh cấu hình tương ứng",
+      "Xóa bảng MAC động tự sửa được cấu hình VLAN sai",
+      "Xóa nhiều MAC động có thể làm tăng flood unknown unicast trong thời gian học lại"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Clear dynamic xử lý bản ghi động; ánh xạ tĩnh cần gỡ đúng dòng cấu hình. Sau khi xóa bản ghi động, đích chưa biết có thể bị flood trong VLAN. Lệnh clear không tự sửa VLAN hay bảo đảm xóa sticky trong cấu hình.\n\nNguồn đối chiếu: chapter04(1).pdf, trang PDF 7–8, mục 4.1.2 và 4.1.3.",
+    "sources": [
+      "b7e4ca4f-8d12-5a4d-9e51-97a86e9cb83b"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 4"
+  }
+]

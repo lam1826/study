@@ -478,5 +478,337 @@
       "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
     ],
     "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Switch có Gi1/0/1, Gi1/0/2 và Gi1/0/3 cùng VLAN 10, đều forwarding; Gi1/0/4 thuộc VLAN 20. Bảng MAC trống. Khung unicast từ A vào Gi1/0/1 gửi tới B chưa biết sẽ được xử lý thế nào?",
+    "options": [
+      "Chỉ gửi tới Gi1/0/4 để nhờ VLAN 20 tìm B",
+      "Học MAC-A tại Gi1/0/1 và flood tới Gi1/0/2, Gi1/0/3",
+      "Học MAC-B tại Gi1/0/1 và flood ra cả bốn cổng",
+      "Không học địa chỉ nào cho đến khi B trả lời"
+    ],
+    "correct": 1,
+    "explanation": "Switch học từ MAC nguồn A, sau đó tra MAC đích B trong VLAN 10. Khi B chưa có, unknown unicast được flood tới các cổng đủ điều kiện cùng VLAN, trừ cổng vào. Cổng VLAN 20 không nhận bản sao và địa chỉ đích không được dùng làm nguồn học.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 4–6, mục 2.1.1–2.1.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "A và B cùng nằm sau một hub nối Gi1/0/1 của switch. Bảng MAC đã ánh xạ cả MAC-A và MAC-B vào Gi1/0/1. Khi switch nhận khung A gửi B từ Gi1/0/1, nó làm gì?",
+    "options": [
+      "Chuyển khung ngược ra Gi1/0/1 để A nhận lại",
+      "Xóa cả hai MAC vì mỗi cổng chỉ được học một địa chỉ",
+      "Lọc khung, không chuyển ra các cổng khác",
+      "Flood khung ra mọi cổng vì có hai MAC trên một cổng"
+    ],
+    "correct": 2,
+    "explanation": "MAC đích đã biết nằm cùng cổng nhận nên switch không cần chuyển khung sang phân đoạn khác. Một cổng nối hub hoặc switch khác có thể học nhiều MAC; việc này tự nó không phải lỗi. Gửi ngược ra cổng vào hoặc flood đều không đúng tình huống tra bảng đã nêu.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 4–6, mục 2.1.1–2.1.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "MAC-B đang được học động tại Gi1/0/2. B được chuyển sang Gi1/0/5 trong cùng VLAN, rồi phát một khung hợp lệ. Không có port-security hay ràng buộc khác. Switch cập nhật thế nào?",
+    "options": [
+      "Giữ Gi1/0/2 cho đến lần khởi động lại tiếp theo",
+      "Học Gi1/0/5 từ MAC đích của một máy khác",
+      "Luôn loại khung của B vì MAC không được đổi cổng",
+      "Chuyển bản ghi MAC-B sang Gi1/0/5 dựa trên khung nguồn mới"
+    ],
+    "correct": 3,
+    "explanation": "Switch học và làm mới vị trí từ MAC nguồn của khung nhận. Khi cùng MAC hợp lệ xuất hiện ở cổng mới trong VLAN, bản ghi động được cập nhật. Không cần reboot hay chờ hết aging time; hạn chế kiểu port-security không nằm trong giả thiết đề bài.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 4–6, mục 2.1.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "B im lặng đủ lâu để bản ghi MAC động hết hạn. A gửi một khung unicast tới B trước khi B phát khung mới. Điều gì xảy ra dù trước đây A và B đã liên lạc?",
+    "options": [
+      "Khung trở thành unknown unicast đối với switch và được flood trong VLAN",
+      "Switch luôn nhớ MAC-B vì A còn giữ ARP cache",
+      "Khung bị loại bắt buộc vì hết hạn MAC tương đương cổng down",
+      "Switch gửi ARP thay A để học MAC-B trước khi chuyển"
+    ],
+    "correct": 0,
+    "explanation": "Bảng MAC động của switch và ARP cache của PC là hai trạng thái khác nhau. Khi bản ghi B hết hạn, switch chưa biết cổng của B nên flood unicast trong VLAN. B phát khung trở lại sẽ giúp switch học lại; không thể suy ra cổng down hay switch phải thực hiện ARP thay PC.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 5–6, mục 2.1.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Quản trị viên xóa bảng MAC động trong một lab đang chạy, không đổi VLAN hay địa chỉ IP. Hệ quả tức thời hợp lý nhất là gì?",
+    "options": [
+      "Switch mất cấu hình khởi động và phải cài lại IOS",
+      "Một số unicast có thể được flood tạm thời cho đến khi switch học lại",
+      "Toàn bộ địa chỉ IP trên PC bị xóa",
+      "Mọi cổng tự chuyển về VLAN 1"
+    ],
+    "correct": 1,
+    "explanation": "Lệnh xóa MAC động tác động trạng thái học địa chỉ, không phải cấu hình IP máy trạm, VLAN hay hệ điều hành. Khi bảng chưa được học lại, các đích chưa biết có thể gây flooding; khung nguồn hợp lệ giúp tạo lại bản ghi.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 5–6, mục 2.1.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một môi trường có lỗi bit cần ngăn khung sai FCS bị chuyển sang đoạn tiếp theo trước khi kiểm tra hoàn tất. Phương pháp chuyển mạch nào phù hợp nhất?",
+    "options": [
+      "Fragment-free",
+      "Bất kỳ cut-through nào cũng kiểm tra đủ FCS trước khi gửi",
+      "Store-and-forward",
+      "Fast-forward"
+    ],
+    "correct": 2,
+    "explanation": "Store-and-forward nhận toàn bộ khung nên có thể kiểm tra FCS trước khi chuyển. Fast-forward/cut-through có thể bắt đầu gửi khi chưa nhận FCS. Fragment-free đợi 64 byte đầu nhưng không bảo đảm kiểm tra FCS của toàn bộ khung dài.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 7, mục 2.1.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một khung dài 1.000 byte có lỗi ở phần gần cuối. Vì sao chế độ fragment-free không bảo đảm phát hiện lỗi đó trước khi bắt đầu chuyển?",
+    "options": [
+      "Nó chỉ áp dụng cho IPv6 nên bỏ qua IPv4",
+      "Nó luôn sửa lỗi cuối khung bằng bộ đệm",
+      "Nó đọc địa chỉ IP thay cho FCS nên phát hiện mọi lỗi",
+      "Nó chỉ chờ 64 byte đầu, chưa có đủ toàn khung và FCS"
+    ],
+    "correct": 3,
+    "explanation": "Fragment-free chờ 64 byte đầu để hạn chế chuyển các mảnh ngắn, không tương đương kiểm tra FCS toàn khung. Lỗi gần cuối khung 1.000 byte có thể chưa được biết khi đã bắt đầu gửi. Cơ chế không tự sửa lỗi và không phụ thuộc việc dữ liệu bên trong là IPv4 hay IPv6.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 7, mục 2.1.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong một hàng đợi, khung đầu đang chờ cổng ra bận làm khung phía sau cũng bị giữ, dù cổng đích của khung phía sau rảnh. Đây là hiện tượng nào?",
+    "options": [
+      "Head-of-line blocking",
+      "MAC aging",
+      "Broadcast filtering",
+      "Duplex negotiation"
+    ],
+    "correct": 0,
+    "explanation": "Head-of-line blocking là việc khung đầu hàng đợi cản các khung sau có thể dùng cổng khác đang sẵn sàng. Nó liên quan tổ chức bộ đệm/hàng đợi, không phải hết hạn MAC, lọc broadcast hay thương lượng tốc độ/song công.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 8, mục 2.1.4.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Đã cấu hình hostname và kiểm tra thấy tên mới có hiệu lực. Sau reload, switch trở lại hostname cũ. Nguyên nhân phù hợp nhất nếu không có cơ chế tự động áp cấu hình khác?",
+    "options": [
+      "Reload luôn bỏ qua startup-config hợp lệ",
+      "Running-config đã đổi nhưng chưa được lưu vào startup-config",
+      "Hostname chỉ tồn tại trong bảng MAC động",
+      "Mọi lệnh hostname đều chỉ có hiệu lực một phiên console"
+    ],
+    "correct": 1,
+    "explanation": "Lệnh cấu hình tác động running-config ngay, còn startup-config chỉ thay đổi khi được lưu. Nếu chưa copy running-config startup-config, lần boot sau vẫn dùng bản cũ. Hostname không thuộc bảng MAC và không phải cấu hình chỉ dành cho một phiên console.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 14, 17, 19–20, mục 2.3.1 và 2.3.3–2.3.4.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "SVI VLAN 1 đã có IP và no shutdown, VLAN tồn tại, nhưng không có cổng lớp 2 nào của VLAN đang hoạt động/chuyển tiếp. Vì sao SVI có thể chưa lên line protocol up?",
+    "options": [
+      "Bắt buộc đổi VLAN 1 thành VLAN 4095 mới lên",
+      "SVI chỉ hoạt động khi bảng MAC đã học đủ 1.000 địa chỉ",
+      "Trạng thái SVI còn phụ thuộc cổng lớp 2 hoạt động trong VLAN",
+      "Chỉ cần IP và no shutdown là mọi SVI luôn up/up"
+    ],
+    "correct": 2,
+    "explanation": "Ngoài tồn tại VLAN và trạng thái quản trị, SVI còn cần điều kiện hoạt động/chuyển tiếp của cổng thuộc VLAN theo nền tảng. IP đúng và no shutdown chưa đủ trong tình huống đề bài. Không có yêu cầu VLAN 4095 hay số lượng MAC tối thiểu như các phương án nhiễu.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 17, 19, mục 2.3.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Switch lớp 2 không bật IP routing có SVI 192.168.10.2/24. Nó ping được máy cùng subnet nhưng cần trả lời máy quản trị ở mạng khác qua router 192.168.10.1. Cấu hình nào phục vụ việc gửi lưu lượng quản trị ra ngoài subnet?",
+    "options": [
+      "ip default-gateway 192.168.20.50",
+      "switchport access vlan 192",
+      "clear mac address-table dynamic",
+      "ip default-gateway 192.168.10.1"
+    ],
+    "correct": 3,
+    "explanation": "Với switch lớp 2 không bật định tuyến, ip default-gateway chỉ ra router cục bộ để gửi lưu lượng quản trị tới mạng khác. Gateway phải nằm trong subnet SVI và truy cập được. Lệnh gán VLAN hoặc xóa MAC không tạo đường đi lớp 3; địa chỉ máy ở xa không phải gateway cục bộ.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 17, 19, mục 2.3.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "IP quản trị ping được nhưng SSH bị từ chối; cổng vật lý và đường đi IP đã được xác minh. Nhóm thông tin nào cần kiểm tra tiếp?",
+    "options": [
+      "Tài khoản cục bộ, khóa RSA, domain name và cấu hình VTY/SSH",
+      "Chỉ kích thước bảng MAC và địa chỉ broadcast",
+      "Chỉ thay dây mạng rồi bỏ qua cấu hình VTY",
+      "Chỉ tăng tốc độ cổng lên 10 Gb/s"
+    ],
+    "correct": 0,
+    "explanation": "Ping xác nhận một phần kết nối IP, không chứng minh dịch vụ SSH và xác thực đã đúng. Cần kiểm tra các điều kiện SSH như user, khóa, domain và line VTY. Thay dây hay tăng tốc độ không trực tiếp xử lý cấu hình dịch vụ khi liên kết và đường IP đã được xác minh.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 16–17, 19, mục 2.3.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi bật service password-encryption, một quản trị viên cho rằng có thể dùng Telnet an toàn vì mật khẩu trong cấu hình không còn hiện rõ. Đánh giá nào đúng?",
+    "options": [
+      "Không đúng chỉ vì tên hostname chưa được viết hoa",
+      "Không đúng: che mật khẩu trong cấu hình không mã hóa phiên Telnet",
+      "Đúng: lệnh này tự chuyển mọi phiên Telnet thành SSH",
+      "Đúng: lệnh này tạo khóa RSA và bật SSH phiên bản 2"
+    ],
+    "correct": 1,
+    "explanation": "service password-encryption dùng cơ chế che mật khẩu có thể đảo ngược trong cấu hình; không thay thế secret và không mã hóa Telnet trên mạng. SSH cần cấu hình riêng và được ưu tiên khi khả dụng. Hostname viết hoa hay thường không giải quyết bản chất vấn đề.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 16–17, mục 2.3.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Đang ở dấu nhắc SW1(config-if)# và muốn trở về privileged EXEC bằng một lệnh. Lựa chọn nào đúng?",
+    "options": [
+      "configure terminal",
+      "interface vlan 1",
+      "end",
+      "enable"
+    ],
+    "correct": 2,
+    "explanation": "end đưa từ chế độ cấu hình con về privileged EXEC, thường có dấu nhắc SW1#. enable dùng để chuyển từ user EXEC lên privileged EXEC; configure terminal đi vào cấu hình toàn cục; interface vlan 1 chọn ngữ cảnh SVI, không phải thoát cấu hình.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 15–16, mục 2.3.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Quản trị viên dùng copy startup-config running-config để trở về bản cấu hình cũ. Vì sao không được khẳng định mọi lệnh thừa trong running-config sẽ bị xóa?",
+    "options": [
+      "Thao tác này chỉ sao chép bảng MAC, không liên quan cấu hình",
+      "Startup-config luôn rỗng nên không có dữ liệu để khôi phục",
+      "Lệnh này tự xóa toàn bộ flash trước khi sao chép",
+      "Thao tác này trộn cấu hình vào running-config, không phải thay thế sạch toàn bộ"
+    ],
+    "correct": 3,
+    "explanation": "Sao chép vào running-config có tính chất merge: áp dụng các lệnh từ nguồn nhưng không bảo đảm loại bỏ mọi lệnh đang tồn tại không có trong nguồn. Vì vậy cần kiểm tra trạng thái thực tế sau khôi phục. Nó không phải sao chép MAC hay xóa flash.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 20, mục 2.3.4.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một bản sao tốt đã được chép vào startup-config, trong khi running-config vẫn chứa thay đổi sai. Khi chuẩn bị reload để dùng bản sao tốt, hành động nào tránh ghi đè bản vừa khôi phục?",
+    "options": [
+      "Không lưu running-config sai đè lên startup-config trước khi reload",
+      "Luôn copy running-config startup-config ngay trước reload",
+      "Xóa file IOS để buộc thiết bị đọc lại cấu hình",
+      "Xóa mọi VLAN trước khi reload bất kể nội dung bản sao"
+    ],
+    "correct": 0,
+    "explanation": "Khi khôi phục vào startup-config, bản đó dành cho lần khởi động sau. Lưu running-config sai trước reload sẽ ghi đè bản tốt và làm mất mục tiêu khôi phục. Cần kiểm tra bản sao và reload có kiểm soát, không xóa IOS hay VLAN không liên quan.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 20, mục 2.3.4.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Bảng MAC trong VLAN 10 đã có A ở Gi1/0/1 và B ở Gi1/0/2, cả hai cổng forwarding. Khi B gửi khung unicast cho A, điều gì xảy ra? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Khung bắt buộc được flood ra mọi VLAN dù A đã biết",
+      "Bản ghi MAC-B được làm mới từ địa chỉ nguồn tại Gi1/0/2",
+      "Khung được chuyển tới Gi1/0/1 theo MAC đích A",
+      "Switch học vị trí B từ địa chỉ MAC đích A"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Học nguồn và tra đích là hai thao tác khác nhau: nguồn B làm mới bản ghi cổng vào, đích A chọn cổng ra đã biết trong cùng VLAN. Không học B từ MAC-A và không flood xuyên VLAN khi đã xác định cổng đích hợp lệ.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 4–6, mục 2.1.2.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cần giới hạn truy cập VTY ở SSH và xác thực bằng tài khoản cục bộ đã tạo. Những lệnh nào cần áp dụng trong ngữ cảnh line vty? (Chọn 2 đáp án đúng)",
+    "options": [
+      "service password-encryption",
+      "ip address 192.168.10.2 255.255.255.0",
+      "login local",
+      "transport input ssh"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "login local yêu cầu dùng cơ sở tài khoản cục bộ; transport input ssh giới hạn giao thức vào VTY là SSH. service password-encryption là lệnh toàn cục che mật khẩu; ip address thuộc ngữ cảnh giao diện, không thay thế xác thực hay giới hạn giao thức VTY. Các điều kiện SSH khác vẫn phải được cấu hình đầy đủ.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 16–17, mục 2.3.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cần phân biệt lỗi ở liên kết vật lý với lỗi SVI quản trị của switch. Những phép kiểm tra nào phù hợp? (Chọn 2 đáp án đúng)",
+    "options": [
+      "show ip interface brief để xem IP và trạng thái SVI",
+      "Chỉ nhìn màu LED là kết luận được đúng IP/mask của SVI",
+      "Chỉ xem hostname là xác nhận được đường đi quản trị",
+      "show interfaces status để xem trạng thái cổng vật lý và tốc độ"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "Hai lệnh show cung cấp hai lớp bằng chứng bổ sung: trạng thái cổng vật lý và trạng thái/IP của giao diện quản trị. LED phụ thuộc model và không biểu diễn đầy đủ IP/mask; hostname không chứng minh khả năng kết nối. Cần đối chiếu cả trạng thái rồi kiểm thử đường đi.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 17, 19, mục 2.3.3.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cổng 10 Gb/s liên tục nhận lưu lượng hướng tới cổng ra 1 Gb/s, tốc độ đến thực tế vượt 1 Gb/s đủ lâu. (Chọn 2 đáp án đúng)",
+    "options": [
+      "Đây là chuyển mạch bất đối xứng vì hai cổng có tốc độ khác nhau",
+      "Bộ đệm hữu hạn có thể đầy và gây loại khung khi tải kéo dài",
+      "Bộ đệm chia sẻ làm cổng ra tự tăng tốc lên 10 Gb/s",
+      "Chuyển mạch bất đối xứng luôn là lỗi cấu hình song công"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Bất đối xứng mô tả các cổng khác tốc độ và là tình huống thiết kế bình thường. Bộ đệm điều hòa trong giới hạn nhưng không thay đổi tốc độ vật lý; nếu thiếu năng lực kéo dài, hàng đợi đầy và có thể mất khung. Điều này không đồng nghĩa duplex mismatch.\n\nNguồn đối chiếu: chapter02(1).pdf, trang PDF 7–8, mục 2.1.4.",
+    "sources": [
+      "6e56a03a-c608-56f9-8213-3b4928ab7b8f"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 2"
   }
 ]

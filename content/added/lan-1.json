@@ -1,0 +1,334 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Một switch chỉ dùng ba cổng: một cổng nối hub có 3 PC, hai cổng còn lại nối trực tiếp 2 PC. Tất cả thuộc một LAN, không có VLAN hay router. Theo quy ước đếm miền của bài giảng, có bao nhiêu miền đụng độ và miền quảng bá?",
+    "options": [
+      "3 miền đụng độ, 1 miền quảng bá",
+      "5 miền đụng độ, 1 miền quảng bá",
+      "6 miền đụng độ, 3 miền quảng bá",
+      "1 miền đụng độ, 3 miền quảng bá"
+    ],
+    "correct": 0,
+    "explanation": "Nhóm 3 PC sau hub và cổng switch nối hub dùng chung một miền đụng độ; hai liên kết PC trực tiếp tạo thêm hai miền. Switch không tạo ranh giới quảng bá giữa các cổng cùng LAN. Không thể đếm miền bằng số PC hoặc cộng riêng từng cổng hub.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 14–16, mục 1.2.1.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Ba switch S1–S2–S3 nối thành chuỗi bằng hai liên kết, mỗi switch nối trực tiếp 2 PC. Mọi cổng đang hoạt động trong cùng VLAN, không có router. Theo quy ước topo trong giáo trình, kết quả đếm nào đúng?",
+    "options": [
+      "8 miền đụng độ, 3 miền quảng bá",
+      "8 miền đụng độ, 1 miền quảng bá",
+      "6 miền đụng độ, 3 miền quảng bá",
+      "10 miền đụng độ, 1 miền quảng bá"
+    ],
+    "correct": 1,
+    "explanation": "Sáu liên kết PC–switch cộng hai liên kết switch–switch tạo 8 miền đụng độ theo quy ước topo. Mỗi liên kết giữa hai switch chỉ tính một lần. Ba switch trong cùng VLAN vẫn chia sẻ một miền quảng bá; full-duplex đúng không phát sinh đụng độ thực tế.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 14–16, 21–23, mục 1.2.1 và 1.3.1.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 có hai giao diện Ethernet định tuyến, mỗi giao diện nối một switch riêng; mỗi switch nối trực tiếp 3 PC, không có liên kết nào khác. Theo quy ước của bài giảng, toàn mô hình có bao nhiêu miền đụng độ và miền quảng bá?",
+    "options": [
+      "8 miền đụng độ, 1 miền quảng bá",
+      "10 miền đụng độ, 2 miền quảng bá",
+      "8 miền đụng độ, 2 miền quảng bá",
+      "6 miền đụng độ, 1 miền quảng bá"
+    ],
+    "correct": 2,
+    "explanation": "Có 6 liên kết PC–switch và 2 liên kết switch–router nên có 8 miền đụng độ theo topo. Hai giao diện lớp 3 của R1 kết thúc hai miền quảng bá riêng. Router không chuyển nguyên broadcast Ethernet từ phía này sang phía kia.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 14–15, 22–23, mục 1.2.1 và 1.3.1.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai thiết bị nối bằng Ethernet 1 Gb/s full-duplex và cùng gửi dữ liệu cho nhau. Bỏ qua overhead và giới hạn xử lý, cách hiểu nào đúng về năng lực liên kết?",
+    "options": [
+      "Cả hai chiều bắt buộc chia nhau tổng cộng 1 Gb/s",
+      "Một chiều có thể đạt 2 Gb/s nếu chiều kia im lặng",
+      "Hai đầu phải dùng CSMA/CD để chọn bên truyền",
+      "Mỗi chiều có thể đạt 1 Gb/s đồng thời"
+    ],
+    "correct": 3,
+    "explanation": "Full-duplex có hai hướng truyền độc lập: mỗi chiều tối đa 1 Gb/s trong điều kiện lý tưởng. Tổng hai chiều có thể là 2 Gb/s nhưng tốc độ một chiều không tăng thành 2 Gb/s. Liên kết điểm–điểm full-duplex không dùng CSMA/CD.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 10, mục 1.1.4.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Chỉ xét thời gian đẩy 1.000 byte lên đường truyền, bỏ qua mọi overhead và độ trễ khác. Khi đổi từ 100 Mb/s sang 1 Gb/s, thời gian này thay đổi như thế nào?",
+    "options": [
+      "Từ 80 micro giây xuống 8 micro giây",
+      "Từ 8 micro giây xuống 0,8 micro giây",
+      "Từ 80 mili giây xuống 8 mili giây",
+      "Không đổi vì số byte của dữ liệu không đổi"
+    ],
+    "correct": 0,
+    "explanation": "Thời gian truyền bằng số bit chia tốc độ bit: 1.000 × 8 / 100.000.000 = 80 micro giây; ở 1.000.000.000 bit/s là 8 micro giây. Đây chỉ là serialization delay; không cộng độ trễ xử lý, hàng đợi hay lan truyền vào phép tính.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 12, mục 1.1.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Bốn PC dùng cổng 1 Gb/s cùng tải dữ liệu qua một uplink 1 Gb/s. Giả sử đường lên là nút thắt duy nhất, chia công bằng, bỏ qua overhead. Giới hạn thông lượng trung bình lý tưởng cho mỗi PC là bao nhiêu?",
+    "options": [
+      "125 Mb/s",
+      "250 Mb/s",
+      "1 Gb/s",
+      "4 Gb/s"
+    ],
+    "correct": 1,
+    "explanation": "Bốn luồng cùng chia một tài nguyên 1 Gb/s nên mỗi luồng tối đa trung bình 1.000/4 = 250 Mb/s trong giả thiết đề bài. Tốc độ cổng riêng không bảo đảm thông lượng đầu cuối bằng tốc độ đó; thực tế có overhead nên giá trị có thể thấp hơn.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 12–13, mục 1.1.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Bên nhận tính lại CRC và thấy không khớp FCS của khung Ethernet. Kết luận nào đúng về xử lý lỗi ở Ethernet lớp 2?",
+    "options": [
+      "Luôn gửi yêu cầu truyền lại Ethernet tới MAC nguồn",
+      "Chuyển nguyên khung lên ứng dụng vì IP sẽ sửa lỗi",
+      "Loại bỏ khung lỗi; FCS không tự sửa bit hay bảo đảm truyền lại",
+      "Dùng FCS để khôi phục tất cả bit sai rồi giao dữ liệu lên IP"
+    ],
+    "correct": 2,
+    "explanation": "FCS giúp phát hiện lỗi, không chứa cơ chế sửa lỗi hay yêu cầu truyền lại ở Ethernet lớp 2. Giao diện nhận loại khung không đạt kiểm tra. Việc phục hồi tin cậy nếu cần do giao thức lớp trên hoặc ứng dụng đảm nhiệm, nên không thể xem FCS như TCP.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 6–7, mục 1.1.2.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC-A 192.168.10.11/24 gửi tới máy chủ 192.168.20.50/24 qua gateway 192.168.10.1. ARP cache đang trống và không có proxy ARP. PC-A cần phân giải MAC của thiết bị nào để tạo khung chặng đầu?",
+    "options": [
+      "Máy chủ 192.168.20.50 ở mạng xa",
+      "Switch lớp 2 đang nối với PC-A",
+      "Mọi máy trong hai mạng để tìm đường đi",
+      "Giao diện gateway 192.168.10.1"
+    ],
+    "correct": 3,
+    "explanation": "PC-A nhận biết đích ngoài subnet của mình nên gửi gói cho default gateway và ARP để tìm MAC của gateway cục bộ. IP đích của gói vẫn là máy chủ. ARP broadcast không được router chuyển nguyên sang mạng xa; MAC của switch không phải next hop định tuyến.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 8, mục 1.1.2.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 chuyển gói từ PC-A sang một máy chủ nằm trực tiếp trên mạng Ethernet ở giao diện ra của R1. Không có NAT. Cặp MAC của khung rời R1 là cặp nào?",
+    "options": [
+      "MAC nguồn của giao diện ra R1, MAC đích của máy chủ",
+      "MAC nguồn của PC-A, MAC đích của máy chủ",
+      "MAC nguồn của giao diện vào R1, MAC đích của PC-A",
+      "MAC nguồn của PC-A, MAC đích của giao diện vào R1"
+    ],
+    "correct": 0,
+    "explanation": "Router bỏ đóng gói Ethernet của chặng vào, rồi tạo khung mới cho chặng ra. Do máy chủ trực tiếp trên mạng ra, MAC đích là MAC của máy chủ và MAC nguồn là giao diện ra của R1. IP nguồn/đích đầu cuối được giữ trong trường hợp không NAT, nhưng MAC không giữ nguyên qua router.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 8, 18–19, mục 1.1.2 và 1.2.4.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một khung Ethernet II không gắn thẻ mang 30 byte dữ liệu lớp trên. Cần bao nhiêu byte Pad để đạt kích thước khung tối thiểu, tính từ Destination MAC đến FCS?",
+    "options": [
+      "46 byte",
+      "16 byte",
+      "30 byte",
+      "34 byte"
+    ],
+    "correct": 1,
+    "explanation": "Trường Data và Pad tối thiểu là 46 byte. Với 30 byte dữ liệu, Pad cần 46 − 30 = 16 byte; cộng 14 byte header và 4 byte FCS được khung 64 byte. Preamble và SFD không được tính vào giới hạn kích thước khung này.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 6–7, mục 1.1.2.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một khung Ethernet II không có thẻ VLAN chứa 1.500 byte trong trường Data. Nếu tính từ Destination MAC đến hết FCS, kích thước khung là bao nhiêu?",
+    "options": [
+      "1.526 byte",
+      "1.514 byte",
+      "1.518 byte",
+      "1.500 byte"
+    ],
+    "correct": 2,
+    "explanation": "Hai địa chỉ MAC chiếm 12 byte, EtherType 2 byte, Data 1.500 byte và FCS 4 byte: tổng 1.518 byte. Giá trị 1.514 bỏ sót FCS; 1.526 cộng thêm 8 byte preamble/SFD vốn nằm ngoài phạm vi tính của câu hỏi.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 6–7, mục 1.1.2.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong 1 giây, một luồng trên liên kết 1 Gb/s truyền thực tế 950 megabit, trong đó 800 megabit là dữ liệu ứng dụng hữu ích; phần còn lại là overhead và truyền lại. Cặp thông lượng/goodput tương ứng là gì?",
+    "options": [
+      "1.000 Mb/s và 950 Mb/s",
+      "800 Mb/s và 950 Mb/s",
+      "1.000 Mb/s và 800 Mb/s",
+      "950 Mb/s và 800 Mb/s"
+    ],
+    "correct": 3,
+    "explanation": "Thông lượng là tổng dữ liệu thực tế qua liên kết theo thời gian, nên bằng 950 Mb/s. Goodput chỉ tính dữ liệu ứng dụng hữu ích, bằng 800 Mb/s. Tốc độ danh định 1.000 Mb/s là năng lực liên kết, không thay thế lượng dữ liệu thực tế đo được.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 12, mục 1.1.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Uplink chỉ dùng trung bình 30% khi đo theo phút, nhưng nhiều PC đồng loạt gửi dữ liệu ngắn khiến độ trễ tăng vọt. Giải thích nào phù hợp nhất?",
+    "options": [
+      "Các đợt lưu lượng có thể tạo hàng đợi tức thời dù tải trung bình thấp",
+      "Tải trung bình dưới 50% chứng minh không có nghẽn tại uplink",
+      "Độ trễ lan truyền của cáp tự tăng theo số lượng PC đang gửi",
+      "Chỉ có thể do thay đổi địa chỉ MAC của PC"
+    ],
+    "correct": 0,
+    "explanation": "Trung bình theo phút có thể che mất những đợt nhiều khung đến gần nhau. Khi tốc độ đến tức thời vượt năng lực cổng ra, hàng đợi tăng và làm tăng độ trễ. Khoảng cách cáp không đổi nên không thể quy mọi biến động đó cho độ trễ lan truyền; MAC cũng không phải lời giải tất yếu.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 12–13, mục 1.1.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một liên kết điểm–điểm đã xác nhận full-duplex đúng ở cả hai đầu, nhưng bộ đếm CRC vẫn tăng. Hướng nhận định nào hợp lý nhất?",
+    "options": [
+      "CRC tăng chứng minh cả hai đầu đã trở thành half-duplex",
+      "Kiểm tra cáp, đầu nối, nhiễu và phần cứng trước khi quy lỗi cho đụng độ",
+      "Kết luận CSMA/CD đang phát hiện đụng độ bình thường",
+      "Tăng số hub để chia nhỏ liên kết"
+    ],
+    "correct": 1,
+    "explanation": "CRC có thể phát sinh vì lỗi bit trên cáp, đầu nối, nhiễu hoặc phần cứng, kể cả ở full-duplex. Full-duplex đúng không có đụng độ trong vận hành bình thường. Chỉ dựa vào CRC không đủ kết luận hai đầu đổi chế độ song công, và thêm hub không khắc phục nguyên nhân vật lý.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 6, 13, mục 1.1.2 và 1.1.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhóm 8 PC đang dùng chung hub được chuyển sang 8 cổng switch riêng, vẫn ở cùng VLAN. Nhận định nào mô tả đúng sự thay đổi?",
+    "options": [
+      "Tự nâng tốc độ mỗi NIC bất kể khả năng phần cứng",
+      "Loại bỏ hoàn toàn nguy cơ nghẽn trên mọi uplink",
+      "Tách môi trường truyền theo cổng, nhưng các PC vẫn cùng miền quảng bá",
+      "Tạo 8 miền quảng bá riêng và tự chặn mọi trao đổi giữa PC"
+    ],
+    "correct": 2,
+    "explanation": "Thay hub bằng switch tạo các vi đoạn theo cổng và cho phép full-duplex khi hai đầu hỗ trợ, nhưng cùng VLAN vẫn chung miền quảng bá. Điều đó không tự tạo chính sách bảo mật, không nâng NIC vượt khả năng và không loại bỏ nút thắt ở các liên kết hội tụ.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 14–16, 21, mục 1.2.1 và 1.2.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong mô phỏng, switch đã học đủ MAC của ba PC nhưng vẫn phát ARP Request từ PC-A tới các cổng PC-B và PC-C trong cùng LAN. Cách giải thích nào đúng?",
+    "options": [
+      "Bảng MAC chắc chắn bị hỏng vì đã biết đích thì không được flood",
+      "Switch luôn lặp mọi khung giống hub, không xét loại khung",
+      "ARP Request phải được định tuyến qua mọi mạng trước khi tìm đích",
+      "ARP Request là broadcast nên vẫn được flood dù đã học đủ MAC"
+    ],
+    "correct": 3,
+    "explanation": "Quyết định phụ thuộc loại khung: ARP Request có MAC đích broadcast và cần được phân phối trong miền quảng bá. Học đủ MAC không biến một khung broadcast thành unicast. Sự khác nhau giữa switch và hub thể hiện ở unicast đã biết, không phải bằng việc cấm mọi flooding.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 8, 24–26, mục 1.1.2 và 1.3.2–1.3.3.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một switch PoE có giới hạn 30 W mỗi cổng và tổng ngân sách 100 W. Bốn thiết bị cần cấp 20 W mỗi thiết bị; dự kiến thêm hai thiết bị cùng loại, bỏ qua tổn hao. (Chọn 2 đáp án đúng)",
+    "options": [
+      "Mỗi thiết bị 20 W nằm trong giới hạn 30 W của một cổng",
+      "Sáu thiết bị cần 120 W nên vượt tổng ngân sách 100 W",
+      "Giới hạn 30 W mỗi cổng bảo đảm cả sáu thiết bị luôn được cấp đủ",
+      "Bật PoE làm thay đổi MAC đích của mọi khung dữ liệu"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Phải xét cả công suất từng cổng và tổng ngân sách: 20 < 30 W nhưng 6 × 20 = 120 W > 100 W. Đạt điều kiện từng cổng chưa đủ bảo đảm cả hệ thống. PoE cấp nguồn trên cáp tương thích, không thay đổi quy tắc MAC hoặc cấu trúc khung Ethernet.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 6, mục 1.1.1.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai máy trong một Ethernet dùng chung half-duplex cùng phát và xảy ra đụng độ. Những bước nào thuộc cơ chế CSMA/CD sau khi phát hiện đụng độ? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Dùng FCS của khung để sửa các bit đã chồng lấn",
+      "Phát tín hiệu jam để các trạm cùng nhận biết đụng độ",
+      "Dừng truyền rồi chờ một khoảng backoff ngẫu nhiên trước khi thử lại",
+      "Tự chuyển toàn bộ hub sang full-duplex"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "CSMA/CD xử lý đụng độ bằng tín hiệu jam và chờ backoff ngẫu nhiên sau khi dừng truyền. Cơ chế này không biến hub thành liên kết full-duplex và không dùng FCS để sửa bit. Phạm vi áp dụng là Ethernet half-duplex dùng chung, không phải vận hành full-duplex thông thường.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 10, mục 1.1.4.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC-A và PC-B cùng mạng IP trao đổi qua một switch lớp 2, không có router và không có cơ chế dịch địa chỉ. Khi mở cùng một gói ICMP tại cổng vào và cổng ra switch, (Chọn 2 đáp án đúng)",
+    "options": [
+      "Switch thay MAC nguồn bằng MAC quản trị của nó ở mỗi cổng ra",
+      "Switch phải giảm TTL của gói như một router",
+      "MAC nguồn và MAC đích của khung vẫn là của hai PC",
+      "IP nguồn và IP đích vẫn là của hai PC"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "Trong cùng LAN, switch chuyển khung dựa trên MAC và không định tuyến gói IP. Vì vậy cặp MAC và cặp IP đầu cuối giữ nguyên; việc tái đóng gói bằng MAC mới và xử lý TTL theo chặng thuộc chức năng router/lớp 3, không phải switch lớp 2 trong tình huống này.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 8, 26, mục 1.1.2 và 1.3.3.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một doanh nghiệp muốn giảm độ trễ tăng cao khi nhiều PC cùng truyền qua một uplink đã quá tải kéo dài. Những nhận định nào đúng về giải pháp và giới hạn? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Chỉ tăng bộ đệm có thể kéo dài thời gian chờ mà không giải quyết thiếu năng lực lâu dài",
+      "Tăng bộ đệm bảo đảm không mất khung dù tốc độ đến luôn vượt tốc độ ra",
+      "Chuyển sang full-duplex bảo đảm mọi PC đạt tốc độ cổng tới máy chủ dùng chung",
+      "Cần xem xét năng lực uplink và mẫu lưu lượng hội tụ"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "Khi tải đến vượt năng lực phục vụ kéo dài, hàng đợi cuối cùng vẫn đầy. Bộ đệm chủ yếu hấp thụ các đợt ngắn và có thể làm tăng độ trễ; phải đánh giá uplink và các nút thắt đầu cuối. Full-duplex loại tranh chấp kiểu hub nhưng không xóa giới hạn của cổng ra dùng chung.\n\nNguồn đối chiếu: chapter01(1).pdf, trang PDF 12–13, mục 1.1.5.",
+    "sources": [
+      "e4ed5483-2a2a-524d-a3cc-84fd3fda42b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 1"
+  }
+]

@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ đã tạo một bản ghi nhưng phản hồi bị mất trên đường về. Client timeout và chuẩn bị gửi lại yêu cầu tạo. Thiết kế nào giảm nguy cơ tạo bản ghi trùng?",
+    "options": [
+      "Dùng cùng một idempotency key cho lần gửi đầu và các lần thử lại của cùng thao tác.",
+      "Tạo idempotency key mới cho mỗi lần thử lại.",
+      "Xem timeout là bằng chứng chắc chắn máy chủ chưa xử lý.",
+      "Tăng số lần retry nhưng không nhận diện yêu cầu đã thực hiện."
+    ],
+    "correct": 0,
+    "explanation": "Phản hồi mất không có nghĩa thao tác chưa xảy ra. Khóa lũy đẳng ổn định giúp máy chủ nhận diện lần gửi lại của cùng thao tác. Khóa mới làm lần thử lại trông như yêu cầu mới; suy luận từ timeout hoặc chỉ tăng retry đều không ngăn tác dụng phụ bị lặp.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 7, mục 8.1.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.1.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi backend vừa quá tải, hàng nghìn client đồng loạt retry ngay và tiếp tục làm tải tăng. Chính sách nào phù hợp nhất với nguyên tắc xử lý lỗi của giáo trình?",
+    "options": [
+      "Retry không giới hạn, không có khoảng nghỉ để nhanh hồi phục.",
+      "Giới hạn số lần thử lại, dùng backoff tăng dần kèm jitter.",
+      "Mọi client retry đúng cùng một chu kỳ rất ngắn cố định.",
+      "Bỏ timeout để mọi client giữ kết nối chờ vô hạn."
+    ],
+    "correct": 1,
+    "explanation": "Backoff giãn khoảng cách, jitter làm lệch thời điểm gửi lại và giới hạn retry tránh kéo dài tải vô ích. Retry dồn dập hoặc đồng bộ nhịp dễ tạo đợt tải mới. Bỏ timeout không phục hồi backend, chỉ khiến bên gọi tiếp tục giữ tài nguyên chờ.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 6, mục 8.1.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.1.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Dịch vụ luôn trả đúng kết quả sau 12 giây, trong khi hợp đồng yêu cầu phản hồi trong 2 giây. Theo phân loại lỗi trong giáo trình, biểu hiện chính thuộc loại nào?",
+    "options": [
+      "Lỗi phản hồi vì giá trị kết quả chắc chắn sai.",
+      "Lỗi dừng vì tiến trình đã chấm dứt hoạt động.",
+      "Lỗi thời gian (timing failure).",
+      "Không phải lỗi vì chỉ cần nội dung đúng, không cần thời hạn."
+    ],
+    "correct": 2,
+    "explanation": "Lỗi thời gian xảy ra khi phản hồi không đáp ứng ràng buộc thời gian dù nội dung có thể đúng. Tình huống không cho thấy giá trị sai hay tiến trình dừng. Khi thời hạn là một phần hợp đồng, phản hồi đúng nhưng quá muộn vẫn vi phạm yêu cầu hệ thống.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 5, mục 8.1.4.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Backend chạy tốt trên máy thật. Sau khi tách Web API và backend thành hai container cùng network, API vẫn gọi localhost:8080 và thất bại. Với service Compose tên backendworker, nên sửa gì?",
+    "options": [
+      "Giữ localhost:8080 vì mọi container cùng network dùng chung localhost.",
+      "Đổi URL thành localhost nhưng tăng số container backend.",
+      "Chỉ mở thêm cổng trên máy khách mà không sửa đích gọi trong API.",
+      "Đặt URL đích thành http://backendworker:8080 nếu backend lắng nghe cổng đó trong container."
+    ],
+    "correct": 3,
+    "explanation": "localhost trong API container trỏ về chính container đó. Tên service backendworker được DNS của mạng Compose phân giải tới backend; cần dùng đúng cổng backend lắng nghe. Thêm bản sao hay mở cổng nơi khác không sửa địa chỉ đích vẫn trỏ sai container.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 10, mục 8.2.4.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Dùng thứ tự nạp cấu hình mặc định nêu trong giáo trình, BackendUrl có giá trị A trong appsettings.json, B trong biến môi trường và C ở đối số dòng lệnh. Khi chẩn đoán API gọi sai đích, giá trị hiệu lực nào cần kiểm tra trước?",
+    "options": [
+      "C, vì đối số dòng lệnh có ưu tiên cao nhất trong thứ tự đã nêu.",
+      "A, vì file cấu hình luôn thắng mọi nguồn khác.",
+      "B, vì biến môi trường luôn thắng cả đối số dòng lệnh.",
+      "Ba URL được tự động gộp thành danh sách đích cân bằng tải."
+    ],
+    "correct": 0,
+    "explanation": "Theo thứ tự cấu hình đang giả định, dòng lệnh ghi đè biến môi trường, còn biến môi trường ghi đè file mặc định. Vì thế C thắng. Các nguồn cùng một khóa không tự tạo danh sách cân bằng tải; cần xem nguồn có ưu tiên cao nhất trước khi sửa file ít ưu tiên hơn.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 9, mục 8.2.2.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Pipeline đã build và publish ứng dụng thành công nhưng image triển khai vẫn chứa toàn bộ SDK và mã nguồn. Thay đổi nào phù hợp với Dockerfile nhiều giai đoạn?",
+    "options": [
+      "Giữ SDK trong image cuối và chỉ đổi tên stage thành runtime.",
+      "Dùng SDK ở giai đoạn build, rồi sao chép sản phẩm publish sang image runtime cuối.",
+      "Chạy dotnet restore lại ở mọi lần container khởi động thay cho publish.",
+      "Sao chép toàn bộ thư mục mã nguồn sang image cuối để bỏ nhu cầu runtime."
+    ],
+    "correct": 1,
+    "explanation": "Multi-stage tách công cụ biên dịch khỏi môi trường chạy: image cuối lấy sản phẩm publish và runtime cần thiết. Đổi tên stage không loại bỏ SDK. Restore khi khởi động không thay thế build/publish, còn có mã nguồn không đồng nghĩa ứng dụng chạy được mà không có môi trường thực thi phù hợp.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 9, mục 8.2.3.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Mỗi sửa đổi một tệp C# đều khiến Docker chạy lại restore dù tệp dự án và package không đổi. Cách sắp xếp các bước nào tăng cơ hội dùng lại lớp restore theo ví dụ giáo trình?",
+    "options": [
+      "COPY toàn bộ mã nguồn trước restore trong mọi trường hợp.",
+      "Đặt restore sau lệnh khởi động ứng dụng trong image cuối.",
+      "COPY tệp .csproj, chạy restore, rồi mới COPY phần mã nguồn còn lại.",
+      "Xóa cache ở đầu mọi bản build để restore ổn định hơn."
+    ],
+    "correct": 2,
+    "explanation": "Sao chép tệp dự án trước giúp lớp restore phụ thuộc vào khai báo package thay vì mọi thay đổi mã nguồn. Copy toàn bộ code trước restore làm thay đổi code có thể vô hiệu hóa lớp này. Đưa restore vào lúc chạy hoặc xóa cache không khai thác được khả năng dùng lại lớp build.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 9, mục 8.2.3.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Compose dùng depends_on dạng chỉ sắp thứ tự khởi động. API thỉnh thoảng gọi backend lúc container đã chạy nhưng ứng dụng bên trong chưa sẵn sàng. Giải pháp nào xử lý đúng khoảng trống này?",
+    "options": [
+      "Cho rằng depends_on dạng này đã chứng minh backend luôn sẵn sàng.",
+      "Bỏ kiểm tra trạng thái vì container đang chạy thì mọi phụ thuộc đều khỏe.",
+      "Chỉ chờ cố định một giây rồi coi backend đã sẵn sàng trong mọi lần triển khai.",
+      "Bổ sung kiểm tra readiness phù hợp và cơ chế retry có giới hạn cho lúc backend đang khởi động."
+    ],
+    "correct": 3,
+    "explanation": "Thứ tự khởi động container không đồng nghĩa ứng dụng đã sẵn sàng phục vụ. Kiểm tra trạng thái phù hợp và retry có giới hạn giúp xử lý giai đoạn chuyển tiếp này. Chỉ nhìn trạng thái chạy, dựa hoàn toàn vào thứ tự hoặc chờ một khoảng cố định đều không chứng minh backend đã sẵn sàng.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 11, mục 8.2.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một dịch vụ chạy được nhưng truy cập cơ sở dữ liệu thất bại và log rất khó lọc theo tác vụ. Hai cải tiến quan sát nào phù hợp? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Bổ sung kiểm tra kết nối phụ thuộc vào application health check khi cần đánh giá khả năng phục vụ.",
+      "Chỉ xem container có PID rồi suy ra mọi phụ thuộc đều hoạt động.",
+      "Ghi log có trường khóa–giá trị như TaskId để công cụ tập trung dễ lọc và phân tích.",
+      "Thay toàn bộ log có cấu trúc bằng chuỗi nối tự do để tự động có thêm trường dữ liệu."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Health check ở ứng dụng có thể kiểm tra sâu hơn tình trạng tiến trình, gồm kết nối cơ sở dữ liệu; log có cấu trúc giữ các trường phục vụ tìm kiếm. PID không chứng minh phụ thuộc hoạt động. Chuỗi nối tự do cũng không tự cung cấp các trường khóa–giá trị cho công cụ thu thập.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 11, mục 8.2.6.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.6"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm lập quy trình dừng và phục hồi dịch vụ sau sự cố. Hai lựa chọn nào phù hợp với hướng dẫn timeout, retry và graceful shutdown? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Giết ngay tiến trình giữa tác vụ là cách mặc định để bảo đảm không có trạng thái dang dở.",
+      "Có thời gian chờ tối đa và giới hạn lần thử lại khi gọi dịch vụ qua mạng.",
+      "Cứ retry vô hạn thì không cần quan tâm tải lên dịch vụ đang lỗi.",
+      "Khi nhận yêu cầu dừng, cho ứng dụng cơ hội hoàn tất hoặc dọn dẹp công việc đang xử lý trước khi thoát."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Timeout và retry giới hạn giúp bên gọi kiểm soát tài nguyên khi phụ thuộc lỗi. Graceful shutdown dành cơ hội xử lý công việc dang dở và dọn dẹp thay vì cắt ngang ngay. Giết tiến trình không tự loại bỏ trạng thái dang dở; retry vô hạn có thể tiếp tục tăng tải lên dịch vụ đang gặp sự cố.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 12, mục 8.2.7.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, mục 8.2.7"
+  }
+]

@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Hệ thống đã kiểm tra quyền và cho mỗi kết nối tham gia đúng nhóm submission:{id}. Khi lượt nộp 42 đổi trạng thái, cách gửi nào phù hợp để tránh thông báo không liên quan?",
+    "options": [
+      "Gửi đến nhóm submission:42 thay vì toàn bộ kết nối.",
+      "Gửi Clients.All rồi yêu cầu các giao diện tự giấu thông báo không thuộc mình.",
+      "Gửi chỉ Clients.Caller dù thay đổi đang được phát từ một tác vụ nền.",
+      "Gửi tới một connectionId bất kỳ vì mọi kết nối đều có cùng quyền xem."
+    ],
+    "correct": 0,
+    "explanation": "Nhóm khoanh vùng các kết nối theo dõi đúng lượt nộp; tình huống đã nêu quyền tham gia được kiểm tra. All truyền cả thông báo không liên quan, Caller gắn với bên gọi hub chứ không đại diện nhóm theo dõi, còn chọn ngẫu nhiên một kết nối sẽ sai người nhận.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 8, mục 3.2.4.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.2.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách mất kết nối khi bài nộp chuyển từ processing sang graded rồi kết nối lại thành công. Chỉ chờ thông điệp tương lai có thể khiến giao diện vẫn hiện processing. Cần bổ sung bước nào?",
+    "options": [
+      "Coi kết nối lại thành công là bằng chứng mọi thông điệp bị lỡ đã được phát lại.",
+      "Đọc trạng thái mới nhất qua REST API sau khi kết nối lại để bù thông tin có thể đã bỏ lỡ.",
+      "Tự đổi giao diện thành graded mà không đọc dữ liệu máy chủ.",
+      "Gửi lại thao tác tạo lượt nộp mới mỗi lần mất kết nối."
+    ],
+    "correct": 1,
+    "explanation": "Giáo trình yêu cầu phối hợp kết nối lại với đồng bộ trạng thái. Kết nối được khôi phục không tự chứng minh đã nhận đầy đủ sự kiện bị lỡ; đoán trạng thái có thể sai, còn tạo lượt nộp mới làm thay đổi nghiệp vụ không cần thiết.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 9, mục 3.2.5.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Worker hoàn tất chấm bài ở ngoài lớp SubmissionHub và cần đẩy trạng thái mới tới nhóm đang theo dõi. Cách tổ chức nào đúng với ví dụ?",
+    "options": [
+      "Chuyển toàn bộ nghiệp vụ chấm bài vào phương thức hub vì bên ngoài hub không thể gửi thông điệp.",
+      "Tạo một phiên bản hub tùy ý rồi coi nó là toàn bộ các kết nối hiện có.",
+      "Dùng IHubContext<SubmissionHub> từ mã xử lý bên ngoài để phát thông điệp tới nhóm thích hợp.",
+      "Buộc mọi máy khách gọi lại phương thức hub liên tục để thay thế việc máy chủ gửi cập nhật."
+    ],
+    "correct": 2,
+    "explanation": "IHubContext cho phép điểm cuối REST hoặc tác vụ nền phát thông điệp mà không nằm trong hub. Vì thế không cần dồn nghiệp vụ vào hub hoặc thay push bằng thăm dò; tự tạo đối tượng hub không phải cách được ví dụ dùng để truy cập kênh gửi.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 14, mục 3.3.1.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.3.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ gửi sự kiện SubmissionStatusChanged, còn máy khách đăng ký SubmissionStatusChange. Kết nối vẫn mở nhưng hàm xử lý không chạy. Hướng kiểm tra phù hợp nhất là gì?",
+    "options": [
+      "Tăng số worker chấm bài vì thiếu một ký tự luôn biểu hiện quá tải.",
+      "Đổi mã trạng thái REST từ 201 sang 200 để tự sửa tên sự kiện.",
+      "Giả định trình biên dịch sẽ báo lỗi nên chỉ kiểm tra cơ sở dữ liệu.",
+      "Đối chiếu chính xác tên sự kiện ở phía gửi và phía đăng ký nhận."
+    ],
+    "correct": 3,
+    "explanation": "Tên thông điệp là một phần hợp đồng giữa SendAsync và hàm đăng ký On; lệch tên có thể không có lỗi biên dịch nhưng hàm nhận không được gọi. Tăng worker, đổi HTTP status hoặc chỉ kiểm tra dữ liệu không sửa hợp đồng sự kiện này.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 6, mục 3.2.2.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ có thể gửi thông điệp chào ngay khi kết nối mở. Máy khách hiện gọi StartAsync rồi mới đăng ký các hàm On. Điều chỉnh nào giảm nguy cơ chưa có hàm nhận khi thông điệp đến?",
+    "options": [
+      "Xây dựng kết nối, đăng ký các hàm xử lý rồi mới mở kết nối bằng StartAsync.",
+      "Mở kết nối nhiều lần liên tiếp trước khi đăng ký để máy chủ lưu hộ thông điệp.",
+      "Bỏ các hàm On và chỉ giữ WithAutomaticReconnect để tự động xử lý mọi dữ liệu.",
+      "Chỉ đăng ký hàm nhận sau khi người dùng đã nhìn thấy thông điệp đầu tiên."
+    ],
+    "correct": 0,
+    "explanation": "Thứ tự thiết lập của giáo trình đặt hàm nhận trước bước mở kết nối. Mở nhiều lần không thay thế đăng ký xử lý; tự kết nối lại giải quyết gián đoạn, không cung cấp logic nhận dữ liệu; chờ thấy sự kiện rồi mới đăng ký làm đảo quan hệ cần thiết.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 6, mục 3.2.3.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một trang chỉ hiển thị tài liệu ít thay đổi và người dùng không cần thấy cập nhật tức thời. Nhóm định duy trì kết nối thời gian thực cho mọi lượt xem. Đánh giá nào phù hợp?",
+    "options": [
+      "Mọi dữ liệu đều phải chuyển sang SignalR vì REST không thể đọc trạng thái hiện tại.",
+      "Có thể tiếp tục đọc bằng REST; chỉ thêm thời gian thực khi độ trễ cập nhật ảnh hưởng rõ đến trải nghiệm hoặc thao tác.",
+      "Chỉ cần dùng SignalR thì không còn phải xác định người nhận và xử lý mất kết nối.",
+      "Dữ liệu ít thay đổi nên phải phát toàn bộ nội dung liên tục để giảm tải máy chủ."
+    ],
+    "correct": 1,
+    "explanation": "Giáo trình khuyến nghị chọn thời gian thực theo nhu cầu cập nhật. Dữ liệu ít thay đổi có thể lấy bằng REST. SignalR không loại bỏ quản lý người nhận hay vòng đời kết nối; phát nội dung liên tục khi không cần làm tăng công việc và lưu lượng.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 3, mục 3.1.3.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "REST API đã trả kết quả tạo lượt nộp, nhưng tác vụ chấm chỉ hoàn tất sau đó. Cách phân chia trách nhiệm nào giữ đúng thiết kế REST kết hợp SignalR?",
+    "options": [
+      "Sau khi có SignalR, xóa API đọc trạng thái vì máy khách sẽ không bao giờ cần đồng bộ lại.",
+      "REST phải giữ phản hồi mở cho tới khi mọi thông điệp SignalR đã được tất cả máy khách nhận.",
+      "REST tạo và đọc tài nguyên; SignalR gửi các thay đổi trạng thái phát sinh sau yêu cầu tạo.",
+      "Hub phải trở thành nơi duy nhất lưu toàn bộ dữ liệu lâu dài của bài nộp."
+    ],
+    "correct": 2,
+    "explanation": "Các kênh giải quyết những phần khác nhau: REST thao tác tài nguyên có phản hồi trực tiếp, SignalR báo cập nhật về sau. Chúng không buộc chung một thời gian sống; kết nối thời gian thực cũng không thay thế nguồn dữ liệu để đọc lại hoặc mặc nhiên làm kho lưu bền vững.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 9, mục 3.3.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong một môi trường, WebSocket không khả dụng nhưng nhóm vẫn muốn giữ SignalR nếu có cơ chế truyền tải phù hợp. Kết luận nào đúng với kiến trúc được mô tả?",
+    "options": [
+      "SignalR đồng nhất với WebSocket nên chắc chắn phải viết lại toàn bộ nghiệp vụ ngay.",
+      "SSE là một kho lưu trữ bảo đảm tự phát lại mọi thông điệp đã mất.",
+      "Long Polling có nghĩa máy chủ gửi dữ liệu mà không cần bất cứ yêu cầu HTTP nào.",
+      "SignalR có lớp trừu tượng cao hơn và có thể dùng SSE hoặc Long Polling tùy khả năng hai phía."
+    ],
+    "correct": 3,
+    "explanation": "SignalR có thể chọn cơ chế truyền tải dự phòng khi môi trường hỗ trợ; điều đó không đồng nghĩa mọi môi trường đều chắc chắn kết nối được. SSE là cơ chế đẩy một chiều, không mặc nhiên là kho lưu sự kiện; Long Polling vẫn dựa trên các yêu cầu HTTP được giữ chờ.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 3, mục 3.1.2.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Thiết kế thông báo kết quả chấm cần đáp ứng đúng nghiệp vụ và có khả năng phục hồi. Những nội dung nào phải làm rõ trước khi chỉ tập trung viết lệnh gửi? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Sự kiện kích hoạt, phạm vi người nhận và phần dữ liệu tối thiểu để cập nhật giao diện.",
+      "Chỉ tên thư viện, vì thư viện tự quyết định ai có quyền nhận mọi kết quả.",
+      "Cách máy khách đồng bộ lại nếu mất kết nối hoặc bỏ lỡ thông điệp.",
+      "Giả định mọi thông điệp đều đến, vì thời gian thực đồng nghĩa không có lỗi mạng."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Thời gian thực cần hợp đồng sự kiện, đối tượng nhận, tải dữ liệu và phương án phục hồi. Thư viện không thay nhóm thiết kế quyết định nghiệp vụ hoặc quyền nhận; khả năng đẩy nhanh cũng không loại bỏ lỗi mạng và thông điệp bị bỏ lỡ.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 3, mục 3.1.3.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một giao diện cần phản ánh đúng vòng đời kết nối SignalR để người dùng không tưởng đang nhận dữ liệu trực tiếp khi kênh đã gián đoạn. Những cách xử lý nào phù hợp? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Xóa kết quả bài nộp trên máy chủ ngay khi xuất hiện Reconnecting.",
+      "Hiển thị đang kết nối lại khi nhận sự kiện Reconnecting.",
+      "Coi Closed là kết nối vẫn hoạt động và tiếp tục hiển thị mọi cập nhật là trực tiếp.",
+      "Khi Closed xảy ra, xử lý trạng thái đã đóng và quyết định bước kết nối mới phù hợp."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Reconnecting phản ánh đang thử phục hồi; Closed báo kết nối đã đóng và ứng dụng cần quyết định bước tiếp theo. Đây là trạng thái kênh truyền, không phải lệnh xóa dữ liệu nghiệp vụ. Hiển thị kênh đã đóng như vẫn trực tiếp sẽ gây hiểu sai.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 9, mục 3.2.5.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.2.5"
+  }
+]

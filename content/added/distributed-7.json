@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Dịch vụ gửi email và dịch vụ thống kê cùng consume một queue sự kiện order.created. Mỗi dịch vụ chỉ thấy một phần đơn hàng, trong khi cả hai đều cần nhận mọi sự kiện. Nên sửa kiến trúc thế nào?",
+    "options": [
+      "Tạo queue riêng cho từng dịch vụ và bind cả hai queue với chủ đề cần nhận.",
+      "Tăng số consumer trên chính queue chung để mỗi dịch vụ có đủ bản sao.",
+      "Giữ queue chung và chỉ đổi EventType trong payload.",
+      "Để một dịch vụ ACK sớm hơn nhằm buộc broker gửi lại cho dịch vụ kia."
+    ],
+    "correct": 0,
+    "explanation": "Các consumer cùng queue cạnh tranh thông điệp; queue riêng cho từng subscriber mới cung cấp bản sao độc lập. Tăng consumer không đổi quy tắc phân phối, EventType không nhân bản queue, còn ACK sớm xác nhận xử lý chứ không tạo một bản sao cho dịch vụ khác.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 9, mục 7.2.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Topic exchange nhận ba routing key: order, order.created và order.created.v2. Một queue cần nhận đủ cả ba nhưng không nhận user.created. Binding nào đáp ứng?",
+    "options": [
+      "order.*",
+      "order.#",
+      "order.created.*",
+      "*.*"
+    ],
+    "correct": 1,
+    "explanation": "order.# khớp order và mọi số cấp con sau order. order.* chỉ khớp đúng một cấp con nên bỏ sót order và order.created.v2; order.created.* bỏ sót hai khóa ngắn hơn. *.* nhận khóa hai cấp như user.created, không đáp ứng bộ lọc yêu cầu.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 9, mục 7.2.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Subscriber đã khai báo topic exchange và queue, sau đó consume nhưng không nhận sự kiện dù publisher gửi đúng exchange. Chưa có thao tác liên kết queue với chủ đề. Bước nào còn thiếu?",
+    "options": [
+      "Chỉ khai báo queue là durable nhưng vẫn bỏ qua việc bind chủ đề.",
+      "Chỉ tăng số consumer trên queue chưa được liên kết.",
+      "Tạo binding giữa queue và exchange với routing pattern phù hợp.",
+      "Chỉ đổi tên queue giống routing key mà không tạo binding với topic exchange."
+    ],
+    "correct": 2,
+    "explanation": "Binding mô tả đường định tuyến từ exchange tới queue theo chủ đề. Khai báo durable chỉ liên quan độ bền, thêm consumer chỉ thay đổi bên đọc queue. Với topic exchange, đặt tên queue giống routing key cũng không thay thế việc tạo binding còn thiếu.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 8, mục 7.2.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi lưu điểm thành công, worker muốn công bố một sự kiện để nhiều dịch vụ tự quyết định phản ứng. Thông điệp nào thể hiện đúng ý nghĩa sự kiện thay vì yêu cầu thực hiện một hành động?",
+    "options": [
+      "SendEmailNow: yêu cầu dịch vụ email gửi ngay một thư.",
+      "GradeSubmission: yêu cầu worker chấm bài nộp này.",
+      "GetCurrentGrade: yêu cầu dịch vụ trả điểm ngay trong lời đáp.",
+      "SubmissionGraded: bài nộp đã được chấm, kèm định danh và kết quả."
+    ],
+    "correct": 3,
+    "explanation": "Sự kiện diễn tả sự việc đã xảy ra, nên SubmissionGraded phù hợp sau khi lưu điểm. Ba thông điệp còn lại yêu cầu một bên gửi thư, chấm bài hoặc trả dữ liệu; chúng mang ý nghĩa lệnh hay yêu cầu, không phải thông báo về kết quả đã xảy ra.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 3, mục 7.1.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hệ thống đã phát sự kiện SubmissionGraded và cần bổ sung dịch vụ kiểm tra thống kê mà không làm publisher biết thêm địa chỉ dịch vụ. Phương án nào giữ đúng mục tiêu giảm phụ thuộc?",
+    "options": [
+      "Cho dịch vụ thống kê đăng ký sự kiện hiện có qua queue và binding riêng.",
+      "Thêm lời gọi HTTP bắt buộc từ publisher tới thống kê trước mỗi lần phát sự kiện.",
+      "Đưa địa chỉ tất cả subscriber vào payload để publisher chờ đủ phản hồi.",
+      "Chuyển toàn bộ thuật toán thống kê vào publisher để không cần subscriber."
+    ],
+    "correct": 0,
+    "explanation": "Pub/sub cho phép một dịch vụ mới đăng ký sự kiện mà publisher không cần tham chiếu trực tiếp tới nó. Gọi HTTP bắt buộc hoặc chờ từng subscriber làm tăng phụ thuộc. Chuyển thuật toán vào publisher cũng làm mất ranh giới chức năng độc lập mà yêu cầu muốn duy trì.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 5, mục 7.1.3.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Đội dự án phát song song order.created.v1 và order.created.v2; cấu trúc v2 không tương thích với subscriber cũ. Để subscriber cũ chỉ đọc v1, cách binding nào rõ ràng nhất?",
+    "options": [
+      "Bind queue cũ với order.# và bỏ kiểm tra phiên bản.",
+      "Bind queue cũ với order.created.v1.",
+      "Bind queue cũ với order.created.* và giả định chỉ v1 tới nơi.",
+      "Bind queue cũ với # vì Version trong payload tự ngăn mọi định tuyến v2."
+    ],
+    "correct": 1,
+    "explanation": "Routing key có phiên bản cho phép subscriber đăng ký chính xác phiên bản mình hỗ trợ. Các pattern rộng order.#, order.created.* và # đều có thể nhận v2. Trường Version giúp nhận diện cấu trúc trong payload nhưng không tự thay đổi quy tắc binding của topic exchange.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 12, mục 7.2.5.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Subscriber dùng ConcurrentDictionary lưu EventId đã xử lý. Sau khi khởi động lại, sự kiện cũ được giao lại và tác dụng phụ bị lặp. Cải tiến nào khắc phục đúng giới hạn lưu trữ nêu trong giáo trình?",
+    "options": [
+      "Tăng dung lượng ConcurrentDictionary nhưng vẫn chỉ giữ trong bộ nhớ tiến trình.",
+      "Đổi EventId cho mọi lần giao lại để dễ phân biệt lần nhận.",
+      "Lưu dấu vết EventId đã xử lý trong cơ sở dữ liệu hoặc cache ngoài với thời hạn phù hợp.",
+      "Bỏ EventId và chỉ dựa vào thời điểm khởi động subscriber."
+    ],
+    "correct": 2,
+    "explanation": "Dictionary trong bộ nhớ mất nội dung khi tiến trình khởi động lại; kho ngoài giúp duy trì dấu vết khử trùng lặp qua lần khởi động. Tăng dung lượng không giải quyết tính dễ mất. Đổi ID khi giao lại hay bỏ ID làm mất khả năng nhận ra cùng một sự kiện.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 12, mục 7.2.5.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một subscriber dùng queue tạm bị xóa khi ngắt kết nối, nhưng nghiệp vụ yêu cầu đọc các sự kiện phát sinh trong thời gian nó offline. Điều chỉnh kiến trúc nào phù hợp nhất?",
+    "options": [
+      "Giữ queue tạm và chỉ tăng tốc độ xử lý sau khi kết nối lại.",
+      "Chỉ tạo lại queue tạm sau khi online rồi kỳ vọng có sẵn mọi sự kiện đã phát lúc queue không tồn tại.",
+      "Cho rằng topic exchange tự giữ mọi sự kiện dù không có queue nhận phù hợp.",
+      "Dùng queue lưu giữ phù hợp cho subscriber và cơ chế lưu thông điệp, thay vì queue tạm biến mất khi offline."
+    ],
+    "correct": 3,
+    "explanation": "Khả năng xử lý tồn đọng cần nơi lưu sự kiện trong thời gian subscriber vắng mặt. Queue tạm bị xóa không cung cấp nơi lưu đó; xử lý nhanh hơn hoặc tạo lại queue về sau không tự khôi phục những thông điệp không được giữ. Exchange không thay cho cấu hình queue và lưu trữ phù hợp.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 3, mục 7.1.1.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm thay chuỗi lời gọi trực tiếp bằng pub/sub để các dịch vụ triển khai độc lập. Hai đánh đổi nào cần đưa vào thiết kế và vận hành? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Một thay đổi có thể chưa xuất hiện tức thời ở mọi dịch vụ nhận sự kiện.",
+      "Publisher bắt buộc phải biết địa chỉ mạng của mọi subscriber.",
+      "Việc theo dõi một luồng xử lý qua nhiều dịch vụ trở nên khó hơn.",
+      "Giảm phụ thuộc luôn loại bỏ toàn bộ chi phí vận hành broker."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Pub/sub giảm tham chiếu trực tiếp nhưng có thể tạo độ trễ nhất quán giữa dịch vụ và làm việc theo dõi luồng khó hơn. Nó không buộc publisher biết địa chỉ mọi subscriber, cũng không xóa chi phí vận hành hạ tầng thông điệp. Đây là đánh đổi cần cân nhắc, không phải ưu thế tuyệt đối.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 6, mục 7.1.4.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một hợp đồng sự kiện có EventId và Version. Hai cách sử dụng nào đúng với vai trò của các trường này? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Dùng Version thay cho ACK để broker biết nghiệp vụ hoàn tất.",
+      "Dùng EventId làm căn cứ nhận diện cùng một sự kiện khi được giao lại.",
+      "Dùng EventId để tự động tạo tất cả binding chưa khai báo.",
+      "Dùng Version để subscriber phân biệt các định dạng của hợp đồng sự kiện."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "EventId định danh sự kiện, hỗ trợ khử trùng lặp; Version mô tả phiên bản cấu trúc để subscriber lựa chọn cách hiểu dữ liệu. Cả hai đều thuộc hợp đồng thông điệp, không thay thế ACK của broker và không tự khai báo binding định tuyến.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 8, mục 7.2.1.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, mục 7.2.1"
+  }
+]

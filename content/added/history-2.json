@@ -249,5 +249,171 @@
     "explanation": "Đáp án theo tài liệu:\n• (1) Trần Phú; (2) Hà Huy Tập; (3) Ban Chấp hành Trung ương Đảng Cộng sản Đông Dương; (4) Nguyễn Ái Quốc\n\nCâu gốc dạng ghép cặp, đúng/sai hoặc điền khuyết đã được chuyển sang chọn phương án; giữ nguyên các cặp nội dung và đáp án trong tài liệu.\n\nNguồn đối chiếu: Lịch-sử-đảng-bài-2 bản đầy đủ (1).docx, câu 44.",
     "sources": [],
     "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một sinh viên cho rằng việc tập trung đấu tranh đòi dân sinh, dân chủ trong những năm 1936–1939 chứng tỏ mục tiêu giải phóng dân tộc đã bị từ bỏ. Lập luận nào sửa được sự nhầm lẫn này?",
+    "options": [
+      "Yêu sách trước mắt phù hợp hoàn cảnh có thể tạo thắng lợi từng bước và rèn luyện lực lượng, trong khi mục tiêu cuối cùng chưa thay đổi.",
+      "Mọi cải cách do chính quyền thuộc địa chấp nhận đều tự động chuyển thành nền độc lập hoàn chỉnh.",
+      "Chỉ những hoạt động vũ trang mới có thể chuẩn bị lực lượng cho mục tiêu giải phóng dân tộc.",
+      "Mục tiêu cuối cùng của phong trào được xác định chỉ bằng khẩu hiệu được sử dụng nhiều nhất trong một thời điểm."
+    ],
+    "correct": 0,
+    "explanation": "Bài giảng phân biệt yêu sách dân chủ trước mắt với mục tiêu cuối cùng, đồng thời ghi nhận quá trình rèn luyện quần chúng và tổ chức. Do đó thay đổi nhiệm vụ trước mắt không tự nó chứng minh từ bỏ mục tiêu lâu dài. Cải cách không làm thay đổi căn bản chế độ thuộc địa; hoạt động chính trị vẫn có vai trò chuẩn bị; một khẩu hiệu nhất thời không đủ xác định toàn bộ chiến lược.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 6, mục 2.2.1.2.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 6, mục 2.2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong điều kiện có khả năng hoạt động công khai thời kỳ 1936–1939, vì sao chủ trương vẫn kết hợp hình thức hợp pháp, nửa hợp pháp với bí mật, bất hợp pháp?",
+    "options": [
+      "Vì hoạt động công khai chỉ dành cho lực lượng không tham gia phong trào dân chủ.",
+      "Vì cần tận dụng điều kiện thuận lợi để mở rộng vận động, đồng thời duy trì các hình thức tổ chức phù hợp với giới hạn và nguy cơ đàn áp.",
+      "Vì điều kiện thuộc địa đã bị xóa bỏ nên mọi tổ chức đều có thể chuyển ngay sang hoạt động hợp pháp hoàn toàn.",
+      "Vì chủ trương chỉ thay đổi tên gọi của hình thức đấu tranh, còn cách tiếp cận quần chúng phải giữ nguyên."
+    ],
+    "correct": 1,
+    "explanation": "Nguồn nêu sự kết hợp nhiều hình thức đấu tranh, phản ánh việc tận dụng khả năng công khai mà vẫn giữ hoạt động bí mật cần thiết trong hoàn cảnh thuộc địa. Hoạt động công khai phục vụ chính phong trào dân chủ, không phải đứng ngoài phong trào. Khả năng nới lỏng không xóa bỏ chế độ thuộc địa; sự kết hợp cũng là thay đổi thực tế phương thức vận động, không chỉ đổi tên.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 4, mục 2.2.1.1.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 4, mục 2.2.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Đối chiếu hạn chế của Luận cương tháng 10/1930 với chủ trương tháng 5/1941, thay đổi nào có ý nghĩa trực tiếp đối với việc mở rộng lực lượng giải phóng dân tộc?",
+    "options": [
+      "Chuyển từ tập hợp nhiều tầng lớp sang chỉ tổ chức những người có cùng nghề nghiệp.",
+      "Coi mọi mâu thuẫn xã hội đều quan trọng ngang nhau và phải giải quyết đồng thời bằng một biện pháp.",
+      "Đặt nhiệm vụ giải phóng dân tộc lên hàng đầu và tập hợp rộng rãi các lực lượng dân tộc trên cơ sở nhiệm vụ đó.",
+      "Thay mục tiêu giành độc lập bằng việc chỉ yêu cầu cải cách trong khuôn khổ cai trị thuộc địa."
+    ],
+    "correct": 2,
+    "explanation": "Nguồn chỉ ra Luận cương chưa đặt đúng mức vấn đề dân tộc và chưa đề ra chiến lược liên minh rộng rãi. Chủ trương năm 1941 xác định nhiệm vụ giải phóng dân tộc hàng đầu, tạo cơ sở tập hợp toàn dân. Thu hẹp lực lượng, san bằng mọi nhiệm vụ hoặc chỉ xin cải cách đều không thể hiện sự điều chỉnh này.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 3, 7, mục 2.1 và 2.2.2.1.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 3, 7, mục 2.1 và 2.2.2.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Có ý kiến cho rằng tạm gác khẩu hiệu cách mạng ruộng đất năm 1941 đồng nghĩa phủ nhận lâu dài quyền lợi của nông dân. Cách giải thích nào phù hợp hơn với sự chuyển hướng được trình bày trong bài giảng?",
+    "options": [
+      "Tạm gác cho thấy vấn đề ruộng đất không còn tồn tại trong xã hội thuộc địa.",
+      "Tạm gác có nghĩa loại nông dân khỏi lực lượng tham gia phong trào giải phóng dân tộc.",
+      "Tạm gác có nghĩa mọi yêu cầu về dân chủ đã được hoàn thành trước khi giành độc lập.",
+      "Tạm gác thể hiện việc xác định thứ tự ưu tiên nhằm tập trung giải quyết nhiệm vụ dân tộc cấp bách và mở rộng đoàn kết."
+    ],
+    "correct": 3,
+    "explanation": "Hội nghị tháng 5/1941 đặt giải phóng dân tộc lên hàng đầu và hướng tới liên minh dân tộc rộng rãi. Đây là sự điều chỉnh thứ tự ưu tiên trong hoàn cảnh cụ thể, không phải chứng minh vấn đề ruộng đất đã biến mất hay quyền lợi nông dân bị phủ nhận vĩnh viễn. Nông dân vẫn là lực lượng quan trọng; các nhiệm vụ dân chủ chưa được hoàn thành chỉ nhờ thay đổi khẩu hiệu.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 7, mục 2.2.2.1.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 7, mục 2.2.2.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau cuộc đảo chính Nhật–Pháp tháng 3/1945, tại sao việc phát động cao trào kháng Nhật cứu nước không đồng nghĩa ra lệnh tổng khởi nghĩa ngay lập tức trên toàn quốc?",
+    "options": [
+      "Vì cao trào có nhiệm vụ chuẩn bị tiền đề và phát triển lực lượng, còn chuyển sang tổng khởi nghĩa cần đủ điều kiện.",
+      "Vì Nhật thay Pháp cho thấy mọi điều kiện tổng khởi nghĩa đã có đủ, chỉ cần chờ một ngày kỷ niệm thuận tiện.",
+      "Vì xác định Nhật là kẻ thù trước mắt đồng nghĩa phải tạm dừng mọi hoạt động chuẩn bị giành chính quyền.",
+      "Vì chủ trương quy định các địa phương phải đạt mức chuẩn bị hoàn toàn giống nhau trước khi được đấu tranh."
+    ],
+    "correct": 0,
+    "explanation": "Chỉ thị tháng 3/1945 xác định cao trào là tiền đề cho tổng khởi nghĩa và yêu cầu sẵn sàng chuyển bước khi đủ điều kiện. Việc Nhật thay Pháp chưa chứng tỏ mọi điều kiện đã chín muồi. Xác định kẻ thù trước mắt phục vụ hành động và chuẩn bị lực lượng, không phải đình chỉ chúng; khởi nghĩa từng phần diễn ra ở nơi có điều kiện chứ không đòi mọi địa phương đồng loạt đạt một mức.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 9, 10, mục 2.2.2.2.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 9, 10, mục 2.2.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Theo bài giảng, kết luận nào phù hợp nhất khi đánh giá quan hệ giữa cao trào kháng Nhật cứu nước và thời cơ tháng 8/1945?",
+    "options": [
+      "Thời cơ quốc tế thuận lợi khiến quá trình xây dựng lực lượng trước đó không còn tác dụng.",
+      "Cao trào tăng cường lực lượng và sự chủ động, giúp biến điều kiện thuận lợi xuất hiện sau đó thành khả năng giành chính quyền.",
+      "Khi lực lượng trong nước đã được chuẩn bị, diễn biến chiến tranh thế giới không còn ảnh hưởng đến thời điểm hành động.",
+      "Cao trào chỉ có ý nghĩa ở nông thôn nên không liên quan đến quá trình giành chính quyền ở đô thị."
+    ],
+    "correct": 1,
+    "explanation": "Nguồn mô tả cao trào mở rộng trận địa, tăng cường lực lượng và làm cho toàn Đảng, toàn dân sẵn sàng chớp thời cơ. Điều kiện khách quan và sự chuẩn bị chủ quan bổ sung cho nhau. Vì vậy không thể bỏ qua một trong hai; hoạt động xây dựng lực lượng diễn ra cả ở đô thị, không chỉ ở nông thôn.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 9, 10, mục 2.2.2.2 và 2.2.2.3.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 9, 10, mục 2.2.2.2 và 2.2.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một số địa phương chủ động khởi nghĩa trong tháng 8/1945 dù chưa nhận được lệnh tổng khởi nghĩa. Theo cách giải thích của bài giảng, điều gì giúp phân biệt sự chủ động đó với hành động tự phát, tách rời chỉ đạo chung?",
+    "options": [
+      "Các địa phương bỏ qua nghị quyết trước đó và chỉ căn cứ vào ý muốn của từng người lãnh đạo.",
+      "Các địa phương áp dụng một thời điểm giống nhau mà không xem xét điều kiện thực tế.",
+      "Các địa phương nắm vững tinh thần nghị quyết, chỉ thị đã có và căn cứ tình hình thực tiễn để hành động kịp thời.",
+      "Các địa phương đã được nước ngoài trao chính quyền nên không cần quá trình vận động quần chúng."
+    ],
+    "correct": 2,
+    "explanation": "Bài giảng lý giải sự chủ động bằng hai yếu tố: hiểu chỉ đạo đã ban hành và đánh giá đúng tình hình cụ thể. Do đó chủ động không đồng nghĩa tùy tiện hoặc tách khỏi định hướng chung. Hành động máy móc không dựa thực tiễn cũng khác với sự chủ động; nguồn không giải thích thắng lợi bằng việc nước ngoài trao chính quyền.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 11, mục 2.2.2.3.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 11, mục 2.2.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Vì sao không thể từ việc Cách mạng Tháng Tám xóa bỏ chế độ quân chủ mà kết luận mọi nhiệm vụ dân chủ, ruộng đất đều đã hoàn thành?",
+    "options": [
+      "Vì việc xóa bỏ chế độ quân chủ không đem lại bất kỳ thay đổi nào về quyền chính trị của nhân dân.",
+      "Vì thay đổi chính quyền chỉ được tính là dân chủ khi toàn bộ ruộng đất đã được phân phối lại ngay.",
+      "Vì một cuộc cách mạng giải phóng dân tộc không thể đồng thời có nội dung dân chủ.",
+      "Vì thay đổi chính quyền và mở rộng quyền dân chủ chưa đồng nghĩa đã xóa bỏ chế độ chiếm hữu ruộng đất phong kiến."
+    ],
+    "correct": 3,
+    "explanation": "Nguồn ghi nhận nhà nước dân chủ nhân dân và quyền tự do dân chủ, đồng thời nêu cách mạng ruộng đất chưa được thực hiện và quan hệ địa chủ–nông dân nhìn chung vẫn như cũ. Vì thế nội dung dân chủ có thật nhưng chưa đầy đủ, sâu sắc. Các phương án khác hoặc phủ nhận thành quả chính trị, hoặc chỉ thừa nhận dân chủ khi mọi nhiệm vụ ruộng đất hoàn tất, hoặc tách cứng giải phóng dân tộc khỏi dân chủ.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 12, 13, mục 2.3.1.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 12, 13, mục 2.3.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "So sánh chủ trương vận động năm 1936 với chuyển hướng được hoàn chỉnh năm 1941, hai nhận định nào phù hợp với bài giảng? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Khẩu hiệu và nhiệm vụ trước mắt thay đổi theo bối cảnh, từ dân sinh, dân chủ đến đặt giải phóng dân tộc lên hàng đầu.",
+      "Năm 1936 chủ trương chỉ thu hút công nhân, đến năm 1941 mới lần đầu nghĩ tới việc tập hợp các tầng lớp khác.",
+      "Cả hai thời kỳ đều coi việc tập hợp lực lượng rộng rãi là cần thiết, nhưng phục vụ nhiệm vụ trước mắt khác nhau.",
+      "Cả hai thời kỳ đều chủ trương thay mọi hoạt động bí mật bằng hình thức hợp pháp hoàn toàn."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Năm 1936, nhiệm vụ trước mắt gắn với chống phản động thuộc địa, đòi tự do, dân chủ, cơm áo, hòa bình; năm 1941 tập trung giải phóng dân tộc. Cả hai đều chủ trương mặt trận rộng rãi. Vì vậy không thể coi năm 1936 chỉ có công nhân; cũng không thể đồng nhất hai thời kỳ với việc hoạt động hợp pháp hoàn toàn.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 4, 7, mục 2.2.1.1 và 2.2.2.1.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 4, 7, mục 2.2.1.1 và 2.2.2.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Những yếu tố nào khiến thời cơ giành chính quyền vào tháng 8/1945 vừa thuận lợi vừa cần được nắm bắt kịp thời? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Sự đầu hàng của Nhật bảo đảm mọi lực lượng bên ngoài đều từ bỏ ý định can thiệp vào Đông Dương.",
+      "Quân Nhật mất tinh thần và bộ máy chính quyền do Nhật dựng lên hoang mang sau khi Nhật đầu hàng.",
+      "Quân Đồng minh đã công nhận sẵn chính quyền cách mạng nên thời điểm giành chính quyền không còn quan trọng.",
+      "Việc quân Đồng minh sắp vào giải giáp cùng toan tính trở lại của Pháp đặt ra nguy cơ mới nếu chậm trễ."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Nguồn đặt hai mặt cạnh nhau: Nhật đầu hàng làm đối phương suy yếu, nhưng quân Đồng minh sắp vào và Pháp có ý định trở lại tạo sức ép về thời gian. Vì thế thuận lợi không đồng nghĩa an toàn vô thời hạn. Không có căn cứ trong đoạn nguồn cho rằng mọi lực lượng từ bỏ can thiệp hoặc quân Đồng minh đã công nhận sẵn chính quyền cách mạng.\n\nNguồn đối chiếu: Bài 2.pdf, trang PDF 10, mục 2.2.2.3.",
+    "sources": [
+      "6a7043a2-e14b-5d25-b0d8-502a98a88e85"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 2.pdf, trang PDF 10, mục 2.2.2.3"
   }
 ]

@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Một nhóm chạy giao diện dòng lệnh và API trên cùng laptop, trong hai tiến trình độc lập trao đổi HTTP. Vì sao vẫn phải thiết kế ranh giới giao tiếp như ứng dụng phân tán?",
+    "options": [
+      "Vì các thành phần phối hợp qua thông điệp giữa các tiến trình, nên phải xử lý tình huống thành phần kia chậm hoặc không sẵn sàng.",
+      "Vì mọi project nằm trong cùng solution tự động chia sẻ bộ nhớ với nhau.",
+      "Vì chỉ cần dùng HTTP là hai tiến trình luôn khởi động và dừng đồng thời.",
+      "Vì cùng một máy vật lý bảo đảm không thể xảy ra lỗi kết nối."
+    ],
+    "correct": 0,
+    "explanation": "Ranh giới tiến trình và truyền thông điệp vẫn tồn tại dù cùng máy vật lý. Solution chỉ tổ chức mã; HTTP không đồng bộ vòng đời các tiến trình và không loại bỏ lỗi hay tình trạng một thành phần ngừng phục vụ.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 3, mục 1.1.1–1.1.2.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.1–1.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trình duyệt gọi Submission.Api; trong lúc xử lý, Submission.Api gọi Grading.Service để lấy kết quả. Cách phân tích vai trò nào giúp xác định đúng bên khởi tạo từng tương tác?",
+    "options": [
+      "Submission.Api luôn là máy chủ nên Grading.Service phải chủ động gửi yêu cầu trước.",
+      "Submission.Api là máy chủ đối với trình duyệt và là máy khách trong lời gọi đến Grading.Service.",
+      "Chỉ trình duyệt có thể là máy khách; lời gọi giữa hai dịch vụ không có bên máy khách.",
+      "Submission.Api đổi thành máy khách thì không thể trả phản hồi cho trình duyệt nữa."
+    ],
+    "correct": 1,
+    "explanation": "Vai trò được xét trên từng lời gọi: Submission.Api nhận yêu cầu từ trình duyệt nhưng khởi tạo yêu cầu đến dịch vụ chấm. Vai trò không bị cố định theo tên thành phần, và một dịch vụ có thể tham gia đồng thời hai quan hệ này.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 3, mục 1.1.2.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một báo cáo cần xử lý vài phút, trong khi giao diện cần nhanh chóng biết yêu cầu đã được ghi nhận. Thiết kế nào phù hợp nhất với nguyên tắc chọn MEP của giáo trình?",
+    "options": [
+      "Giữ duy nhất lời gọi đồng bộ cho đến khi tạo xong mọi trang báo cáo, bất kể thời gian chờ.",
+      "Đổi tên endpoint thành /async nhưng vẫn buộc máy khách chờ toàn bộ tác vụ.",
+      "Dùng yêu cầu–phản hồi để ghi nhận ban đầu, rồi chuyển phần tạo báo cáo sang xử lý bất đồng bộ.",
+      "Chỉ tăng số trường trong JSON phản hồi để tự động biến tác vụ thành xử lý nền."
+    ],
+    "correct": 2,
+    "explanation": "Giáo trình tách phản hồi tiếp nhận ngắn khỏi công việc dài. Giữ máy khách chờ vẫn tạo phụ thuộc thời gian; đổi tên endpoint hay cấu trúc JSON không thay đổi mô hình thực thi hoặc cách trao đổi thông điệp.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 4, mục 1.1.3.a.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.3.a"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một dịch vụ gửi thông điệp kiểm toán một chiều và nhận tín hiệu rằng thông điệp đã được đưa vào kênh truyền. Có thể kết luận gì về bản ghi kiểm toán?",
+    "options": [
+      "Bản ghi chắc chắn đã lưu bền vững vì thông điệp không có phản hồi nghiệp vụ.",
+      "Không cần ghi nhật ký ở bên nhận vì bên gửi đã hoàn tất thao tác gửi.",
+      "Bên gửi đã nhận đầy đủ kết quả nghiệp vụ nhưng kết quả bị ẩn khỏi giao diện.",
+      "Chưa đủ căn cứ kết luận đã xử lý xong; cần cơ chế quan sát hoặc xử lý lỗi ở bên nhận."
+    ],
+    "correct": 3,
+    "explanation": "Chấp nhận gửi vào kênh khác với hoàn tất nghiệp vụ ở đích. Mô hình một chiều không trả kết quả xử lý trực tiếp, nên giám sát và xử lý lỗi ở bên nhận vẫn cần thiết; không thể suy ra lưu bền vững từ tín hiệu tiếp nhận.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 5, mục 1.1.3.b.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.3.b"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một worker có thể nhận lại cùng thông điệp chấm bài sau khi hệ thống gửi lại. Đâu là yêu cầu thiết kế trực tiếp giúp tránh cộng điểm hai lần?",
+    "options": [
+      "Thiết kế xử lý lũy đẳng để cùng công việc được xử lý lại mà không làm sai lệch kết quả nghiệp vụ.",
+      "Chỉ đổi định dạng thông điệp từ JSON sang nhị phân.",
+      "Tạo thêm worker rồi để mỗi worker tự cộng điểm cho mọi thông điệp nhận được.",
+      "Bỏ toàn bộ nhật ký để worker xử lý nhanh hơn khi nhận lại thông điệp."
+    ],
+    "correct": 0,
+    "explanation": "Lũy đẳng giải quyết tác dụng phụ khi xử lý lại cùng công việc. Định dạng nhị phân không chống cộng trùng; tăng worker không thay thế kiểm soát xử lý lại; bỏ nhật ký còn làm việc phát hiện và truy vết lỗi khó hơn.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 5, mục 1.1.3.c.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.3.c"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Luồng nộp bài cần tiếp nhận nhanh, chấm nền, báo sự kiện hoàn tất cho nhiều dịch vụ và cập nhật giao diện. Chuỗi MEP nào khớp nhất với từng bước?",
+    "options": [
+      "Phát hành–đăng ký → đẩy dữ liệu → một lời gọi đồng bộ kéo dài cho mọi bước.",
+      "Yêu cầu–phản hồi → hàng đợi công việc → phát hành–đăng ký → đẩy dữ liệu về máy khách.",
+      "Hàng đợi cho mỗi bản cập nhật giao diện → yêu cầu–phản hồi bắt mọi bên nhận cùng xử lý.",
+      "Một chiều ở mọi bước, vì khi đó người dùng luôn biết ngay kết quả chấm cuối cùng."
+    ],
+    "correct": 1,
+    "explanation": "Mỗi bước có nhu cầu khác nhau: tiếp nhận cần phản hồi, chấm cần tách nền, sự kiện cần nhiều bên đăng ký, giao diện cần nhận cập nhật. Các phương án khác ghép sai mục đích hoặc suy luận sai rằng gửi một chiều cung cấp ngay kết quả cuối.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 8, mục 1.1.4.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Program.cs gọi app.Run() rồi mới gọi app.MapGet(\"/health\", ...). Khi ứng dụng đang chạy, /health không được phục vụ như mong đợi. Cách giải thích và sửa nào phù hợp?",
+    "options": [
+      "Đặt thêm một Run trước MapGet để máy chủ đọc lại toàn bộ tệp cấu hình.",
+      "Đổi /health sang POST để mã sau Run được thực thi trong mỗi yêu cầu.",
+      "Đặt ánh xạ endpoint trước Run, vì mã sau Run chỉ chạy khi máy chủ đã dừng.",
+      "Giữ nguyên thứ tự và chỉ tăng số máy khách gọi đồng thời."
+    ],
+    "correct": 2,
+    "explanation": "Thứ tự chuẩn là chuẩn bị, Build, ánh xạ endpoint rồi Run. Run giữ ứng dụng hoạt động nên mã nằm sau chưa tham gia xử lý yêu cầu hiện tại. Đổi HTTP method, tăng lưu lượng hay thêm Run không khắc phục thứ tự cấu hình sai.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 10, mục 1.2.2.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "API và ứng dụng dòng lệnh khai báo hai record DTO có cùng các trường. Nhóm cho rằng chúng đã trở thành cùng một đối tượng dùng chung nên có thể bỏ qua hợp đồng JSON. Nhận định nào đúng?",
+    "options": [
+      "Hai record cùng cấu trúc bảo đảm thay đổi kiểu dữ liệu ở API không bao giờ ảnh hưởng máy khách.",
+      "Chỉ cần đặt cùng tên record thì máy khách có thể gọi trực tiếp mọi hàm nội bộ của API.",
+      "HTTP tự biến hai record thành một vùng nhớ chung có thể sửa từ cả hai phía.",
+      "Hai record biểu diễn hợp đồng dữ liệu tương thích; chúng vẫn trao đổi qua HTTP và chuyển đổi JSON giữa hai tiến trình."
+    ],
+    "correct": 3,
+    "explanation": "Sự tương ứng của DTO giúp hai bên hiểu dữ liệu truyền qua mạng, không tạo bộ nhớ dùng chung hay lời gọi hàm nội bộ. Vì đây là hợp đồng ở biên, thay đổi trường hoặc kiểu dữ liệu phía API vẫn có thể làm máy khách không đọc đúng phản hồi.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 20, mục 1.3.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi tách một hàm nội bộ thành dịch vụ gọi qua mạng, nhóm muốn giữ nguyên giả định như lời gọi trong cùng tiến trình. Những điều nào cần đưa vào thiết kế? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Giới hạn chờ và cách xử lý khi kết nối lỗi hoặc phản hồi chậm.",
+      "Định dạng dữ liệu và khả năng quan sát tương tác giữa các thành phần.",
+      "Giả định mọi lần gọi đều hoàn tất ngay vì tên hàm không đổi.",
+      "Bỏ qua lỗi từng phần vì các dịch vụ thuộc cùng một sản phẩm."
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Ranh giới mạng làm xuất hiện độ trễ, lỗi kết nối, giới hạn chờ và nhu cầu thống nhất dữ liệu, quan sát hệ thống. Tên hàm hay việc cùng một sản phẩm không bảo đảm phản hồi tức thì và không loại bỏ lỗi từng phần.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 2, mục 1.1.1.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một hệ thống vừa có công việc \"chấm lượt nộp 42\" vừa có sự kiện \"lượt nộp 42 đã được chấm\" cho thống kê và thông báo. Những lựa chọn nào phù hợp? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Phân phối công việc cho một worker trong nhóm xử lý theo mô hình hàng đợi.",
+      "Buộc cả thống kê và thông báo cùng nhận công việc chấm rồi tự chấm lại để biết kết quả.",
+      "Phát sự kiện hoàn tất cho nhiều bên đăng ký độc lập để mỗi bên thực hiện trách nhiệm riêng.",
+      "Dùng hàng đợi công việc đồng nghĩa mọi bên đăng ký đều bắt buộc nhận một bản của mỗi công việc."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Hàng đợi thường phân phối công việc cho một worker trong nhóm; pub/sub phân phối sự kiện đã xảy ra tới các bên có phản ứng độc lập. Thống kê và thông báo không cần chấm lại, và cơ chế chia công việc giữa worker không đồng nghĩa phát một bản cho mọi bên.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 5, mục 1.1.3.c.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, mục 1.1.3.c"
+  }
+]

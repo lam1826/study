@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Điểm đã được lưu nhưng trình duyệt mất kết nối SignalR đúng lúc phát thông báo. Khi kết nối lại, thiết kế nào giúp giao diện lấy đúng trạng thái hiện tại?",
+    "options": [
+      "Gọi API đọc lại trạng thái từ dữ liệu đã lưu, rồi tiếp tục nhận cập nhật thời gian thực.",
+      "Giữ trạng thái đang chấm mãi nếu chưa nhận lại đúng thông báo cũ.",
+      "Xóa kết quả đã lưu rồi gửi lại toàn bộ bài nộp để kích hoạt thông báo mới.",
+      "Xem thông báo SignalR là nơi lưu duy nhất của điểm và bỏ API đọc trạng thái."
+    ],
+    "correct": 0,
+    "explanation": "Thông báo thời gian thực là kênh cập nhật thuận tiện, còn trạng thái bền vững phải có trong cơ sở dữ liệu. Truy vấn lại API giúp khôi phục sau mất kết nối. Chờ mãi hoặc chấm lại làm sai luồng phục hồi; dùng thông báo làm nơi lưu duy nhất khiến kết quả phụ thuộc vào kết nối luôn hoạt động.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Độ dài hàng đợi tăng, nhưng cơ sở dữ liệu đã gần bão hòa và worker chủ yếu chờ ghi kết quả. Trước đề xuất nhân đôi mọi worker, đánh giá nào hợp lý nhất?",
+    "options": [
+      "Thêm worker luôn làm giảm thời gian chờ mà không ảnh hưởng thành phần nào khác.",
+      "Cần xác định nút thắt và khả năng chịu tải của cơ sở dữ liệu vì thêm worker có thể làm tải lưu trữ nặng hơn.",
+      "Nhân đôi API chắc chắn giải quyết được thời gian worker chờ ghi dữ liệu.",
+      "Chỉ tăng dung lượng hàng đợi là đủ để tốc độ ghi kết quả vào cơ sở dữ liệu tăng."
+    ],
+    "correct": 1,
+    "explanation": "Mở rộng worker chỉ có ích khi tài nguyên phía sau còn đáp ứng được; giáo trình nêu rõ nó có thể tăng tải cơ sở dữ liệu hoặc môi trường chấm. Nhân bản API không xử lý trực tiếp nút thắt ghi kết quả. Tăng sức chứa hàng đợi chỉ chứa thêm việc chờ, không tự tăng tốc độ ghi dữ liệu.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sơ đồ có đủ API, gRPC, RabbitMQ, worker và cơ sở dữ liệu nhưng mọi mũi tên giống nhau, không ghi giao thức. Bổ sung nào giúp người đọc đánh giá chính xác luồng và điểm chờ?",
+    "options": [
+      "Chỉ đổi màu các hộp theo ngôn ngữ lập trình.",
+      "Xóa mũi tên để sơ đồ bớt thông tin.",
+      "Gắn nhãn giao thức, phân biệt kết nối đồng bộ/bất đồng bộ và chỉ ra các điểm có thể lỗi.",
+      "Vẽ tất cả kết nối thành REST vì các thành phần đều giao tiếp qua mạng."
+    ],
+    "correct": 2,
+    "explanation": "Chú giải kiến trúc cần thể hiện giao thức, mô hình chờ phản hồi hay truyền thông điệp, và điểm lỗi. Màu theo ngôn ngữ không làm rõ hành vi kết nối. Xóa mũi tên làm mất luồng; đồng nhất mọi kết nối thành REST mô tả sai các vai trò gRPC, hàng đợi, sự kiện và lưu trữ.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 8, mục 9.2.1.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.2.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong buổi duyệt thiết kế, một thành viên đề xuất chạy thuật toán chấm bài bên trong message broker vì broker đang giữ công việc. Theo ranh giới thành phần của giáo trình, nên phân công lại thế nào?",
+    "options": [
+      "Broker thực thi thuật toán chấm, worker chỉ chuyển tiếp kết quả về API.",
+      "API chấm xong toàn bộ trước khi gửi hàng đợi; worker chỉ ghi log về kết quả có sẵn.",
+      "Storage tự chạy toàn bộ thuật toán khi nhận dữ liệu; worker chỉ kiểm tra kết nối mạng.",
+      "Broker nhận, lưu tạm và phân phối thông điệp; worker tiêu thụ công việc và thực thi tính toán."
+    ],
+    "correct": 3,
+    "explanation": "Broker đảm nhiệm vận chuyển thông điệp giữa các tiến trình; worker là thành phần thực thi tác vụ nền. Việc giữ thông điệp không biến broker thành nơi tính điểm. Đưa toàn bộ tính toán trở lại API hoặc gán nó mặc nhiên cho storage đều bỏ mất vai trò xử lý nền của worker trong kiến trúc được mô tả.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 5, mục 9.1.3.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong kiến trúc tổng thể, Submission.Api vẫn gọi Grading.GrpcService trước khi đưa việc sang worker. Điều gì giải thích vì sao có lời gọi gRPC nhưng HTTP nộp bài vẫn không phải chờ chấm xong?",
+    "options": [
+      "gRPC service chỉ điều phối: kiểm tra yêu cầu và chuyển công việc vào hàng đợi; worker thực thi sau.",
+      "Mọi lời gọi gRPC đều tự động không chặn và không cần phản hồi.",
+      "gRPC tự biến kết quả chưa tính thành điểm hoàn tất để API trả ngay.",
+      "Có gRPC nghĩa là hàng đợi chỉ dùng ghi log, worker không còn tham gia."
+    ],
+    "correct": 0,
+    "explanation": "Đồng bộ hay bất đồng bộ cần xét ở từng đoạn. API có thể chờ lời đáp điều phối ngắn, trong khi phần tính điểm diễn ra về sau ở worker qua hàng đợi. Không thể suy ra mọi gRPC đều không chặn; giao thức cũng không tạo sẵn điểm và không loại bỏ vai trò của worker.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 3, mục 9.1.1.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi thêm email và bảng thống kê, worker phải gọi lần lượt từng dịch vụ nên thay đổi một chức năng mới lại đòi sửa worker. Cách tổ chức nào giảm phụ thuộc này?",
+    "options": [
+      "Đưa thêm địa chỉ từng dịch vụ vào mã worker và chờ tất cả trả lời.",
+      "Worker phát GradedEvent; các chức năng email và thống kê đăng ký nhận sự kiện để xử lý riêng.",
+      "Bắt mọi chức năng mới trực tiếp sửa mã nguồn worker.",
+      "Dùng SignalR làm kho lưu duy nhất của sự kiện và bỏ cơ chế đăng ký của dịch vụ."
+    ],
+    "correct": 1,
+    "explanation": "Phát sự kiện hoàn tất cho phép các chức năng mới trở thành subscriber mà không buộc worker biết từng nơi nhận. Danh sách lời gọi trực tiếp hay sửa worker khi thêm chức năng đều tiếp tục tăng phụ thuộc. SignalR phục vụ cập nhật máy khách, không thay cho kiến trúc đăng ký sự kiện giữa dịch vụ.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một thông điệp không thể xử lý sau nhiều lần gửi lại đang chiếm luồng công việc. Nhóm cần tách nó để điều tra trong khi tiếp tục xử lý các thông điệp khác. Mẫu nào đúng với mục đích này?",
+    "options": [
+      "Circuit Breaker để đưa riêng thông điệp này ra khỏi hàng đợi chính.",
+      "Retry ngay không giới hạn trong hàng đợi chính.",
+      "Dead Letter Queue để cách ly thông điệp không xử lý được.",
+      "Tăng ưu tiên cho thông điệp lỗi để mọi worker tiếp tục nhận nó trước."
+    ],
+    "correct": 2,
+    "explanation": "Dead Letter Queue được dùng để cách ly thông điệp không thể xử lý sau các lần thử. Circuit Breaker cắt lời gọi đến dịch vụ đang lỗi liên tục, không phải cơ chế chuyển riêng thông điệp sang khu vực cách ly. Retry vô hạn hoặc tăng ưu tiên đều giữ thông điệp lỗi trong luồng chính và tiếp tục tiêu tốn năng lực xử lý.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 6, mục 9.1.4.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một đề xuất cho trình duyệt gọi thẳng mọi dịch vụ gRPC nội bộ để giảm một bước mạng, trong khi yêu cầu là xác thực và giới hạn tần suất tại cổng vào thống nhất. Phương án nào phù hợp với ranh giới kiến trúc được mô tả?",
+    "options": [
+      "Mở công khai mọi dịch vụ nội bộ rồi bỏ kiểm soát ở cổng vào.",
+      "Cho máy khách gửi trực tiếp thông điệp tới storage để tránh xác thực API.",
+      "Chuyển kiểm soát tần suất sang các thông báo SignalR gửi sau khi xử lý xong.",
+      "Máy khách đi qua API Gateway/Entrypoint; các dịch vụ nội bộ tiếp tục nằm sau ranh giới truy cập đó."
+    ],
+    "correct": 3,
+    "explanation": "Gateway/Entrypoint là điểm tiếp nhận, định tuyến, xác thực và kiểm soát tần suất; dịch vụ nội bộ nằm sau ranh giới này. Bỏ cổng vào hoặc cho client ghi thẳng storage không đáp ứng mục tiêu đã nêu. Kiểm soát qua thông báo sau xử lý cũng không thay thế kiểm tra ở đầu vào.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 5, mục 9.1.3.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một yêu cầu nộp bài đã được tiếp nhận và trả trạng thái Processing, nhưng worker đang xử lý chậm. Hai kết luận nào đúng về luồng tích hợp? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Phản hồi tiếp nhận không chứng minh điểm số đã được tính xong.",
+      "Chỉ cần API trả Processing thì mọi dịch vụ đã có điểm mới tức thời.",
+      "Kết quả có thể xuất hiện sau khi worker hoàn tất và sự kiện được xử lý để cập nhật trạng thái.",
+      "Giao diện được phép suy ra điểm bằng 0 chỉ vì chưa nhận thông báo hoàn tất."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Luồng hàng đợi tách tiếp nhận khỏi tính điểm; worker hoàn tất rồi phát sự kiện để cập nhật trạng thái và thông báo. Vì vậy Processing chỉ phản ánh giai đoạn đang xử lý. Chưa có điểm không đồng nghĩa điểm 0, và phản hồi ban đầu cũng không chứng minh mọi dịch vụ đã đồng bộ kết quả.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 3, mục 9.1.1 và 9.1.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.1.1 và 9.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi bảo vệ kiến trúc trước đợt nộp bài cao điểm, nhóm phải nêu cả cách mở rộng và giới hạn của nó. Hai nhận định nào được hỗ trợ bởi các kịch bản trong giáo trình? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Hàng đợi tăng nghĩa là bắt buộc phải nhân bản đồng đều mọi loại dịch vụ.",
+      "Có thể tăng worker riêng khi năng lực chấm là nút thắt, đồng thời theo dõi độ dài hàng đợi.",
+      "Một khi dùng hàng đợi thì không cần cảnh báo về công việc tồn đọng.",
+      "Dùng pub/sub để thêm chức năng thuận tiện hơn có thể làm luồng khó theo dõi, cần nhật ký tương quan và truy vết."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Kiến trúc cho phép mở rộng thành phần cần thiết và theo dõi hàng đợi thay vì nhân bản đồng đều. Pub/sub hỗ trợ thêm chức năng nhưng làm luồng phân tán khó quan sát hơn, nên cần dữ liệu tương quan và truy vết. Hàng đợi chỉ đệm công việc, không loại bỏ nhu cầu cảnh báo tồn đọng.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.2.2"
+  }
+]

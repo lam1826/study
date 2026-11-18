@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Một bài nghiên cứu đã phục dựng khá đầy đủ diễn biến các phong trào yêu nước theo thời gian, nhưng chưa giải thích được khuynh hướng chung dẫn tới sự ra đời của Đảng. Cách bổ sung nào phù hợp nhất với phương pháp nghiên cứu trong bài giảng?",
+    "options": [
+      "Kết hợp phương pháp logic để làm rõ bản chất và khuynh hướng, trên cơ sở các diễn biến lịch sử đã được kiểm chứng.",
+      "Bổ sung thêm mốc thời gian vào niên biểu rồi coi số lượng sự kiện là căn cứ đủ để kết luận về quy luật.",
+      "Chọn trước một quy luật tổng quát, sau đó chỉ giữ lại những sự kiện phù hợp với quy luật ấy.",
+      "Thay việc phân tích diễn biến bằng so sánh danh tiếng của các nhân vật tham gia phong trào."
+    ],
+    "correct": 0,
+    "explanation": "Phương pháp lịch sử giúp phục dựng quá trình cụ thể; phương pháp logic giúp nhận ra bản chất, quy luật và khuynh hướng chung. Vì vậy cần kết hợp hai cách tiếp cận. Thêm niên đại chưa tự tạo ra lời giải thích; chọn lọc sự kiện theo kết luận có sẵn làm sai lệch nghiên cứu; danh tiếng nhân vật không thay thế được phân tích quá trình.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 14, mục 1.1.3.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 14, mục 1.1.3.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi đánh giá một quyết định lịch sử, nhóm học tập tìm được tư liệu đáng tin cậy không phù hợp với nhận định ban đầu của mình. Xử lý nào đáp ứng yêu cầu về tính khoa học của môn Lịch sử Đảng?",
+    "options": [
+      "Loại tư liệu đó vì giữ nguyên kết luận ban đầu giúp bài viết nhất quán hơn.",
+      "Kiểm tra xuất xứ và bối cảnh tư liệu, đối chiếu các chứng cứ rồi điều chỉnh nhận định nếu cần.",
+      "Giữ cả hai nhận định trái ngược nhau mà không đánh giá độ tin cậy của từng chứng cứ.",
+      "Chọn nhận định được nhiều thành viên đồng ý nhất để thay cho việc kiểm chứng tư liệu."
+    ],
+    "correct": 1,
+    "explanation": "Tính khoa học đòi hỏi phản ánh lịch sử khách quan, trung thực và dựa vào luận cứ. Việc kiểm chứng rồi điều chỉnh kết luận phù hợp với yêu cầu đó. Loại chứng cứ bất lợi là áp đặt kết luận; đặt mọi chứng cứ ngang nhau mà không thẩm định bỏ qua độ tin cậy; biểu quyết không xác định được sự thật lịch sử.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 14, mục 1.1.4.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 14, mục 1.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Từ việc thực dân Pháp đưa phương thức khai thác tư bản chủ nghĩa vào Việt Nam, một sinh viên kết luận xã hội phong kiến đã được thay thế hoàn toàn bằng xã hội tư bản. Dữ kiện nào trong bài giảng bác bỏ trực tiếp suy luận này?",
+    "options": [
+      "Sự xuất hiện của công nhân và tư sản chứng tỏ các giai cấp cũ đã mất vai trò kinh tế ngay lập tức.",
+      "Chính sách chia ba kỳ làm cho quan hệ sở hữu ruộng đất trở thành vấn đề không còn liên quan đến tính chất xã hội.",
+      "Pháp kết hợp bóc lột tư bản chủ nghĩa với phong kiến; địa chủ và nông dân vẫn tồn tại trong xã hội thuộc địa nửa phong kiến.",
+      "Sự phát triển của khai thác thuộc địa khiến Việt Nam thoát khỏi tình trạng kinh tế phụ thuộc."
+    ],
+    "correct": 2,
+    "explanation": "Bài giảng nêu sự kết hợp phương thức bóc lột tư bản chủ nghĩa với phong kiến và sự tồn tại đồng thời các giai cấp cũ, mới. Do đó, có yếu tố tư bản không đồng nghĩa đã chuyển thành xã hội tư bản độc lập. Sự xuất hiện giai cấp mới không xóa ngay giai cấp cũ; chia ba kỳ không giải quyết quan hệ ruộng đất; nền kinh tế vẫn phụ thuộc vào Pháp.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 15, 16, mục 1.2.1.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 15, 16, mục 1.2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Theo phần phân tích cơ cấu xã hội đầu thế kỷ XX, vì sao công nhân và nông dân có cơ sở xã hội để liên minh, dù điều kiện lao động của hai giai cấp khác nhau?",
+    "options": [
+      "Vì hai giai cấp đều là lực lượng đông đảo nhất và giữ vai trò lãnh đạo ngang nhau trong phong trào cách mạng.",
+      "Vì quan hệ gần gũi khiến yêu cầu về độc lập và ruộng đất trở thành một vấn đề giống hệt nhau đối với hai giai cấp.",
+      "Vì sự xuất hiện công nghiệp đã xóa bỏ khác biệt giai cấp, khiến việc liên minh chỉ còn là phối hợp giữa các nghề.",
+      "Vì công nhân xuất thân từ nông dân, có quan hệ gần gũi với nông dân trong bối cảnh cùng chịu áp bức thuộc địa."
+    ],
+    "correct": 3,
+    "explanation": "Nguồn nêu công nhân xuất thân từ nông dân nên có quan hệ khăng khít với nông dân; cả hai thuộc lực lượng bị áp bức dưới chế độ thuộc địa. Đây là cơ sở xã hội cho liên minh, không phải sự đồng nhất về vai trò, nhu cầu hoặc vị trí giai cấp. Nguồn xác định nông dân đông đảo nhất và công nhân có đặc điểm riêng; sự phát triển công nghiệp không xóa ngay các khác biệt ấy.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 16, mục 1.2.1.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 16, mục 1.2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Các phong trào yêu nước cuối thế kỷ XIX, đầu thế kỷ XX không giành được thắng lợi cuối cùng. Đánh giá nào phản ánh đầy đủ hơn ý nghĩa của chúng theo bài giảng?",
+    "options": [
+      "Thất bại cho thấy cần tìm một con đường cứu nước phù hợp hơn, đồng thời các phong trào vẫn nuôi dưỡng tinh thần yêu nước.",
+      "Thất bại chứng minh xã hội Việt Nam khi đó thiếu ý chí giành độc lập nên chưa đặt ra nhu cầu tìm đường cứu nước.",
+      "Các phong trào đã giải quyết được khủng hoảng đường lối, chỉ còn thiếu sự công nhận từ bên ngoài.",
+      "Do chưa giành chính quyền, các phong trào không để lại tác động nào đối với quá trình tìm đường cứu nước sau đó."
+    ],
+    "correct": 0,
+    "explanation": "Bài giảng đồng thời ghi nhận thất bại của các con đường cứu nước cũ và tác dụng tiếp tục bồi đắp lòng yêu nước, thúc đẩy tìm kiếm con đường mới. Không thể từ kết quả thất bại suy ra thiếu ý chí độc lập hoặc không có ảnh hưởng lịch sử. Khủng hoảng đường lối, lãnh đạo vẫn tồn tại, nên không thể coi chỉ còn thiếu sự công nhận bên ngoài.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 17, mục 1.2.1.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 17, mục 1.2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Việc mở lớp huấn luyện ở Quảng Châu, cử cán bộ về nước và phát triển cơ sở của Hội Việt Nam Cách mạng Thanh niên có ý nghĩa gì vượt ra ngoài việc phổ biến tư tưởng?",
+    "options": [
+      "Chủ yếu hoàn thành việc phổ biến lý luận, còn xây dựng tổ chức phải chờ phong trào tự hình thành sau đó.",
+      "Tạo đội ngũ và mạng lưới tổ chức, chuẩn bị khả năng tập hợp phong trào để tiến tới thành lập Đảng.",
+      "Chứng tỏ Hội đã là một Đảng thống nhất, nên hội nghị hợp nhất sau đó chỉ có ý nghĩa đổi tên.",
+      "Cho phép tách đào tạo cán bộ khỏi hoạt động trong nước vì mạng lưới ở nước ngoài đã đủ thay thế."
+    ],
+    "correct": 1,
+    "explanation": "Huấn luyện cán bộ, đưa cán bộ về nước và xây dựng cơ sở tạo nền tảng tổ chức bên cạnh chuẩn bị tư tưởng, chính trị. Bài giảng xem Hội là tổ chức quá độ để tiến tới thành lập Đảng. Vì vậy không thể coi đây chỉ là phổ biến lý luận hoặc đồng nhất Hội với Đảng thống nhất đã ra đời. Đưa cán bộ về nước và phát triển cơ sở cũng cho thấy sự gắn bó với phong trào trong nước.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 19, mục 1.2.2.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 19, mục 1.2.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhận định cho rằng cách mạng thuộc địa phải chờ cách mạng vô sản ở chính quốc thành công mới có thể giành thắng lợi. Đối chiếu quan điểm của Nguyễn Ái Quốc trong bài giảng, cần sửa nhận định ấy như thế nào?",
+    "options": [
+      "Hai cuộc cách mạng không có quan hệ hỗ trợ vì mục tiêu và địa bàn của chúng khác nhau.",
+      "Cách mạng ở chính quốc chỉ có thể thắng sau khi tất cả các thuộc địa đều giành độc lập.",
+      "Hai cuộc cách mạng có quan hệ hỗ trợ, nhưng cách mạng thuộc địa không phụ thuộc và có thể thành công trước.",
+      "Thời điểm thắng lợi của cách mạng thuộc địa hoàn toàn do tổ chức ở chính quốc quyết định."
+    ],
+    "correct": 2,
+    "explanation": "Bài giảng phân biệt quan hệ liên hệ, hỗ trợ với sự phụ thuộc: cách mạng thuộc địa có tính chủ động và có thể thắng trước. Vì thế không thể tách rời hai phong trào, áp đặt trình tự thắng lợi bắt buộc theo chiều ngược lại, hoặc trao toàn bộ quyền quyết định cho lực lượng ở chính quốc.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 19, mục 1.2.2.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 19, mục 1.2.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Vì sao sự xuất hiện các tổ chức cộng sản năm 1929 vừa biểu hiện bước phát triển của phong trào, vừa đặt ra yêu cầu hợp nhất?",
+    "options": [
+      "Vì mỗi tổ chức đã đủ sức lãnh đạo toàn quốc, nên hợp nhất chủ yếu nhằm giảm số lượng cơ quan tuyên truyền.",
+      "Vì có thể duy trì sự lãnh đạo riêng biệt nếu cùng mục tiêu, nên chỉ cần liên lạc không chính thức giữa các tổ chức.",
+      "Vì xu hướng cộng sản phát triển đồng nghĩa đã có sẵn một cương lĩnh và cơ quan lãnh đạo chung cho toàn phong trào.",
+      "Vì xu hướng cộng sản đã phát triển nhưng các tổ chức còn hoạt động riêng rẽ, trong khi phong trào cần sự lãnh đạo thống nhất."
+    ],
+    "correct": 3,
+    "explanation": "Sự hình thành các tổ chức cộng sản phản ánh sự phát triển của phong trào công nhân và yêu nước. Tuy nhiên, hoạt động riêng rẽ không đáp ứng yêu cầu lãnh đạo thống nhất, nên hợp nhất là bước cần thiết. Hợp nhất không chỉ nhằm giảm đầu mối tuyên truyền. Cùng mục tiêu chưa đủ khắc phục hoạt động riêng rẽ, và sự phát triển của xu hướng cộng sản chưa tự tạo ra cơ quan lãnh đạo chung.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 19, 20, mục 1.2.3.1 và 1.2.3.2.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 19, 20, mục 1.2.3.1 và 1.2.3.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi phân tích quan hệ giữa nền tảng giai cấp và đoàn kết dân tộc trong Cương lĩnh đầu tiên, hai kết luận nào được nội dung bài giảng hỗ trợ? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Lấy công nhân, nông dân làm lực lượng cơ bản vẫn có thể đi cùng việc tập hợp các lực lượng tiến bộ, yêu nước khác.",
+      "Xác định giai cấp công nhân lãnh đạo đồng nghĩa chỉ công nhân được tham gia phong trào cách mạng.",
+      "Yêu cầu độc lập dân tộc được đặt cùng các quyền xã hội như tự do tổ chức và nam nữ bình quyền.",
+      "Muốn đoàn kết dân tộc thì Cương lĩnh phải bỏ mọi mục tiêu về quyền lợi xã hội và đời sống nhân dân."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Cương lĩnh nêu công nông là lực lượng cơ bản, đồng thời chủ trương đoàn kết các lực lượng tiến bộ, yêu nước; nhiệm vụ độc lập gắn với những quyền xã hội cụ thể. Vai trò lãnh đạo không đồng nghĩa độc quyền tham gia. Việc tập hợp rộng rãi cũng không đòi hỏi từ bỏ quyền lợi xã hội đã nêu trong Cương lĩnh.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 21, mục 1.2.3.3.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 21, mục 1.2.3.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Từ quan điểm của Cương lĩnh đầu tiên về đoàn kết quốc tế, hai nhận định nào giải thích đúng việc vừa chống thực dân Pháp vừa liên hệ với quần chúng vô sản Pháp? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Hợp tác với quần chúng vô sản Pháp đồng nghĩa chấp nhận duy trì sự thống trị của thực dân Pháp.",
+      "Cương lĩnh phân biệt lực lượng thống trị thực dân với quần chúng lao động ở chính quốc.",
+      "Đoàn kết quốc tế đòi hỏi tạm gác mục tiêu làm cho Việt Nam hoàn toàn độc lập.",
+      "Đấu tranh giành độc lập có thể kết hợp với đoàn kết các dân tộc bị áp bức và lực lượng vô sản trên thế giới."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Cương lĩnh đồng thời nêu nhiệm vụ chống đế quốc Pháp, giành độc lập và liên hệ với quần chúng vô sản Pháp. Hai nội dung này cho thấy sự phân biệt giữa bộ máy thống trị và nhân dân lao động, đồng thời gắn cách mạng Việt Nam với phong trào thế giới. Đoàn kết với lực lượng lao động không phải chấp nhận thuộc địa hay từ bỏ độc lập.\n\nNguồn đối chiếu: Bài 1.pdf, trang PDF 21, mục 1.2.3.3.",
+    "sources": [
+      "e1692169-838a-5c94-9b54-a50426931efe"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 1.pdf, trang PDF 21, mục 1.2.3.3"
+  }
+]

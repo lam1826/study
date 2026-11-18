@@ -379,5 +379,171 @@
     "explanation": "Chỉ thị Kháng chiến kiến quốc của Ban Chấp hành Trung ương Đảng ban hành ngày 25/11/1945; câu hỏi yêu cầu chọn năm 1945.\n\nĐáp án theo tài liệu:\n• 1945\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 27.",
     "sources": [],
     "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Vì sao việc chống đói, xóa mù chữ và tổ chức Tổng tuyển cử sau Cách mạng Tháng Tám có thể được xem là những biện pháp bảo vệ chính quyền, dù không trực tiếp là hoạt động quân sự?",
+    "options": [
+      "Chúng giải quyết khó khăn xã hội, phát huy quyền làm chủ và củng cố nền tảng của chính quyền cách mạng.",
+      "Chúng thay thế hoàn toàn nhiệm vụ chống ngoại xâm nên không cần xây dựng lực lượng bảo vệ chính quyền.",
+      "Chúng chỉ nhằm cải thiện hình ảnh đối ngoại, không liên quan đến đời sống hay sự tham gia của nhân dân.",
+      "Chúng chứng tỏ các nguy cơ từ bên ngoài đã chấm dứt ngay sau ngày tuyên bố độc lập."
+    ],
+    "correct": 0,
+    "explanation": "Chỉ thị kháng chiến kiến quốc gắn củng cố chính quyền với cải thiện đời sống; xóa mù chữ được coi là giải pháp xây dựng chính quyền và phát huy dân chủ; Tổng tuyển cử khẳng định quyền làm chủ. Vì vậy bảo vệ chính quyền bao gồm cả xây dựng nền tảng xã hội, chính trị. Những nhiệm vụ này không xóa bỏ nhu cầu chống ngoại xâm hay chứng minh nguy cơ bên ngoài đã hết.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 1, 2, mục 3.1.1 và 3.1.2.1–3.1.2.2.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 1, 2, mục 3.1.1 và 3.1.2.1–3.1.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Từ sự chênh lệch lực lượng ban đầu, bài giảng giải thích chủ trương kháng chiến trường kỳ theo logic nào?",
+    "options": [
+      "Kéo dài thời gian tự nó tạo ra thắng lợi, dù lực lượng và tổ chức không có thay đổi.",
+      "Cần thời gian để từng bước xây dựng, chuyển hóa lực lượng từ yếu thành mạnh trong quá trình kháng chiến.",
+      "Thời gian dài cho phép ngừng hoạt động xây dựng kinh tế để chỉ chờ sự suy yếu của đối phương.",
+      "Kháng chiến trường kỳ có nghĩa mọi chiến dịch đều phải tránh chủ động tiến công."
+    ],
+    "correct": 1,
+    "explanation": "Trường kỳ nhằm tạo thời gian vật chất để chuyển hóa tương quan lực lượng, chứ không phải kéo dài chiến tranh như một mục đích tự thân. Quá trình đó cần xây dựng lực lượng và nguồn lực; không phải chờ đợi thụ động hoặc phủ nhận mọi hoạt động tiến công. Bài giảng trình bày trường kỳ như một phương châm chiến lược phù hợp tương quan ban đầu.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 4, mục 3.2.1.1.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 4, mục 3.2.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Từ nguyên tắc “dựa vào sức mình là chính”, một người suy ra rằng việc tranh thủ sự ủng hộ quốc tế là trái đường lối kháng chiến. Cách hiểu nào phù hợp với cả đường lối và quá trình thực hiện trong bài giảng?",
+    "options": [
+      "Tự lực chỉ cần thiết trước khi có viện trợ; sau đó có thể giao toàn bộ việc quyết định kháng chiến cho bên ngoài.",
+      "Muốn bảo đảm tự lực thì phải ngừng mọi hoạt động ngoại giao và phối hợp quốc tế.",
+      "Lấy sức mình làm nền tảng vẫn đi cùng việc chủ động tranh thủ sự đồng tình, giúp đỡ của các lực lượng quốc tế.",
+      "Nguồn hỗ trợ quốc tế quyết định toàn bộ nội dung đường lối, nên nguồn lực trong nước chỉ có vai trò tượng trưng."
+    ],
+    "correct": 2,
+    "explanation": "Bài giảng vừa nêu tự lực là chính, vừa trình bày chủ trương mở rộng ngoại giao và tranh thủ ủng hộ quốc tế. Hai nội dung có thể bổ sung cho nhau: nguồn lực trong nước là nền tảng, sự giúp đỡ bên ngoài là điều kiện hỗ trợ. Tự lực không đồng nghĩa tự cô lập; tranh thủ hỗ trợ cũng không đồng nghĩa giao quyền quyết định cho bên ngoài.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 4, 5, mục 3.2.1.1 và 3.2.1.2.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 4, 5, mục 3.2.1.1 và 3.2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi phân loại nội dung đường lối kháng chiến, cặp nhận xét nào phân biệt đúng “toàn dân” với “toàn diện”?",
+    "options": [
+      "Toàn dân nói về thời gian kéo dài; toàn diện nói về việc chỉ huy tập trung trong quân đội.",
+      "Toàn dân có nghĩa ai cũng làm cùng một nhiệm vụ quân sự; toàn diện có nghĩa bỏ mọi hoạt động ngoài chiến trường.",
+      "Toàn dân nói về quan hệ quốc tế; toàn diện nói về việc chỉ huy động người dân ở vùng tự do.",
+      "Toàn dân nhấn mạnh lực lượng tham gia rộng khắp; toàn diện nhấn mạnh phối hợp đấu tranh trên nhiều lĩnh vực."
+    ],
+    "correct": 3,
+    "explanation": "Toàn dân trả lời vấn đề huy động ai, với lực lượng vũ trang làm nòng cốt; toàn diện trả lời đấu tranh trên những lĩnh vực nào như quân sự, chính trị, kinh tế, ngoại giao, văn hóa. Hai khái niệm liên quan nhưng không đồng nghĩa. Thời gian thuộc phương châm trường kỳ; toàn dân không buộc mọi người cùng một nhiệm vụ; toàn diện không thu hẹp vào quân sự hay một vùng.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 4, mục 3.2.1.1.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 4, mục 3.2.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Vì sao Chiến dịch Biên giới năm 1950 được trình bày như một bước chuyển có ý nghĩa rộng hơn việc tiêu diệt sinh lực đối phương?",
+    "options": [
+      "Chiến dịch còn nhằm mở rộng căn cứ Việt Bắc và tạo hành lang thông thương với Trung Quốc, các nước xã hội chủ nghĩa.",
+      "Chiến dịch giải quyết toàn bộ nhiệm vụ chiến lược nên sau đó không cần tiếp tục xây dựng căn cứ và hậu phương.",
+      "Chiến dịch đặt việc mở rộng quan hệ bên ngoài thay cho xây dựng căn cứ trong nước, vì hai mục tiêu này không thể kết hợp.",
+      "Chiến dịch chỉ có tác dụng quân sự tại chỗ; việc thông thương không liên quan đến điều kiện phát triển kháng chiến."
+    ],
+    "correct": 0,
+    "explanation": "Nguồn liên kết mục tiêu quân sự với mở rộng căn cứ và khai thông quan hệ thông thương, qua đó thúc đẩy kháng chiến sang giai đoạn mới. Không thể giới hạn ý nghĩa ở số lực lượng đối phương bị tiêu diệt. Chiến dịch không giải quyết xong mọi nhiệm vụ; xây dựng căn cứ và khai thông quan hệ bên ngoài được kết hợp. Chính liên hệ giữa các mục tiêu ấy giải thích tác dụng vượt ra ngoài kết quả quân sự tại chỗ.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 6, mục 3.2.1.2.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 6, mục 3.2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Theo Chính cương năm 1951, xác định hoàn thành giải phóng dân tộc là nhiệm vụ chính trước mắt cần được hiểu như thế nào trong quan hệ với các nhiệm vụ khác?",
+    "options": [
+      "Ba nhiệm vụ không có quan hệ với nhau nên chỉ cần thực hiện một nhiệm vụ duy nhất.",
+      "Ba nhiệm vụ gắn bó chặt chẽ, nhưng phải xác định nhiệm vụ trọng tâm trước mắt phù hợp tình hình.",
+      "Nhiệm vụ ruộng đất và phát triển dân chủ nhân dân đã hoàn thành nên không còn cần được đặt ra.",
+      "Mọi nhiệm vụ phải có mức ưu tiên và nhịp độ như nhau, bất kể điều kiện chiến tranh."
+    ],
+    "correct": 1,
+    "explanation": "Chính cương nêu ba nhiệm vụ khăng khít: giành độc lập, thống nhất; xóa tàn tích phong kiến và giải quyết ruộng đất; phát triển dân chủ nhân dân, gây cơ sở cho chủ nghĩa xã hội. Đồng thời, hoàn thành giải phóng dân tộc là nhiệm vụ chính trước mắt. Do đó gắn bó không có nghĩa ngang bằng về ưu tiên, và ưu tiên một nhiệm vụ không xóa bỏ các nhiệm vụ còn lại.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 6, mục 3.2.2.1.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 6, mục 3.2.2.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một sơ đồ học tập chia con đường phát triển nêu trong Chính cương năm 1951 thành ba giai đoạn hoàn toàn tách biệt, cấm mọi nhiệm vụ của giai đoạn sau xuất hiện sớm hơn. Cần điều chỉnh sơ đồ này ra sao?",
+    "options": [
+      "Xóa mọi sự phân biệt nhiệm vụ chủ yếu giữa các giai đoạn vì chúng hoàn toàn giống nhau.",
+      "Đảo ngược thứ tự để xây dựng xong chủ nghĩa xã hội rồi mới giải phóng dân tộc.",
+      "Giữ sự phân biệt nhiệm vụ chủ yếu, đồng thời thể hiện các giai đoạn liên hệ mật thiết và xen kẽ nhau.",
+      "Chỉ giữ giai đoạn giải phóng dân tộc vì Chính cương không đề cập định hướng phát triển sau đó."
+    ],
+    "correct": 2,
+    "explanation": "Nguồn trình bày nhiệm vụ chủ yếu của từng giai đoạn nhưng nhấn mạnh chúng không tách rời, có quan hệ mật thiết và xen kẽ. Vì thế cần tránh cả hai cực đoan: chia thành các ngăn kín hoặc xóa mọi sự khác biệt. Đảo trình tự hay bỏ định hướng sau giải phóng đều không đúng với Chính cương.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 6, 7, mục 3.2.2.1.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 6, 7, mục 3.2.2.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi đánh giá ý nghĩa thắng lợi của cuộc kháng chiến chống Pháp, vì sao cần phân biệt “giải phóng hoàn toàn miền Bắc” với “hoàn thành thống nhất cả nước”?",
+    "options": [
+      "Vì giải phóng miền Bắc chỉ có ý nghĩa tại chỗ, không ảnh hưởng đến quá trình đấu tranh ở miền Nam.",
+      "Vì thắng lợi năm 1954 không tạo ra điều kiện xây dựng hoặc phát triển nào cho miền Bắc.",
+      "Vì sau thắng lợi, nhiệm vụ giải phóng dân tộc trên phạm vi cả nước được thay hoàn toàn bằng nhiệm vụ đối ngoại.",
+      "Vì miền Bắc được giải phóng và trở thành cơ sở, hậu phương cho sự nghiệp tiếp tục đấu tranh giải phóng miền Nam, thống nhất đất nước."
+    ],
+    "correct": 3,
+    "explanation": "Nguồn nêu thắng lợi giải phóng miền Bắc và mở ra điều kiện xây dựng miền Bắc thành cơ sở, hậu phương cho đấu tranh ở miền Nam. Điều đó vừa ghi nhận kết quả đạt được, vừa cho thấy nhiệm vụ trên phạm vi cả nước còn tiếp tục. Các phương án khác tách miền Bắc khỏi sự nghiệp chung hoặc phủ nhận những điều kiện mới do thắng lợi tạo ra.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 8, 9, mục 3.3.1.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 8, 9, mục 3.3.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Từ Chỉ thị kháng chiến kiến quốc và cách ứng xử với các lực lượng nước ngoài năm 1945–1946, hai nhận định nào phản ánh đúng quan hệ giữa nguyên tắc và sách lược? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Giữ mục tiêu độc lập và bảo vệ chính quyền có thể đi cùng việc hòa hoãn, nhân nhượng có nguyên tắc trong hoàn cảnh cụ thể.",
+      "Nhân nhượng về kinh tế đương nhiên đồng nghĩa từ bỏ độc lập về chính trị.",
+      "Xác định kẻ thù chính và thực hiện thêm bạn bớt thù giúp tập trung xử lý mối nguy cấp bách.",
+      "Hòa hoãn với một lực lượng có nghĩa coi mọi lực lượng nước ngoài đều có cùng lợi ích với cách mạng."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Nguồn nêu độc lập về chính trị, có thể nhân nhượng về kinh tế; xác định thực dân Pháp là kẻ thù chính; đồng thời chủ trương thêm bạn bớt thù và hòa hoãn có nguyên tắc với quân Tưởng. Như vậy mục tiêu cơ bản có thể được bảo vệ bằng sách lược linh hoạt. Nhân nhượng cụ thể không tự động từ bỏ độc lập, và hòa hoãn không có nghĩa đồng nhất lợi ích với mọi lực lượng.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 2, 3, mục 3.1.2.1 và 3.1.2.3.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 2, 3, mục 3.1.2.1 và 3.1.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Đối chiếu đường lối kháng chiến với việc tổ chức thực hiện những năm 1947–1950, hai lập luận nào giải thích đúng việc vừa chiến đấu vừa tăng gia sản xuất, duy trì học tập? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Đời sống và giáo dục chỉ cần được chú ý sau khi chiến tranh kết thúc, nên các hoạt động này nằm ngoài đường lối.",
+      "Sản xuất và bảo đảm đời sống tạo nguồn lực vật chất để duy trì kháng chiến lâu dài.",
+      "Đã có đấu tranh kinh tế, văn hóa thì mặt trận quân sự không còn giữ vai trò quan trọng.",
+      "Duy trì học tập, xây dựng đời sống gắn hoạt động kháng chiến với củng cố xã hội và thực hiện kháng chiến toàn diện."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Bài giảng ghi rõ tăng gia, tự túc lương thực để bảo đảm đời sống bộ đội và nhân dân, đồng thời duy trì bình dân học vụ và trường học. Đây là cách xây dựng nguồn lực vật chất, xã hội ngay trong chiến tranh, phù hợp kháng chiến toàn diện. Không thể hoãn toàn bộ việc xây dựng đến sau chiến tranh; phối hợp nhiều lĩnh vực cũng không phủ nhận vai trò quân sự.\n\nNguồn đối chiếu: Bài 3.pdf, trang PDF 4, 5, mục 3.2.1.1 và 3.2.1.2.",
+    "sources": [
+      "b98048d0-c4f9-5102-a826-7c87c3fd9ec9"
+    ],
+    "from": "Biên soạn nâng cao từ Bài 3.pdf, trang PDF 4, 5, mục 3.2.1.1 và 3.2.1.2"
   }
 ]

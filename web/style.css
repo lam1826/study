@@ -800,15 +800,16 @@ kbd { display:inline-block; min-width:1.5em; padding:0 .35rem; border:1px solid 
 /* Inside the attempt card the verdict and blocks are flat colour bands: the
    card is the only outline (no box inside a box). */
 .question-card .cblock, .question-card .verdict { border-color:transparent; }
-/* Essay reading pages (one question, whole chapter): one reading column. Text
-   runs the full width of each block, so the text, the coloured blocks, the
-   question and the buttons share one right edge (about 80 characters a line). */
-/* The reading column sits in the middle of the space it has. */
-.reading-page .reading-main { max-width:46rem; min-width:0; margin-inline:auto; }
+/* Essay reading pages (one question, whole chapter): the content fills the
+   space it has, up to 75rem (only very wide screens reach it; then it is
+   centred). Text runs the full width of each block, so the text, the
+   coloured blocks, the question and the buttons share one right edge. */
+.reading-page .reading-main { max-width:75rem; min-width:0; margin-inline:auto; }
+.reading-page .answer-item { max-width:none; }
 /* From 1200 px the chapter's questions sit in a sticky list against the
-   right edge (aligned with the top bar's tools); the reading column is
-   centred in the space to its left. The list ends above the bottom-right
-   corner, where ChatGPT Sites can place its own floating widget. */
+   right edge (aligned with the top bar's tools); the content fills the space
+   to its left. The list ends above the bottom-right corner, where ChatGPT
+   Sites can place its own floating widget. */
 .chapter-toc { display:none; }
 @media (min-width: 1200px) {
   .reading-page main { max-width:none; }

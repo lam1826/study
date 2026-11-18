@@ -2,6 +2,11 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import worker from '../dist/server/index.js';
+import { loadAddedQuestions } from '../scripts/added-questions.mjs';
+// The original course (346 questions, 118 quiz) plus content/added/ (checked by tests/added.mjs).
+const added=await loadAddedQuestions();
+const addedIds=new Set(added.questions.map(q=>q.id));
+const TOTAL=346+added.questions.length, QUIZ=118+added.questions.length, MULTI=7+added.questions.filter(q=>Array.isArray(q.correct)).length;
 const sqlite=new DatabaseSync(':memory:');
 sqlite.exec(readFileSync('drizzle/0000_quiz.sql','utf8'));
 sqlite.exec(readFileSync('drizzle/0001_content_imports.sql','utf8'));
@@ -28,22 +33,24 @@ async function call(path,method='GET',data,identity='u',expected=200){
   return res.headers.get('content-type').includes('application/json')?JSON.parse(text):text;
 }
 const state=await call('api/state?compact=1');
-assert.equal(state.questions.length,346);
-assert.equal(state.questions.filter(q=>q.kind==='quiz').length,118);
+assert.equal(state.questions.length,TOTAL);
+assert.equal(state.questions.filter(q=>q.kind==='quiz').length,QUIZ);
 assert.equal(state.questions.filter(q=>q.kind==='essay').length,228);
 assert.ok(state.questions.every(q=>!('correct' in q)&&!('options' in q)));
 await call('api/state','GET',undefined,'',401);
 await call('api/bank','GET',undefined,'other',403);
 const bank=await call('api/bank');
-assert.ok(bank.filter(q=>q.kind==='quiz').every(q=>q.explanation.length>200 && !q.explanation.startsWith('Đáp án theo phần được đánh dấu')));
+const courseBank=bank.filter(q=>!addedIds.has(q.id));
+assert.equal(courseBank.length,346);
+assert.ok(courseBank.filter(q=>q.kind==='quiz').every(q=>q.explanation.length>200 && !q.explanation.startsWith('Đáp án theo phần được đánh dấu')));
 const multi=bank.filter(q=>Array.isArray(q.correct));
-assert.equal(multi.length,7);
-assert.equal(bank.filter(q=>q.kind==='quiz' && q.options.length===3).length,1);
-assert.ok(bank.every(q=>q.explanation && q.sources.length));
+assert.equal(multi.length,MULTI);
+assert.equal(courseBank.filter(q=>q.kind==='quiz' && q.options.length===3).length,1);
+assert.ok(courseBank.every(q=>q.explanation && q.sources.length));
 // Four import markers: course, reviewed explanations, essay guides, added questions.
 assert.equal(sqlite.prepare('SELECT count(*) AS n FROM content_imports').get().n,4);
 await call('api/state');
-assert.equal(sqlite.prepare('SELECT count(*) AS n FROM questions').get().n,346);
+assert.equal(sqlite.prepare('SELECT count(*) AS n FROM questions').get().n,TOTAL);
 // A complete chapter includes all seven types of saved option IDs regardless of order.
 const cfg={chapter:'distributed-2',tier:'main',mode:'practice',count:15};
 const start=await call('api/attempt','POST',cfg);
@@ -95,7 +102,7 @@ assert.ok(bank.filter(q=>q.kind==='essay').every(q=>q.key_points.length>=2&&q.co
 await call('api/essay/'+essay.id,'POST',{draft:'Nội dung cá nhân',learned:true});
 assert.equal((await call('api/essay/'+essay.id,'GET',undefined,'other')).draft,'');
 await call('api/content-import?id=x','PUT',undefined,'',403);
-console.log('PASS: 346 imported questions, source-marked answers, seven multi-answer questions, batch saves, grading, retry, admin roundtrip, source authorization and private drafts.');
+console.log('PASS: '+TOTAL+' imported questions (346 + '+added.questions.length+' added), source-marked answers, '+MULTI+' multi-answer questions, batch saves, grading, retry, admin roundtrip, source authorization and private drafts.');
 
 // Practice feedback uses snapshot keys immediately, but an active exam never
 // exposes keys or explanations, even through non-compact save responses.
@@ -145,7 +152,7 @@ for(const d of source.documents)files.set(d.storage_key,'original-file-'+d.id);
 const backup=await call('api/backups','POST',{});
 const manifest=await call('api/backups/'+backup.id);
 assert.equal(Object.keys(manifest.files).length,47);
-assert.equal(manifest.data.questions.length,346);
+assert.equal(manifest.data.questions.length,TOTAL);
 await call('api/essay/'+essay.id,'POST',{draft:'bị thay đổi',status:'learning'});
 await call('api/chapters/distributed-1','PATCH',{title:'Đổi sau sao lưu',overview:''});
 await call('api/backups/'+backup.id+'/restore','POST',{});
@@ -154,7 +161,7 @@ assert.equal((await call('api/state')).chapters.find(c=>c.id==='distributed-1').
 const restoredDoc=sqlite.prepare('SELECT storage_key FROM documents WHERE id=?').get(source.documents[0].id);
 assert.equal(files.get(restoredDoc.storage_key),'original-file-'+source.documents[0].id);
 assert.equal((await call('api/backups')).length,2);
-assert.equal((await call('api/state')).questions.length,346);
+assert.equal((await call('api/state')).questions.length,TOTAL);
 console.log('PASS: long essays without truncation, partial autosave, checklist, account isolation, global mistake resolution, chapter protection/order, complete file backup and checkpointed restore.');
 const chapterAnswers=await call('api/essay-answers?chapter=distributed-1','GET',undefined,'other');
 assert.equal(chapterAnswers.length,36);
@@ -175,11 +182,11 @@ for(const chapter of state.chapters){
  assert.equal(answers.length,expected.length);answerTotal+=answers.length;
  for(const q of answers){const source=expected.find(x=>x.id===q.id);assert.deepEqual(q.correct,source.correct);assert.deepEqual(q.options,source.options);assert.ok(q.explanation);assert.equal(q.chapter,chapter.id);assert.ok(!('draft' in q));}
 }
-assert.equal(answerTotal,118);
+assert.equal(answerTotal,QUIZ);
 assert.equal(sqlite.prepare('SELECT count(*) AS n FROM attempts').get().n,attemptsBefore);
 await call('api/quiz-answers?chapter=missing','GET',undefined,'u',404);
 await call('api/quiz-answers?chapter=distributed-2','GET',undefined,'',401);
-console.log('PASS: all 118 quiz answer keys and option IDs match the bank, chapter scope, learner access and no progress mutations.');
+console.log('PASS: all '+QUIZ+' quiz answer keys and option IDs match the bank, chapter scope, learner access and no progress mutations.');
 
 // Shuffled attempts keep every option's text with its own ID and the stored
 // key on the same IDs, including multi-answer questions.
@@ -235,7 +242,7 @@ const css=page.match(/<link rel="stylesheet" href="(\/style\.[a-f0-9]{12}\.css)"
 assert.ok(css&&js,'page links hashed assets');
 assert.ok(!page.includes('<style>')&&page.indexOf('id="initial-state"')>page.indexOf('<main'));
 const boot=JSON.parse(page.match(/<script type="application\/json" id="initial-state">(.*?)<\/script>/s)[1]);
-assert.equal(boot.questions.length,346);
+assert.equal(boot.questions.length,TOTAL);
 assert.equal(boot.history.length,sqlite.prepare("SELECT count(*) AS n FROM attempts WHERE owner='u'").get().n);
 assert.ok(boot.questions.every(q=>!('correct' in q)&&!('explanation' in q)));
 const signedOutPage=await call('','GET',undefined,'');
@@ -250,7 +257,7 @@ console.log('PASS: the page streams its shell with immutable hashed CSS/JS and e
 const coldWorker=(await import('../dist/server/index.js?cold-isolate')).default;
 const coldBefore=trips;
 const coldState=await coldWorker.fetch(new Request('https://example.test/api/state?compact=1',{headers:{'oai-authenticated-user-id':'u','oai-authenticated-user-email':'owner@example.test'}}),{DB:db,BUCKET:bucket,QUIZ_OWNER_EMAIL:'owner@example.test'});
-assert.equal(coldState.status,200);assert.equal((await coldState.json()).questions.length,346);
+assert.equal(coldState.status,200);assert.equal((await coldState.json()).questions.length,TOTAL);
 assert.equal(trips-coldBefore,2);
 console.log('PASS: a cold isolate loads the page state in two D1 round trips (was 11 calls, 5 of them sequential).');
 // The home review queue names unfinished attempts: mode, size, answers given, deadline.

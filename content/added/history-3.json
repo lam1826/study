@@ -1,0 +1,383 @@
+[
+  {
+    "tier": "main",
+    "prompt": "Phương châm “Đánh chắc, tiến chắc” và “đánh chắc thắng” xuất hiện trong chiến dịch nào sau đây:",
+    "options": [
+      "Chiến dịch Hồ Chí Minh",
+      "Chiến dịch Biên giới",
+      "Chiến dịch Việt Bắc",
+      "Chiến dịch Điện Biên Phủ"
+    ],
+    "correct": 3,
+    "explanation": "Phương châm đánh chắc, tiến chắc gắn với chiến dịch Điện Biên Phủ. Các phương án còn lại là tên những chiến dịch khác.\n\nĐáp án theo tài liệu:\n• Chiến dịch Điện Biên Phủ\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 1.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Tại Đại hội đại biểu toàn quốc lần thứ II (2/1951), Đảng ra hoạt động công khai và quyết định đổi tên thành:",
+    "options": [
+      "Đảng Cộng sản Việt Nam",
+      "Đảng Cộng sản Đông Dương",
+      "Đảng Lao động Việt Nam",
+      "Hội nghiên cứu Chủ nghĩa Mác- Lê nin"
+    ],
+    "correct": 2,
+    "explanation": "Đại hội II tháng 2/1951 quyết định đưa Đảng ra hoạt động công khai với tên gọi Đảng Lao động Việt Nam.\n\nĐáp án theo tài liệu:\n• Đảng Lao động Việt Nam\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 2.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Những thuận lợi cơ bản của nước Việt Nam Dân chủ Cộng hòa sau Cách mạng tháng Tám năm 1945 là:",
+    "options": [
+      "Việt Nam trở thành quốc gia độc lập tự do",
+      "Hệ thống chính quyền dày dặn kinh nghiệm quản lý",
+      "Phong trào cách mạng trong nước phát triển mạnh mẽ",
+      "Kinh tế ổn định"
+    ],
+    "correct": 0,
+    "explanation": "Trong các phương án của câu hỏi, thuận lợi được đánh dấu là Việt Nam trở thành quốc gia độc lập, tự do sau thắng lợi của Cách mạng Tháng Tám.\n\nĐáp án theo tài liệu:\n• Việt Nam trở thành quốc gia độc lập tự do\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 3.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Nhiệm vụ chính của cách mạng Việt Nam giai đoạn 1951 -1954 là đánh đuổi:",
+    "options": [
+      "Giai cấp tư sản",
+      "Đế quốc Pháp xâm lược",
+      "Bọn phong kiến phản động",
+      "Giai cấp công nhân"
+    ],
+    "correct": 1,
+    "explanation": "Nhiệm vụ chính được hỏi là đánh đuổi đế quốc Pháp xâm lược, phù hợp với mục tiêu kháng chiến chống thực dân Pháp trong giai đoạn 1951–1954.\n\nĐáp án theo tài liệu:\n• Đế quốc Pháp xâm lược\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 4.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Ai đã được cử làm Tư lệnh kiêm Bí thư Đảng ủy chiến dịch Điện Biên Phủ?",
+    "options": [
+      "Phạm Văn Đồng",
+      "Võ Nguyên Giáp",
+      "Văn Tiến Dũng",
+      "Nguyễn Chí Thanh"
+    ],
+    "correct": 1,
+    "explanation": "Đại tướng Võ Nguyên Giáp được cử làm Tư lệnh kiêm Bí thư Đảng ủy chiến dịch Điện Biên Phủ.\n\nĐáp án theo tài liệu:\n• Võ Nguyên Giáp\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 5.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Mục tiêu của cuộc cách mạng Đông Dương năm 1945 là:",
+    "options": [
+      "Giải phóng dân cày",
+      "Giải phóng giai cấp nông dân",
+      "Dân tộc giải phóng",
+      "Xây dựng chủ nghĩa xã hội"
+    ],
+    "correct": 2,
+    "explanation": "Chỉ thị Kháng chiến kiến quốc xác định mục tiêu cần nêu cao vẫn là dân tộc giải phóng, với khẩu hiệu Dân tộc trên hết, Tổ quốc trên hết.\n\nĐáp án theo tài liệu:\n• Dân tộc giải phóng\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 6.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Miền Bắc bắt đầu tiến lên chủ nghĩa xã hội từ năm bao nhiêu?",
+    "options": [
+      "1945",
+      "1954",
+      "1975",
+      "1986"
+    ],
+    "correct": 1,
+    "explanation": "Sau thắng lợi của cuộc kháng chiến chống Pháp và việc miền Bắc được giải phóng, miền Bắc bước vào thời kỳ quá độ lên chủ nghĩa xã hội từ năm 1954.\n\nĐáp án theo tài liệu:\n• 1954\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 7.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Cuộc kháng chiến chống Pháp giai đoạn 1951 -1954 nhằm giải quyết mâu thuẫn:",
+    "options": [
+      "Giai cấp công nhân với giai cấp nông dân",
+      "Giai cấp công nhân với giai cấp tư sản",
+      "Nhân dân Việt Nam với chủ nghĩa đế quốc xâm lược",
+      "Nhân dân Việt Nam với giai cấp tư sản"
+    ],
+    "correct": 2,
+    "explanation": "Cuộc kháng chiến chống Pháp nhằm giải quyết mâu thuẫn giữa nhân dân Việt Nam với chủ nghĩa đế quốc xâm lược.\n\nĐáp án theo tài liệu:\n• Nhân dân Việt Nam với chủ nghĩa đế quốc xâm lược\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 8.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Kẻ thù chính của Cách mạng Việt Nam được xác định trong Chỉ thị Kháng chiến kiến quốc ngày 25/11/1945 là:",
+    "options": [
+      "Tưởng giới thạch và tay sai",
+      "Thực dân Pháp xâm lược",
+      "Thực dân Anh xâm lược",
+      "Giặc đói và giặc dốt"
+    ],
+    "correct": 1,
+    "explanation": "Chỉ thị Kháng chiến kiến quốc ngày 25/11/1945 xác định kẻ thù chính là thực dân Pháp xâm lược, để tập trung đấu tranh chống chúng.\n\nĐáp án theo tài liệu:\n• Thực dân Pháp xâm lược\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 9.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chính cương của Đảng Lao động Việt Nam được thông qua tại Đại hội II (2/1951) đã xác định nền tảng của cách mạng là:",
+    "options": [
+      "Giai cấp công nhân, giai cấp nông dân, lao động trí óc",
+      "Giai cấp nông dân, giai cấp tư sản, lao động trí óc",
+      "Giai cấp công nhân, tầng lớp trí thức và phong kiến",
+      "Giai cấp nông dân, phong kiến và lao động trí óc"
+    ],
+    "correct": 0,
+    "explanation": "Cần phân biệt nền tảng với động lực của cách mạng. Nền tảng được xác định là công nhân, nông dân và lao động trí óc.\n\nĐáp án theo tài liệu:\n• Giai cấp công nhân, giai cấp nông dân, lao động trí óc\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 10.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Bài học kinh nghiệm nào của Đảng trong lãnh đạo khánh chiến chống thực dân Pháp xâm lược có thể được áp dụng cho cách mạng Việt Nam trong giai đoạn hiện nay?",
+    "options": [
+      "Phải luôn thực hiện kháng chiến trường kỳ",
+      "Đề ra đường lối đúng đắn, sáng tạo, phù hợp với thực tiễn lịch sử của cuộc kháng chiến ngay từ những ngày đầu",
+      "Cần có giai cấp nông dân lên lãnh đạo",
+      "Cần có tầng lớp trí thức lãnh đạo cách mạng"
+    ],
+    "correct": 1,
+    "explanation": "Bài học được nhấn mạnh trong câu này là đề ra đường lối đúng đắn, sáng tạo và phù hợp với thực tiễn ngay từ đầu cuộc kháng chiến.\n\nĐáp án theo tài liệu:\n• Đề ra đường lối đúng đắn, sáng tạo, phù hợp với thực tiễn lịch sử của cuộc kháng chiến ngay từ những ngày đầu\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 11.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Bài học kinh nghiệm nào của Đảng trong lãnh đạo khánh chiến chống thực dân Pháp xâm lược có thể được áp dụng cho cách mạng Việt Nam trong giai đoạn hiện nay",
+    "options": [
+      "Luôn coi trọng công tác xây dựng, chỉnh đốn Đảng",
+      "Luôn đề cao vai trò lãnh đạo của giai cấp công nhân",
+      "Luôn đề cao vai trò lãnh đạo của Nhà nước",
+      "Luôn phát triển giai cấp nông dân đông đảo nhất trong xã hội"
+    ],
+    "correct": 0,
+    "explanation": "Câu này nhấn mạnh bài học luôn coi trọng công tác xây dựng, chỉnh đốn Đảng. Đáp án cần chọn theo đúng nhóm phương án đi kèm.\n\nĐáp án theo tài liệu:\n• Luôn coi trọng công tác xây dựng, chỉnh đốn Đảng\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 12.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Những nhiệm vụ trước mắt được Đảng xác định trong bản Chỉ thị kháng chiến kiến quốc ngày 25/11/1945 là:",
+    "options": [
+      "Củng cố chính quyền, chống thực dân Pháp, bài trừ nội phản, cải thiện đời sống của nhân dân",
+      "Đánh đuổi quân Tưởng",
+      "Hòa hoãn với thực dân Pháp",
+      "Mở lớp học các cấp"
+    ],
+    "correct": 0,
+    "explanation": "Bốn nhiệm vụ trước mắt gồm củng cố chính quyền, chống thực dân Pháp, bài trừ nội phản và cải thiện đời sống nhân dân.\n\nĐáp án theo tài liệu:\n• Củng cố chính quyền, chống thực dân Pháp, bài trừ nội phản, cải thiện đời sống của nhân dân\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 13.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Tình hình nước Việt Nam Dân chủ Cộng hòa sau Cách mạng tháng Tám năm 1945 được ví như:",
+    "options": [
+      "Nước sôi lửa nóng",
+      "Nước sôi lửa bỏng",
+      "Ngàn cân treo sợi tóc",
+      "Trứng nước"
+    ],
+    "correct": 2,
+    "explanation": "Cụm từ ngàn cân treo sợi tóc diễn tả tình thế rất khó khăn của chính quyền cách mạng non trẻ sau Cách mạng Tháng Tám.\n\nĐáp án theo tài liệu:\n• Ngàn cân treo sợi tóc\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 14.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chính cương của Đảng Lao động Việt Nam được thông qua tại Đại hội II (2/1951) đã xác định xã hội Việt Nam gồm 3 tính chất, đó là:",
+    "options": [
+      "Phong kiến, dân tộc, dân chủ",
+      "Thuộc địa, dân chủ, xã hội chủ nghĩa",
+      "Dân tộc, dân chủ, xã hội chủ nghĩa",
+      "Dân chủ nhân dân, một phần thuộc địa và nửa phong kiến"
+    ],
+    "correct": 3,
+    "explanation": "Chính cương xác định ba tính chất của xã hội Việt Nam là dân chủ nhân dân, một phần thuộc địa và nửa phong kiến.\n\nĐáp án theo tài liệu:\n• Dân chủ nhân dân, một phần thuộc địa và nửa phong kiến\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 15.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Một trong những khó khăn, thách thức đối với nước Việt Nam Dân chủ Cộng Hòa sau Cách mạng tháng Tám năm 1945 là:",
+    "options": [
+      "Khoảng 95% dân số mù chữ",
+      "Thực dân Pháp quay trở lại xâm lược miền Bắc Việt Nam",
+      "Chủ nghĩa xã hội rơi vào khủng hoảng ở nhiều nước xã hội chủ nghĩa",
+      "Tình trạng vi phạm pháp luật, vượt biên trái phép diễn ra phổ biến"
+    ],
+    "correct": 0,
+    "explanation": "Tài liệu trắc nghiệm đánh dấu phương án khoảng 95% dân số mù chữ. Đây là khó khăn về văn hóa, giáo dục do chế độ cũ để lại.\n\nĐáp án theo tài liệu:\n• Khoảng 95% dân số mù chữ\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 16.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Cuộc chiến đấu mở đầu cho cuộc kháng chiến chống Pháp của quân và dân ta tại Hà Nội diễn ra trong bao nhiêu ngày?",
+    "options": [
+      "60 ngày đêm",
+      "30 ngày đêm",
+      "90 ngày đêm",
+      "12 ngày đêm"
+    ],
+    "correct": 0,
+    "explanation": "Quân và dân Hà Nội chiến đấu 60 ngày đêm, góp phần giam chân địch và tạo điều kiện để cả nước chuẩn bị kháng chiến lâu dài.\n\nĐáp án theo tài liệu:\n• 60 ngày đêm\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 17.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Đại hội đại biểu toàn toàn quốc lần thứ II (2/1951), đã thông qua bản Chính cương của Đảng lao động Việt Nam do ai soạn thảo:",
+    "options": [
+      "Chủ tịch Hồ Chí Minh",
+      "Trường Chinh",
+      "Võ Nguyên Giáp",
+      "Lê Duẩn"
+    ],
+    "correct": 1,
+    "explanation": "Chính cương của Đảng Lao động Việt Nam được thông qua tại Đại hội II tháng 2/1951 do Trường Chinh soạn thảo.\n\nĐáp án theo tài liệu:\n• Trường Chinh\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 18.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Sau 2/9/1945, nhiệm vụ lớn, quan trọng, cấp bách mà Đảng, Chính phủ và chủ tịch Hồ Chí Minh chỉ ra là (chọn nhiều đáp án): (Sinh viên chọn 2 đáp án đúng nhất)",
+    "options": [
+      "Chống giặc đói, đẩy lùi nạn đói",
+      "Chống đế quốc Mỹ",
+      "Chống giặc nội phản",
+      "Chống lại phong kiến, phản động"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Theo đáp án đánh dấu trong bộ câu hỏi, cần chọn đồng thời chống giặc đói, đẩy lùi nạn đói và chống giặc nội phản. Câu này yêu cầu hai lựa chọn.\n\nĐáp án theo tài liệu:\n• Chống giặc đói, đẩy lùi nạn đói\n• Chống giặc nội phản\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 19.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Kết quả của cuộc kháng chiến chống thực dân Pháp và can thiệp Mỹ là:",
+    "options": [
+      "Thành lập nhà nước Việt Nam dân chủ cộng hòa",
+      "Thành lập Đảng Cộng sản Việt Nam",
+      "Giải phóng hoàn toàn miền Bắc",
+      "Giải phóng hoàn toàn miền Nam"
+    ],
+    "correct": 2,
+    "explanation": "Kết quả được hỏi là miền Bắc được hoàn toàn giải phóng. Giải phóng hoàn toàn miền Nam thuộc giai đoạn lịch sử sau đó.\n\nĐáp án theo tài liệu:\n• Giải phóng hoàn toàn miền Bắc\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 20.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chính cương của Đảng Lao động Việt Nam được thông qua tại Đại hội II (2/1951) đã xác định động lực của cách mạng gồm 4 giai cấp, tầng lớp đó là:",
+    "options": [
+      "Công nhân, nông dân, trí thức, địa chủ phong kiến",
+      "Nông dân, tư sản, tiểu tư sản, địa chủ phong kiến",
+      "Công nhân, nông dân, tiểu tư sản, tư sản dân tộc",
+      "Công nhân, trí thức, địa chủ phong kiến, tư sản"
+    ],
+    "correct": 2,
+    "explanation": "Động lực gồm công nhân, nông dân, tiểu tư sản và tư sản dân tộc. Không nhầm danh sách này với nền tảng công nhân, nông dân và lao động trí óc.\n\nĐáp án theo tài liệu:\n• Công nhân, nông dân, tiểu tư sản, tư sản dân tộc\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 21.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chọn câu trả lời đúng và đầy đủ nhất: Cách mạng Việt Nam giai đoạn từ 1945 -1947 với nội dung cơ bản của đường lối kháng chiến là:",
+    "options": [
+      "Lâu dài, toàn diện",
+      "Kháng chiến toàn dân",
+      "Kháng chiến trường kỳ",
+      "Dựa trên sức mạnh toàn dân, toàn diện, lâu dài và dựa vào sức mình là chính"
+    ],
+    "correct": 3,
+    "explanation": "Nội dung cơ bản của đường lối kháng chiến gồm toàn dân, toàn diện, lâu dài và dựa vào sức mình là chính; phải chọn phương án nêu đầy đủ các nội dung.\n\nĐáp án theo tài liệu:\n• Dựa trên sức mạnh toàn dân, toàn diện, lâu dài và dựa vào sức mình là chính\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 22.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chọn câu trả lời đúng và đầy đủ nhất: Năm 1945, Chính phủ lâm thời họp phiên đầu tiên dưới sự chủ trì của chủ tịch Hồ Chí Minh xác định nhiệm vụ trước mắt là:",
+    "options": [
+      "Diệt giặc đói",
+      "Diệt giặc dốt",
+      "Diệt giặc ngoại xâm",
+      "Diệt giặc đói, diệt giặc dốt, diệt giặc ngoại xâm"
+    ],
+    "correct": 3,
+    "explanation": "Câu hỏi yêu cầu đáp án đầy đủ nên lựa chọn phải bao gồm cả diệt giặc đói, diệt giặc dốt và diệt giặc ngoại xâm.\n\nĐáp án theo tài liệu:\n• Diệt giặc đói, diệt giặc dốt, diệt giặc ngoại xâm\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 23.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Ngay sau khi chiến dịch Điện Biên Phủ kết thúc, Hội nghị quốc tế về chấm dứt chiến tranh ở Đông Dương đã diễn ra tại đâu:",
+    "options": [
+      "Pari",
+      "Giơnevơ",
+      "Postdam",
+      "New York"
+    ],
+    "correct": 1,
+    "explanation": "Địa điểm được đánh dấu là Giơnevơ, nơi diễn ra hội nghị về chấm dứt chiến tranh, lập lại hòa bình ở Đông Dương năm 1954.\n\nĐáp án theo tài liệu:\n• Giơnevơ\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 24.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Để củng cố chính quyền, Nhà nước Việt Nam tổ chức cuộc bầu cử toàn quốc lần đầu tiên vào năm nào?",
+    "options": [
+      "1945",
+      "1946",
+      "1954",
+      "1975"
+    ],
+    "correct": 1,
+    "explanation": "Cuộc Tổng tuyển cử đầu tiên diễn ra ngày 6/1/1946. Vì câu hỏi chỉ yêu cầu năm, đáp án cần chọn là 1946.\n\nĐáp án theo tài liệu:\n• 1946\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 25.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Trong giai đoạn hiện nay, để bảo vệ thành quả cuả các cuộc cách mạng, đất nước ta cần đặt dưới sự lãnh đạo của:",
+    "options": [
+      "Đảng Cộng sản",
+      "Nhà nước xã hội chủ nghĩa",
+      "Giai cấp công nhân",
+      "Giai cấp nông dân"
+    ],
+    "correct": 0,
+    "explanation": "Theo nội dung và đáp án của tài liệu, đất nước cần đặt dưới sự lãnh đạo của Đảng Cộng sản để bảo vệ thành quả cách mạng.\n\nĐáp án theo tài liệu:\n• Đảng Cộng sản\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 26.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chỉ thị Kháng chiến kiến quốc của Ban chấp hành Trung ương Đảng ra đời năm nào?",
+    "options": [
+      "1945",
+      "1946",
+      "1947",
+      "1948"
+    ],
+    "correct": 0,
+    "explanation": "Chỉ thị Kháng chiến kiến quốc của Ban Chấp hành Trung ương Đảng ban hành ngày 25/11/1945; câu hỏi yêu cầu chọn năm 1945.\n\nĐáp án theo tài liệu:\n• 1945\n\nĐáp án được giữ theo các lựa chọn đánh dấu màu đỏ trong tài liệu trắc nghiệm bạn cung cấp.\n\nNguồn đối chiếu: Lịch-sử-bài-3(1).docx, câu 27.",
+    "sources": [],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  }
+]

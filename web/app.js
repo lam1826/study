@@ -8,7 +8,7 @@ const field = (label,control) => `<label>${label}${control}</label>`;
 const input = (name,value='',type='text',attrs='') => `<input name="${name}" type="${type}" value="${esc(value)}" ${attrs}>`;
 const select = (name,options) => `<select name="${name}">${options}</select>`;
 const area = (name,value='',attrs='') => `<textarea name="${name}" ${attrs}>${esc(value)}</textarea>`;
-const title = (heading,desc='') => `<div class="heading"><h1>${esc(heading)}</h1>${desc?`<p class="muted">${esc(desc)}</p>`:''}</div>`;
+const title = (heading,desc='',cls='') => `<div class="heading ${cls}"><h1>${esc(heading)}</h1>${desc?`<p class="muted">${esc(desc)}</p>`:''}</div>`;
 const empty = msg => `<div class="card empty">${esc(msg)}</div>`;
 const date = value => new Date(value).toLocaleString('vi-VN');
 const tierLabel = tier => tier==='main'?'Câu hỏi chính':'Câu hỏi bổ sung';
@@ -24,13 +24,13 @@ let learnedQuestions = new Set();
 let chapterLookup = new Map();
 let questionLookup = new Map();
 const attemptSessions = new Map();
-const answerIds = value => Array.isArray(value) ? value : value ? [value] : [];
-const answerMatches = (value, correct) => {
-  const a=answerIds(value), b=answerIds(correct);
-  return a.length>0 && a.length===b.length && a.every(id=>b.includes(id));
-};
 function sessionFor(attempt) {
-  if(!attemptSessions.has(attempt.id)) attemptSessions.set(attempt.id,{attempt,pending:new Map(),saving:null,error:'',finishing:false,checked:new Set()});
+  if(!attemptSessions.has(attempt.id)) {
+    // A two-answer question saved with a full selection counts as checked, so
+    // it stays revealed and locked after a reload.
+    const checked=new Set(attempt.items.filter(q=>q.selectionCount>1&&answerIds(attempt.answers[q.id]).length===q.selectionCount).map(q=>q.id));
+    attemptSessions.set(attempt.id,{attempt,pending:new Map(),saving:null,error:'',finishing:false,checked,warned:new Set()});
+  }
   return attemptSessions.get(attempt.id);
 }
 let historyLimit = 20;
@@ -53,6 +53,7 @@ async function loadState(force = false) {
   if(bootState) {
     const initial=bootState;bootState=null;
     if(initial.signedOut) throw Object.assign(new Error('Vui lòng đăng nhập ChatGPT để tiếp tục.'),{status:401});
+    if(initial.error) throw new Error(initial.error);
     return applyState(initial);
   }
   if (!force && state && Date.now() - stateLoadedAt < 120000) return state;
@@ -111,11 +112,17 @@ function controls(route) {
   const subjects=state.subjects;
   const subject=all?filter.subject:filter.subject||subjects[0]?.id;
   const chapters=state.chapters.filter(c=>!subject||c.subject===subject);
-  const chapter=all?filter.chapter:chapters.some(c=>c.id===filter.chapter)?filter.chapter:chapters[0]?.id;
+  // Quiz and essay pickers mark chapters that have nothing of that kind yet
+  // and default to the first chapter that does.
+  const kind={quiz:'quiz',essay:'essay'}[route];
+  const has=id=>!kind||state.questions.some(q=>q.chapter===id&&q.kind===kind);
+  const chapter=all?filter.chapter:chapters.some(c=>c.id===filter.chapter)?filter.chapter:(chapters.find(c=>has(c.id))||chapters[0])?.id;
+  const hasExtra=route==='quiz'&&state.questions.some(q=>q.chapter===chapter&&q.kind==='quiz'&&q.tier==='extra');
+  if(route==='quiz'&&!hasExtra)filter.tier='all';
   return {chapter,html:`<div class="filters content-filters">
     ${field('Môn học',select('subject',(all?opt('','Tất cả môn học',subject):'')+subjects.map(s=>opt(s.id,s.title,subject)).join('')))}
-    ${field('Chương',select('chapter',(all?opt('','Tất cả chương',chapter):'')+chapters.map(c=>opt(c.id,c.title,chapter)).join('')))}
-    ${route!=='quiz'?'':field('Nhóm câu hỏi',select('tier',opt('all','Cả hai nhóm',filter.tier)+opt('main','Câu hỏi chính',filter.tier)+opt('extra','Câu hỏi bổ sung',filter.tier)))}</div>`};
+    ${field('Chương',select('chapter',(all?opt('','Tất cả chương',chapter):'')+chapters.map(c=>opt(c.id,c.title+(has(c.id)?'':' — chưa có câu'),chapter)).join('')))}
+    ${hasExtra?field('Nhóm câu hỏi',select('tier',opt('all','Cả hai nhóm',filter.tier)+opt('main','Câu hỏi chính',filter.tier)+opt('extra','Câu hỏi bổ sung',filter.tier))):''}</div>`};
 }
 function bindFilters() {
   on('.content-filters select','change',(_,el)=>{
@@ -146,76 +153,135 @@ function coverage(chapters) {
     : 0;
 }
 const metric = (name, value, detail = '') => `<article class="card metric"><small>${name}</small><strong>${value}</strong>${detail ? `<small class="metric-detail">${detail}</small>` : ''}</article>`;
+// Scores use the Vietnamese decimal comma (7,5/10).
+const scoreText = value => String(value).replace('.', ',');
+const shortDate = value => { const d = new Date(value), two = n => String(n).padStart(2, '0'); return two(d.getHours()) + ':' + two(d.getMinutes()) + ' ' + two(d.getDate()) + '/' + two(d.getMonth() + 1); };
+const chapterShort = chapter => (chapter?.title || 'Chương').split(/[.:]/)[0].trim().slice(0, 32);
+// A whole-row link: title, detail line, and the action it leads to.
+const taskRow = (href, heading, detail, action, cls = '') => `<a class="task-row ${cls}" href="#${esc(href)}"><span class="row-main"><strong>${heading}</strong><small>${detail}</small></span><span class="row-end">${action}<span aria-hidden="true"> →</span></span></a>`;
 function subjectCards() {
-  return `<div class="grid">${state.subjects.map((subject, index) => {
+  return `<div class="panel subject-list">${state.subjects.map(subject => {
     const chapters = state.chapters.filter(chapter => chapter.subject === subject.id);
-    const chapterIds = new Set(chapters.map(chapter => chapter.id));
-    const questions = state.questions.filter(question => chapterIds.has(question.chapter));
+    const ids = new Set(chapters.map(chapter => chapter.id));
+    const questions = state.questions.filter(question => ids.has(question.chapter));
+    const quizCount = questions.filter(question => question.kind === 'quiz').length, essayCount = questions.length - quizCount;
     const progress = coverage(chapters);
-    return `<article class="card subject">
-      <div class="subject-head"><span class="subject-icon" aria-hidden="true">${esc(subject.icon||['▤','⌘','◇'][index % 3])}</span><small>${chapters.length} chương</small></div>
-      <h3>${esc(subject.title)}</h3><small>${questions.filter(q=>q.kind==='quiz').length} trắc nghiệm · ${questions.filter(q=>q.kind==='essay').length} tự luận</small><p>${esc(subject.description||'')}</p>
-      <div class="subject-footer"><div class="subject-progress"><span>Tiến độ học tập</span><span>${progress}%</span></div>${bar(progress)}
-      ${link('subject/' + subject.id, 'Tiếp tục học →', 'link')}</div></article>`;
+    return `<a class="task-row subject-row" href="#subject/${esc(subject.id)}">
+      <span class="row-main"><strong>${esc(subject.title)}</strong>
+      <small>${[chapters.length + ' chương', quizCount && quizCount + ' trắc nghiệm', essayCount && essayCount + ' tự luận'].filter(Boolean).join(' · ')}</small>
+      <span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span></span>
+      <span class="row-end">Mở<span aria-hidden="true"> →</span></span></a>`;
   }).join('')}</div>`;
 }
 function historyList(entries) {
-  return entries.length?`<div class="list">${entries.map(a=>`<article class="card listitem"><div><h3>${esc(chapterName(a.chapter))}</h3><small>${date(a.created)} · ${a.result?`${a.result.score}/10 · ${a.result.correct}/${a.result.total} câu đúng`:'Đang làm'}</small></div>${link('attempt/'+a.id,a.result?'Xem kết quả':'Tiếp tục','link')}</article>`).join('')}</div>`:empty('Các bài làm sẽ xuất hiện ở đây.');
+  return entries.length?`<div class="list">${entries.map(a=>`<article class="card listitem"><div><h3>${esc(chapterName(a.chapter))}</h3><small>${shortDate(a.created)} · ${a.result?`${scoreText(a.result.score)}/10 · ${a.result.correct}/${a.result.total} câu đúng`:'Đang làm'}</small></div>${link('attempt/'+a.id,a.result?'Xem kết quả':'Tiếp tục','link')}</article>`).join('')}</div>`:empty('Các bài làm sẽ xuất hiện ở đây.');
 }
+// Home leads with what to review now: unfinished attempts, unresolved quiz
+// mistakes and essays marked for review, each one tap from the work itself.
 function home() {
-  const summary = metrics();
-  const active = state.history.find(attempt => !attempt.finished);
-  const quizCount = state.questions.filter(question => question.kind === 'quiz').length;
-  const essayCount = state.questions.length - quizCount;
-  const progress = coverage(state.chapters);
-  main.innerHTML = `<section class="hero">
-    <div><div class="eyebrow">ÔN TẬP VIỆT QUIZ</div><h1>Chào ${esc(state.user.name)}!</h1>
-    <p>Luyện trắc nghiệm, viết tự luận và theo dõi tiến độ theo từng chương.</p>
-    <div class="actions">${link(active ? 'attempt/' + active.id : 'quiz', active ? 'Tiếp tục làm bài →' : 'Bắt đầu ôn tập →')}
-    ${link('docs', 'Đọc tài liệu', 'hero-secondary')}</div></div>
-    <div class="hero-progress"><small>Tiến độ học tập</small><strong>${progress}%</strong>${bar(progress)}<small>Trên tất cả môn học</small></div>
-    </section>
-    <div class="grid metrics">
-      ${metric('Môn học', state.subjects.length, state.chapters.length + ' chương')}
-      ${metric('Ngân hàng câu hỏi', state.questions.length, quizCount + ' trắc nghiệm · ' + essayCount + ' tự luận')}
-      ${metric('Bài hoàn thành', summary.h.length, summary.answered + ' câu đã trả lời')}
-      ${metric('Tỷ lệ đúng', summary.accuracy + '%', summary.h.length ? 'Điểm trung bình ' + summary.average + '/10' : 'Bắt đầu một bài để theo dõi')}
+  const now = Date.now(), summary = metrics();
+  // All unfinished attempts are counted; the two most recent get a row.
+  const unfinished = state.history.filter(entry => !entry.finished), open = unfinished.slice(0, 2);
+  const mistakes = new Map(), essaysDue = new Map();
+  for (const id of state.progress.unresolved) { const question = questionLookup.get(id); if (question) mistakes.set(question.chapter, (mistakes.get(question.chapter) || 0) + 1); }
+  for (const row of state.essays) if (row.status === 'review' && !row.learned) { const question = questionLookup.get(row.question); if (question) essaysDue.set(question.chapter, (essaysDue.get(question.chapter) || 0) + 1); }
+  const mistakeTotal = [...mistakes.values()].reduce((a, b) => a + b, 0), essayTotal = [...essaysDue.values()].reduce((a, b) => a + b, 0);
+  const section = (heading, rows) => `<section class="home-section"><h2>${heading}</h2><div class="panel">${rows}</div></section>`;
+  const resume = open.map(entry => {
+    const session = attemptSessions.get(entry.id);
+    const total = session ? session.attempt.items.length : entry.total;
+    const answered = session ? Object.values(session.attempt.answers).filter(value => answerIds(value).length).length : entry.answered || 0;
+    const expired = entry.deadline && entry.deadline <= now;
+    const left = entry.deadline && !expired ? ' · còn ' + Math.ceil((entry.deadline - now) / 60000) + ' phút' : '';
+    return taskRow('attempt/' + entry.id, esc(attemptModes[entry.mode] || 'Bài làm') + ' · ' + esc(chapterName(entry.chapter)),
+      (total ? answered + '/' + total + ' câu đã trả lời' : 'Đang làm') + left + ' · bắt đầu ' + shortDate(entry.created), expired ? 'Xem kết quả' : 'Làm tiếp', 'is-resume');
+  }).join('') + (unfinished.length > open.length ? taskRow('stats', 'Còn ' + (unfinished.length - open.length) + ' bài đang làm dở khác', 'Xem tất cả trong lịch sử học tập', 'Xem') : '');
+  const byCount = map => [...map].sort((a, b) => b[1] - a[1]);
+  const mistakeRows = byCount(mistakes).map(([chapter, n]) => taskRow('quiz/' + chapter + '?mode=review', esc(chapterName(chapter)), n + ' câu còn sai · ' + esc(subjectName(chapterLookup.get(chapter)?.subject)), 'Ôn câu sai')).join('');
+  const essayRows = byCount(essaysDue).map(([chapter, n]) => taskRow('essay/' + chapter + '?status=review', esc(chapterName(chapter)), n + ' câu đánh dấu cần ôn · ' + esc(subjectName(chapterLookup.get(chapter)?.subject)), 'Ôn lại')).join('');
+  const lastResult = state.history.find(entry => entry.result);
+  const recentEssays = [...state.essays].filter(row => row.updated_at && questionLookup.has(row.question)).sort((a, b) => b.updated_at - a.updated_at).slice(0, 3);
+  const recentRows = (lastResult ? taskRow('attempt/' + lastResult.id, 'Kết quả gần nhất: ' + esc(attemptModes[lastResult.mode] || 'Bài làm') + ' · ' + scoreText(lastResult.result.score) + '/10', esc(chapterName(lastResult.chapter)) + ' · ' + lastResult.result.correct + '/' + lastResult.result.total + ' câu đúng · ' + shortDate(lastResult.created), 'Xem lại') : '')
+    + recentEssays.map(row => { const question = questionLookup.get(row.question); const status = row.learned ? 'mastered' : row.status || 'unseen';
+      return taskRow('essayitem/' + question.id + '?mode=answer', esc((question.code ? question.code + ' · ' : '') + question.prompt), esc(chapterName(question.chapter)) + ' · ' + studyStatuses[status], 'Mở', 'is-clamped'); }).join('');
+  const due = [unfinished.length && unfinished.length + ' bài đang làm dở', mistakeTotal && mistakeTotal + ' câu trắc nghiệm còn sai', essayTotal && essayTotal + ' câu tự luận cần ôn'].filter(Boolean);
+  const name = state.user.name && state.user.name !== 'bạn' ? state.user.name : 'bạn';
+  main.innerHTML = `<div class="home">
+    <div class="heading home-head"><h1>Chào ${esc(name)}</h1><p class="muted">${due.length ? 'Hôm nay cần ôn: ' + due.join(' · ') + '.' : 'Chưa có gì cần ôn lại. Chọn một môn để bắt đầu.'}</p></div>
+    <div class="home-grid"><div class="home-main">
+      ${resume ? section('Làm tiếp', resume) : ''}
+      ${mistakeRows ? section('Câu trắc nghiệm còn sai', mistakeRows) : ''}
+      ${essayRows ? section('Tự luận cần ôn', essayRows) : ''}
+      ${due.length ? '' : `<section class="home-section"><h2>Bắt đầu</h2><div class="panel start-panel"><p>Chọn môn rồi chọn chương. <strong>Luyện tập</strong> cho biết đúng/sai và lý do ngay khi chọn; <strong>Đáp án tự luận</strong> mở sẵn các ý chính cần nhớ.</p><div class="actions">${link('subjects', 'Chọn môn học', 'primary')}${link('quiz', 'Làm trắc nghiệm')}</div></div></section>`}
+      ${recentRows ? section('Học gần đây', recentRows) : ''}
     </div>
-    <div class="section-head"><h2>Môn học của bạn</h2><a href="#subjects">Xem tất cả →</a></div>
-    ${subjectCards()}
-    <section class="section"><div class="section-head"><h2>Bài làm gần đây</h2><a href="#stats">Lịch sử học tập →</a></div>
-    ${historyList(state.history.slice(0, 3))}<div class="actions section">${[...state.essays].sort((a,b)=>(b.updated_at||0)-(a.updated_at||0)).slice(0,3).map(e=>link('essayitem/'+e.question,questionLookup.get(e.question)?.code||'Tiếp tục tự luận')).join('')}</div></section>`;
+    <aside class="home-side"><section class="home-section"><h2>Môn học</h2>${subjectCards()}</section>
+      <p class="home-stats">${summary.h.length ? summary.h.length + ' bài đã nộp · đúng ' + summary.accuracy + '% · điểm trung bình ' + summary.average + '/10' : 'Chưa nộp bài nào.'} <a href="#stats">Xem thống kê</a></p></aside>
+    </div></div>`;
 }
 function subject(id) {
   const sub=state.subjects.find(s=>s.id===id);
-  if(!sub) return main.innerHTML=empty('Không tìm thấy môn học.');
+  if(!sub) return main.innerHTML=empty('Không tìm thấy môn học.')+`<div class="actions section">${link('subjects','← Danh sách môn học')}</div>`;
   const chapters=state.chapters.filter(c=>c.subject===id);
-  main.innerHTML=`${title(sub.title,'Chọn chương và hình thức ôn tập.')}<div class="list chapter-list">${chapters.map(c=>`<article class="card listitem"><div><h3>${esc(c.title)}</h3><small>Tiến độ ${coverage([c])}%</small></div><div class="actions">${link('chapter/'+c.id,'Tổng quan')}${['quiz','essay','docs'].map((t,i)=>link(t+'/'+c.id,['Trắc nghiệm','Tự luận','Tài liệu'][i])).join('')}</div></article>`).join('')||empty('Môn này chưa có chương.')}</div>`;
+  const ready=chapters.filter(c=>{const n=chapterCounts(c.id);return n.quiz||n.essay;}), waiting=chapters.filter(c=>!ready.includes(c));
+  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('subjects','← Môn học','link')}</nav>${title(sub.title,sub.description||'Chọn chương, rồi làm bài hoặc xem đáp án.')}
+    <div class="list chapter-list">${ready.map(chapterRow).join('')||empty('Môn này chưa có chương nào có câu hỏi.')}</div>
+    ${waiting.length?`<details class="card section empty-chapters"><summary>${waiting.length} chương chưa có câu hỏi</summary><ul>${waiting.map(c=>{const n=chapterCounts(c.id);return `<li><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a>${n.docs?` <small>· ${n.docs} tài liệu</small>`:''}</li>`;}).join('')}</ul></details>`:''}`;
+}
+function chapterRow(c) {
+  const n=chapterCounts(c.id), progress=coverage([c]);
+  return `<article class="card chapter-row"><div class="chapter-row-head"><h2><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a></h2><span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span></div>${chapterActions(c.id,n)}</article>`;
+}
+function chapterCounts(id) {
+  const questions=state.questions.filter(q=>q.chapter===id);
+  return {quiz:questions.filter(q=>q.kind==='quiz').length, essay:questions.filter(q=>q.kind==='essay').length, docs:state.documents.filter(d=>d.chapter===id).length};
+}
+// Actions grouped by kind (quiz, essay, documents), one clear primary per chapter.
+function chapterActions(id,n=chapterCounts(id)) {
+  const row=(label,count,buttons,cls='')=>`<div class="action-row ${cls}"><span class="action-label">${label}<small>${count}</small></span><div class="action-buttons">${buttons}</div></div>`;
+  const rows=[
+    n.quiz&&row('Trắc nghiệm',n.quiz+' câu',link('quiz/'+id,'Làm bài','primary')+link('quizanswers/'+id,'Xem đáp án')),
+    n.essay&&row('Tự luận',n.essay+' câu',link('essay/'+id,'Học từng câu',n.quiz?'':'primary')+link('essayanswers/'+id,'Đáp án cả chương')),
+    n.docs&&row('Tài liệu',n.docs+' tệp',link('docs/'+id,'Mở tài liệu','link'),'docs-row')
+  ].filter(Boolean);
+  return `<div class="chapter-actions">${rows.join('')||'<p class="muted">Chương đang chờ bổ sung nội dung.</p>'}</div>`;
 }
 function quiz() {
   const selection = controls('quiz');
+  const chapter = chapterLookup.get(selection.chapter);
   const count = state.questions.filter(question => question.chapter === selection.chapter && question.kind === 'quiz'
     && (filter.tier === 'all' || question.tier === filter.tier) && (quizSettings.mode!=='review'||state.progress.unresolved.includes(question.id))).length;
   const selectedCount = Math.min(quizSettings.count, count);
   const isExam = quizSettings.mode === 'exam';
-  main.innerHTML = `${title('Trắc nghiệm', 'Chọn nội dung ôn tập và bắt đầu bài làm của bạn.')}
-    <section class="card form-card">
-      <div class="form-section"><h2>Nội dung ôn tập</h2>${selection.html}<div class="actions section">${link('quizanswers/'+selection.chapter+'?tier='+filter.tier,'Xem đáp án trắc nghiệm','primary')}</div></div>
+  const chapterQuiz = state.questions.filter(question => question.chapter === selection.chapter && question.kind === 'quiz').length;
+  const modes = [['practice','Luyện tập','Biết đúng/sai và đọc giải thích ngay khi chọn; lựa chọn đầu tiên được tính.'],['review','Ôn câu sai','Chỉ các câu bạn vẫn còn làm sai trong chương.'],['exam','Thi thử','Đếm giờ; đáp án chỉ hiện sau khi nộp bài.']];
+  document.body.classList.add('has-start-bar');
+  // The chapter shows as one line; the subject/chapter pickers open on demand.
+  main.innerHTML = `<nav class="study-crumbs" aria-label="Điều hướng">${chapter ? link('chapter/'+chapter.id,'← '+chapterShort(chapter),'link') : link('subjects','← Môn học','link')}</nav>
+    ${title('Trắc nghiệm', '', 'compact-heading')}
+    <section class="card form-card quiz-setup">
+      <details class="chapter-pick" ${filter.chapter ? '' : 'open'}>
+        <summary><span class="pick-text"><small>${esc(subjectName(chapter?.subject))}</small><strong>${esc(chapter?.title || 'Chọn chương')}</strong></span><span class="pick-change">Đổi chương</span></summary>
+        <div class="pick-body">${selection.html}</div>
+      </details>
       <form id="start" class="form-section">
-        <h2>Cách làm bài</h2><p class="muted">Luyện tập: xem đúng/sai ngay khi chọn. Thi thử: xem đáp án sau khi nộp bài.</p>
+        <fieldset class="mode-choices"><legend>Cách làm bài</legend>
+          ${modes.map(([value,label,hint]) => `<label class="mode-choice"><input type="radio" name="mode" value="${value}" ${quizSettings.mode === value ? 'checked' : ''}><span><strong>${label}</strong><small>${hint}</small></span></label>`).join('')}
+          <p class="mode-hint">${modes.find(([value]) => value === quizSettings.mode)?.[2] || ''}</p>
+        </fieldset>
         <div class="filters">
-          ${field('Chế độ', select('mode', opt('practice', 'Luyện tập', quizSettings.mode) + opt('review','Ôn các câu còn sai',quizSettings.mode) + opt('exam', 'Thi thử có đếm giờ', quizSettings.mode)))}
           ${field('Số câu hỏi', input('count', selectedCount || '', 'number', `min="1" max="${Math.min(100, count) || 1}" inputmode="numeric" required ${count ? '' : 'disabled'}`))}
           <label id="time-field" ${isExam ? '' : 'hidden'}>Thời gian thi (phút)
             ${input('minutes', quizSettings.minutes, 'number', `min="1" max="180" inputmode="numeric" required ${isExam ? '' : 'disabled'}`)}
           </label>
         </div>
-        <p class="muted">${count
-          ? count + ' câu phù hợp. Câu hỏi và phương án sẽ được xáo trộn trong mỗi lượt làm.'
-          : quizSettings.mode==='review'?'Bạn không còn câu sai cần ôn trong bộ lọc này.':'Chương này đang chờ bổ sung câu hỏi.'}</p>
-        <div class="actions form-submit"><button class="primary" ${count ? '' : 'disabled'}>Bắt đầu làm bài →</button>
-          ${state.user.isAdmin ? link('admin', 'Quản trị câu hỏi') : link('docs/' + selection.chapter, 'Đọc tài liệu')}</div>
+        <p class="form-note">${count
+          ? count + ' câu phù hợp. Câu hỏi và phương án được xáo trộn mỗi lượt; đáp án đúng luôn đi cùng nội dung của nó.'
+          : quizSettings.mode==='review'?'Bạn không còn câu sai cần ôn trong chương này.':'Chương này đang chờ bổ sung câu hỏi.'}</p>
+        <div class="start-bar"><button class="primary" ${count ? '' : 'disabled'}>Bắt đầu làm bài →</button>
+          ${chapterQuiz ? link('quizanswers/'+selection.chapter+'?tier='+filter.tier,'Xem đáp án') : ''}</div>
       </form>
+      <p class="setup-links">${state.user.isAdmin ? link('admin', 'Quản trị câu hỏi', 'link') : ''}${state.documents.some(d=>d.chapter===selection.chapter) ? link('docs/' + selection.chapter, 'Tài liệu của chương', 'link') : ''}</p>
     </section>`;
   bindFilters();
   on('#start [name=mode]', 'change', (_, element) => {
@@ -231,12 +297,21 @@ function quiz() {
       chapter:selection.chapter, tier:filter.tier, mode:data.get('mode'),
       count:Number(data.get('count')), minutes:Number(data.get('minutes') || quizSettings.minutes), previous
     });
-    stateLoadedAt = 0;
+    // The new attempt comes back with the response; opening it needs no extra request.
+    rememberAttempt(result);
     location.hash = 'attempt/' + result.id;
   });
 }
+// Readable name for a source document: titles imported from file names
+// ("Phát-triển-phân-tán-bài-1", "chapter08") get spaces and their file type.
+// The stored title is unchanged; the owner can rename it in Quản trị.
+function docLabel(doc) {
+  const kind = doc.mime === 'application/pdf' ? 'PDF' : doc.mime?.includes('wordprocessingml') ? 'Word' : doc.mime?.startsWith('image/') ? 'Ảnh' : 'Văn bản';
+  const name = String(doc.title || doc.filename || 'Tài liệu').replace(/\.(pdf|docx?|txt|md|png|jpe?g|webp)$/i, '').replace(/[_-]+/g, ' ').replace(/(\p{L})(\d)/gu, '$1 $2').replace(/\s+/g, ' ').trim();
+  return name.charAt(0).toLocaleUpperCase('vi') + name.slice(1) + ' · ' + kind;
+}
 function sourceLinks(ids) {
-  return ids.map(id=>state.documents.find(d=>d.id===id)).filter(Boolean).map(doc=>link('doc/'+doc.id,doc.title,'link')).join('');
+  return ids.map(id=>state.documents.find(d=>d.id===id)).filter(Boolean).map(doc=>link('doc/'+doc.id,docLabel(doc),'link')).join('');
 }
 async function attempt(id, generation) {
   const cached = attemptSessions.get(id);
@@ -251,137 +326,279 @@ async function attempt(id, generation) {
   sessionFor(result);
   drawAttempt(result);
 }
+const attemptModes = {practice:'Luyện tập', review:'Ôn câu sai', exam:'Thi thử'};
+// Keep the new attempt locally (session + history) instead of reloading all state.
+function rememberAttempt(result) {
+  if (!result.attempt) { stateLoadedAt = 0; return; }
+  sessionFor(result.attempt);
+  if (!state.history.some(entry => entry.id === result.id)) state.history.unshift({id:result.id, chapter:result.attempt.chapter, created:result.attempt.created, finished:null, result:null, mode:result.attempt.config.mode, total:result.attempt.items.length, answered:0, deadline:result.attempt.deadline});
+}
+function attemptItems(attempt) {
+  return wrongOnly ? attempt.items.filter(question => !answerMatches(attempt.answers[question.id],question.correct)) : attempt.items;
+}
+function attemptMounted(attempt) {
+  return main.querySelector('#attempt-view')?.dataset.attempt === attempt?.id;
+}
+// Options with their reveal state. Labels carry the meaning; colour only repeats it.
+function optionList(question, chosenValue, revealed, disabled) {
+  const chosen = answerIds(chosenValue);
+  return lettered(question).map(option => {
+    const picked = chosen.includes(option.id);
+    const state = revealed ? option.correct ? 'is-key' : picked ? 'is-wrong' : 'is-dim' : picked ? 'is-chosen' : '';
+    const status = revealed
+      ? option.correct ? '✓ Đáp án đúng' + (picked ? ' · Bạn chọn' : '') : picked ? '✕ Bạn chọn · Sai' : ''
+      : picked ? '● Đã chọn' : '';
+    return `<button type="button" class="option ${state}" aria-pressed="${picked}" data-option="${esc(option.id)}" ${disabled ? 'disabled' : ''}>
+      <span class="option-letter" aria-hidden="true">${option.letter}</span>
+      <span class="option-text">${esc(option.text)}${status ? `<span class="option-status">${status}</span>` : ''}</span>
+    </button>`;
+  }).join('');
+}
+// "Vì sao đúng" block shared by practice feedback, results and answer pages.
+function whyBlock(question) {
+  const keys = lettered(question).filter(option => option.correct);
+  const parts = explanationParts(question.explanation, keys.map(option => option.text));
+  const letters = joinLetters(keys.map(option => option.letter));
+  const paragraphs = parts.why ? parts.why.split(/\n\s*\n/).map(text => `<p>${esc(text.trim())}</p>`).join('') : '<p>Chưa có giải thích cho câu này.</p>';
+  return `<section class="why" aria-label="Giải thích đáp án">
+    <h3><span class="why-mark" aria-hidden="true">✓</span>Vì sao ${letters ? (keys.length > 1 ? 'các đáp án ' : 'đáp án ') + letters : 'đáp án này'} đúng?</h3>
+    ${paragraphs}
+    ${parts.source ? `<p class="why-source"><strong>Nguồn đối chiếu:</strong> ${esc(parts.source)}</p>` : ''}
+  </section>`;
+}
+function verdict(question, value, completed) {
+  const picked = chosenLetters(question, value), key = joinLetters(keyLetters(question));
+  if (!picked.length) return `<div class="verdict neutral" role="status"><strong>— Chưa trả lời</strong><span>Đáp án đúng: ${key}.</span></div>`;
+  return answerMatches(value, question.correct)
+    ? `<div class="verdict good" role="status"><strong>✓ Chính xác</strong><span>Bạn chọn ${joinLetters(picked)}${completed ? '' : ' — đúng đáp án'}.</span></div>`
+    : `<div class="verdict bad" role="status"><strong>✕ Chưa đúng</strong><span>Bạn chọn ${joinLetters(picked)}; đáp án đúng: ${key}.</span></div>`;
+}
 function drawAttempt(attempt) {
   clearInterval(tick);
   activeAttempt = attempt;
   const completed = !!attempt.finished;
-  const session=sessionFor(attempt);
-  const attemptSaving=!!session.saving || !!session.pending.size;
-  const attemptSaveError=session.error;
-  const submitting=session.finishing;
+  const result = attempt.result;
   document.body.classList.toggle('taking-quiz', !completed);
   document.body.classList.toggle('review-quiz', completed);
-  const items = wrongOnly ? attempt.items.filter(question => !answerMatches(attempt.answers[question.id],question.correct)) : attempt.items;
+  const items = attemptItems(attempt);
   if (attemptIndex >= items.length) attemptIndex = 0;
-  const question = items[attemptIndex];
-  const practice=attempt.config.mode!=='exam';
-  const selected=answerIds(attempt.answers[question?.id]);
-  const feedback=!!question && !completed && practice && (question.selectionCount>1 ? session.checked.has(question.id) : selected.length>0);
-  const revealed=completed || feedback;
-  const correctFeedback=feedback && answerMatches(attempt.answers[question.id],question.correct);
-  const answered = Object.values(attempt.answers).filter(a=>answerIds(a).length).length;
-  const result = attempt.result;
-  const header = completed
-    ? `${title('Kết quả bài làm', chapterName(attempt.chapter))}
-      <div class="grid metrics">${metric('Điểm', result.score + '/10')}${metric('Đúng', result.correct)}${metric('Sai', result.wrong)}${metric('Chưa trả lời', result.unanswered)}${metric('Chính xác',Math.round(result.correct/result.total*100)+'%')}</div>
-      <p class="muted">${result.total} câu · ${Math.floor(result.seconds / 60)} phút ${result.seconds % 60} giây</p>
-      <div class="actions"><button id="retry" class="primary">Làm lại bài</button>
-      <button id="retry-wrong" ${result.wrong + result.unanswered ? '' : 'disabled'}>Luyện lại câu chưa đúng</button>
-      <button id="wrong-only">${wrongOnly ? 'Xem toàn bài' : 'Chỉ xem câu chưa đúng'}</button>${link('chapter/'+attempt.chapter,'Về chương')}</div>`
-    : `${title(attempt.config.mode === 'exam' ? 'Thi thử' : 'Luyện tập trắc nghiệm', chapterName(attempt.chapter))}
-      <div class="quiz-status"><div><small>${answered}/${attempt.items.length} câu đã trả lời</small>${bar(Math.round(answered / attempt.items.length * 100))}</div>
-      ${attempt.deadline ? '<p class="timer" id="timer" aria-label="Thời gian còn lại"></p>' : '<span class="badge">Luyện tập</span>'}</div>`;
-  main.innerHTML = header + (question ? `
-    <div class="quizgrid section">
-      <section class="card question-card">
-        <div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
-          ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button class="icon" id="flag" aria-pressed="${attempt.flags.includes(question.id)}" ${submitting ? 'disabled' : ''}>${attempt.flags.includes(question.id) ? '⚑ Đã đánh dấu' : '⚑ Đánh dấu'}</button>`}
-        </div>
-        <h2 class="question-title" id="question-title" tabindex="-1">${esc(question.prompt)}</h2>
-        ${question.selectionCount>1?'<p class="muted multi-hint">Chọn '+question.selectionCount+' đáp án đúng. Chỉ tính đúng khi chọn đủ và không chọn thừa.</p>':''}
-        <div class="options" role="group" aria-labelledby="question-title">
-          ${question.options.map((option, index) => {
-            const chosen = answerIds(attempt.answers[question.id]).includes(option.id);
-            const correct = revealed && answerIds(question.correct).includes(option.id);
-            const style = correct ? 'correct' : chosen ? revealed ? 'wrong' : 'selected' : '';
-            const status = correct ? 'Đáp án đúng' + (chosen ? ' · Bạn đã chọn' : '') : revealed && chosen ? 'Bạn đã chọn · Sai' : '';
-            return `<button class="option ${style}" aria-pressed="${chosen}" data-option="${option.id}" ${completed || submitting ? 'disabled' : ''}>
-              <span class="option-letter">${'ABCDEF'[index]}</span>
-              <span class="option-text">${esc(option.text)}${status ? `<span class="option-result">${status}</span>` : ''}</span>
-            </button>`;
-          }).join('')}
-        </div>
-        ${!completed && practice && question.selectionCount>1 ? `<div class="actions practice-check"><button id="check-answer" ${selected.length!==question.selectionCount?'disabled':''}>Kiểm tra đáp án</button><small class="muted">Đã chọn ${selected.length}/${question.selectionCount}</small></div>` : ''}
-        ${feedback ? `<div class="answer-feedback ${correctFeedback?'correct':'wrong'}" role="status"><strong>${correctFeedback?'✓ Chính xác!':'✕ Chưa đúng'}</strong><span>${correctFeedback?'Bạn đã chọn đúng đáp án.':'Đáp án đúng được tô màu xanh bên trên.'}</span></div>` : ''}
-        ${revealed ? `<div class="explanation"><strong>Giải thích</strong><p class="content">${esc(question.explanation || 'Chưa có giải thích cho câu này.')}</p></div>` : ''}
-        ${!completed ? `<span class="save-status ${attemptSaveError ? 'notice' : ''}" role="status">${attemptSaveError || (attemptSaving ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : answered ? 'Đã lưu bài làm' : 'Chọn phương án để trả lời')}</span>${attemptSaveError?'<button id="retry-save" class="link">Thử lưu lại</button>':''}` : ''}
-        <div class="actions source-links">${sourceLinks(question.sources)}</div>
-        <div class="question-actions">
-          <button id="prev" ${attemptIndex === 0 || submitting ? 'disabled' : ''}>← Câu trước</button>
-          <button id="next" class="primary" ${attemptIndex === items.length - 1 || submitting ? 'disabled' : ''}>Câu tiếp →</button>
-        </div>
-      </section>
-      <section class="card attempt-side">
-        <details id="answer-sheet" ${matchMedia('(min-width: 681px)').matches ? 'open' : ''}>
+  const previousSheet = main.querySelector('#answer-sheet');
+  const sheetOpen = previousSheet ? previousSheet.open : matchMedia('(min-width: 681px)').matches;
+  // Results read like a tutor's note: the score, one line of what to do next,
+  // and reviewing the missed questions as the main action.
+  const missed = completed ? result.wrong + result.unanswered : 0;
+  const advice = !completed ? '' : !missed ? 'Bạn trả lời đúng tất cả. Có thể thử Thi thử hoặc chuyển sang chương khác.'
+    : result.score >= 8 ? `Rất tốt. Xem lại ${missed} câu chưa đúng để chắc chắn trước khi thi.`
+    : result.score >= 5 ? `Khá. Đọc phần “Vì sao” của ${missed} câu chưa đúng rồi luyện lại riêng các câu đó.`
+    : `Cần ôn thêm. Bắt đầu với ${missed} câu chưa đúng: đọc phần “Vì sao”, rồi luyện lại riêng các câu này.`;
+  const summary = completed ? `<section class="result-panel card" aria-labelledby="result-title">
+      <h1 id="result-title" tabindex="-1">Kết quả <span class="score">${scoreText(result.score)}<small>/10</small></span></h1>
+      <p class="result-line">${result.correct}/${result.total} câu đúng (${Math.round(result.correct/result.total*100)}%)${result.wrong ? ' · ' + result.wrong + ' sai' : ''}${result.unanswered ? ' · ' + result.unanswered + ' chưa trả lời' : ''} · ${Math.floor(result.seconds / 60)} phút ${result.seconds % 60} giây</p>
+      <p class="result-advice">${advice}</p>
+      <div class="actions result-actions">
+        ${missed ? `<button id="wrong-only" class="${wrongOnly ? '' : 'primary'}" aria-pressed="${wrongOnly}">${wrongOnly ? 'Xem toàn bài' : 'Xem lại ' + missed + ' câu chưa đúng'}</button><button id="retry-wrong" class="${wrongOnly ? 'primary' : ''}">Luyện lại câu chưa đúng</button>` : ''}
+        <button id="retry" class="${missed ? '' : 'primary'}">Làm lại bài</button>${link('chapter/'+attempt.chapter,'Về chương','link')}
+      </div>
+    </section>` : '';
+  main.innerHTML = `<div id="attempt-view" data-attempt="${esc(attempt.id)}">${summary}
+    <div class="attempt-bar ${!completed && attempt.deadline ? 'has-timer' : ''}">
+      <div class="attempt-meta">${completed ? `<strong>${attemptModes[attempt.config.mode] || 'Bài làm'} · Xem lại</strong>` : `<h1 class="attempt-heading">${attemptModes[attempt.config.mode] || 'Bài làm'}</h1>`}<small class="attempt-chapter">${esc(chapterName(attempt.chapter))}</small><small id="attempt-count"></small></div>
+      <div class="attempt-progress" aria-hidden="true"><div class="bar"><i id="attempt-fill"></i></div></div>
+      ${!completed && attempt.deadline ? '<p class="timer" id="timer" role="timer" aria-label="Thời gian còn lại"></p>' : ''}
+      ${completed ? '' : '<button id="finish" type="button">Nộp bài</button>'}
+    </div>
+    ${items.length ? `<div class="quizgrid">
+      <div class="question-column">
+      <section class="card question-card" id="question-card"></section>
+      <nav class="question-actions" aria-label="Chuyển câu">
+        <button type="button" id="prev" data-key-prev><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></button>
+        <span class="question-position" id="question-position" aria-live="polite"></span>
+        <button type="button" id="next" class="primary" data-key-next><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></button>
+      </nav>
+      </div>
+      <aside class="card attempt-side">
+        <details id="answer-sheet" ${sheetOpen ? 'open' : ''}>
           <summary>${completed ? 'Xem lại từng câu' : 'Danh sách câu hỏi'} · ${items.length}</summary>
-          <div class="tiles">${items.map((entry, index) => {
-            const chosen = answerIds(attempt.answers[entry.id]).length>0;
-            const checked=completed || (practice && chosen && (entry.selectionCount<=1 || session.checked.has(entry.id)));
-            const status = checked ? answerMatches(attempt.answers[entry.id],entry.correct) ? 'correct' : 'wrong' : chosen ? 'selected' : '';
-            return `<button data-index="${index}" class="${status} ${index === attemptIndex ? 'current' : ''} ${attempt.flags.includes(entry.id) ? 'flagged' : ''}"
-              aria-label="Câu ${index + 1}${chosen ? ', đã trả lời' : ', chưa trả lời'}${attempt.flags.includes(entry.id) ? ', đã đánh dấu' : ''}"
-              ${index === attemptIndex ? 'aria-current="step"' : ''} ${submitting ? 'disabled' : ''}>${index + 1}</button>`;
-          }).join('')}</div>
-          <div class="tile-legend"><span>Đã trả lời</span><span class="flag-legend">Đánh dấu</span></div>
+          <div class="tiles">${items.map((_, index) => `<button type="button" data-index="${index}">${index + 1}</button>`).join('')}</div>
+          <div class="tile-legend">${completed || attempt.config.mode !== 'exam' ? '<span class="legend-good">✓ Đúng</span><span class="legend-bad">✕ Sai</span>' : ''}<span class="legend-chosen">● Đã chọn</span><span class="legend-flag">⚑ Đánh dấu</span></div>
         </details>
-        ${completed ? '' : `<button class="primary" id="finish" ${submitting ? 'disabled' : ''}>Nộp bài</button>`}
-      </section>
-    </div>` : empty('Không có câu nào trong danh sách này.'));
-  function move(index) {
-    attemptIndex = index;
-    drawAttempt(activeAttempt);
-    document.querySelector('#question-title')?.focus({preventScroll:true});
-    if (matchMedia('(max-width: 680px)').matches) document.querySelector('.question-card')?.scrollIntoView({block:'start'});
-  }
-  on('[data-index]', 'click', (_, element) => move(Number(element.dataset.index)));
-  on('#prev', 'click', () => move(attemptIndex - 1));
-  on('#next', 'click', () => move(attemptIndex + 1));
-  on('[data-option]', 'click', (_, element) => {
-    const id=element.dataset.option, selected=answerIds(attempt.answers[question.id]);
-    const option=question.selectionCount>1 ? selected.includes(id)?selected.filter(value=>value!==id):[...selected,id] : id;
-    return saveAttempt({question:question.id,option},'PATCH');
-  });
-  on('#check-answer','click',()=>{session.checked.add(question.id);drawAttempt(attempt);});
-  on('#retry-save','click',()=>flushAttempt(session));
-  on('#flag', 'click', () => saveAttempt({question:question.id, flag:!attempt.flags.includes(question.id)}, 'PATCH'));
-  on('#finish', 'click', () => {
-    const remaining = attempt.items.length - answered;
-    const message = remaining ? `Bạn còn ${remaining} câu chưa trả lời. Nộp bài để xem kết quả?` : 'Nộp bài và xem kết quả?';
-    if (confirm(message)) return saveAttempt({}, 'POST');
-  });
-  on('#wrong-only', 'click', () => { wrongOnly = !wrongOnly; move(0); });
-  async function retry(wrong, element) {
-    element.disabled = true;
+      </aside>
+    </div>` : empty('Không có câu nào trong danh sách này.')}
+  </div>`;
+  const view = main.querySelector('#attempt-view');
+  // One delegated listener per drawn attempt; switching questions only
+  // replaces the question card and updates the tiles in place.
+  view.addEventListener('click', async event => {
+    const target = event.target.closest('button');
+    if (!target || target.disabled || !view.contains(target)) return;
+    const session = sessionFor(activeAttempt);
+    const current = attemptItems(activeAttempt)[attemptIndex];
     try {
-      const result = await api('attempt', {...attempt.config, previous:attempt.id, ...(wrong ? {ids:[], mode:'practice', count:attempt.items.length} : {})});
-      stateLoadedAt = 0;
-      location.hash = 'attempt/' + result.id;
-    } finally { element.disabled = false; }
-  }
-  on('#retry', 'click', (_, element) => retry(false, element));
-  on('#retry-wrong', 'click', (_, element) => retry(true, element));
+      if (target.dataset.index !== undefined) moveAttempt(Number(target.dataset.index));
+      else if (target.id === 'prev') moveAttempt(attemptIndex - 1);
+      else if (target.id === 'next') {
+        // The bar's main button follows the situation: next, check, submit, back to results.
+        const action = target.dataset.action;
+        if (action === 'check') revealChecked(current);
+        else if (action === 'finish') openSubmitSheet();
+        else if (action === 'top') { window.scrollTo(0, 0); main.querySelector('#result-title')?.focus({preventScroll:true}); }
+        else moveAttempt(attemptIndex + 1);
+      }
+      else if (target.dataset.jump !== undefined) { main.querySelector('#submit-sheet')?.close(); moveAttempt(Number(target.dataset.jump)); }
+      else if (target.id === 'confirm-submit') { main.querySelector('#submit-sheet')?.close(); await saveAttempt({}, 'POST'); }
+      else if (target.dataset.option !== undefined) {
+        const id = target.dataset.option, selected = answerIds(activeAttempt.answers[current.id]);
+        const option = current.selectionCount > 1 ? selected.includes(id) ? selected.filter(value => value !== id) : [...selected, id] : id;
+        await saveAttempt({question:current.id, option}, 'PATCH');
+      }
+      else if (target.id === 'check-answer') revealChecked(current);
+      else if (target.id === 'retry-save') await flushAttempt(session);
+      else if (target.id === 'flag') await saveAttempt({question:current.id, flag:!activeAttempt.flags.includes(current.id)}, 'PATCH');
+      else if (target.id === 'finish') openSubmitSheet();
+      else if (target.id === 'wrong-only') { wrongOnly = !wrongOnly; attemptIndex = 0; drawAttempt(activeAttempt); }
+      else if (target.id === 'retry' || target.id === 'retry-wrong') await retryAttempt(target.id === 'retry-wrong', target);
+    } catch (error) { toast(error.message); }
+  });
+  renderQuestion();
   if (!completed && attempt.deadline) {
+    const session = sessionFor(attempt);
+    const show = seconds => {
+      const timer = main.querySelector('#timer');
+      if (!timer) return;
+      timer.textContent = '⏱ ' + Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+      timer.classList.toggle('warn', seconds <= 300);
+      timer.classList.toggle('urgent', seconds <= 60);
+    };
+    // Spoken/visible warnings once at 5 and 1 minutes left (toast is a live region).
+    // A mark is skipped when the whole exam is not much longer than it.
+    const duration = (attempt.deadline - attempt.created) / 1000;
+    const warn = seconds => {
+      for (const [limit, message] of [[60, 'Còn 1 phút. Bài sẽ tự nộp khi hết giờ.'], [300, 'Còn 5 phút. Xem lại các câu chưa trả lời hoặc đã đánh dấu.']]) {
+        if (duration > limit + 30 && seconds > 0 && seconds <= limit && !session.warned.has(limit)) { session.warned.add(limit); if (limit === 60) session.warned.add(300); toast(message); break; }
+      }
+    };
     const update = () => {
       const seconds = Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000));
-      const timer = main.querySelector('#timer');
-      if (timer) {
-        timer.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
-        timer.classList.toggle('urgent', seconds <= 60);
-      }
-      if (!seconds && !submitting && !attemptSaveError) {
+      show(seconds); warn(seconds);
+      if (!seconds && !session.finishing && !session.error) {
         clearInterval(tick);
-        saveAttempt({}, 'POST').catch(() => {});
+        main.querySelector('#submit-sheet')?.close();
+        saveAttempt({}, 'POST').then(() => toast('Hết giờ. Bài thi đã được nộp tự động.')).catch(() => {});
       }
     };
     tick = setInterval(update, 1000);
-    // Defer expiry submission until controls are rendered.
+    // Show the time at once; expiry is submitted by the interval after the controls exist.
     const seconds = Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000));
-    const timer = main.querySelector('#timer');
-    if (timer) timer.textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+    show(seconds); warn(seconds);
   }
 }
+function renderQuestion() {
+  const attempt = activeAttempt;
+  if (!attemptMounted(attempt)) return;
+  const session = sessionFor(attempt);
+  const completed = !!attempt.finished, submitting = session.finishing, practice = attempt.config.mode !== 'exam';
+  const items = attemptItems(attempt);
+  const question = items[attemptIndex];
+  const answered = Object.values(attempt.answers).filter(value => answerIds(value).length).length;
+  main.querySelector('#attempt-count').textContent = answered + '/' + attempt.items.length + ' câu đã trả lời';
+  main.querySelector('#attempt-fill').style.width = Math.round(answered / attempt.items.length * 100) + '%';
+  const finish = main.querySelector('#finish');
+  if (finish) finish.disabled = submitting;
+  if (!question) return;
+  const selected = answerIds(attempt.answers[question.id]);
+  const feedback = !completed && practice && (question.selectionCount > 1 ? session.checked.has(question.id) : selected.length > 0);
+  const revealed = completed || feedback;
+  const flagged = attempt.flags.includes(question.id);
+  const saveText = session.error || (session.saving || session.pending.size ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : answered ? 'Đã lưu bài làm' : 'Chọn phương án để trả lời');
+  main.querySelector('#question-card').innerHTML = `
+    <div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
+      ${question.selectionCount > 1 ? `<span class="badge multi-badge">Chọn ${question.selectionCount} đáp án</span>` : ''}
+      ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button type="button" class="icon flag-button" id="flag" aria-pressed="${flagged}" ${submitting ? 'disabled' : ''}>${flagged ? '⚑ Đã đánh dấu' : '⚐ Đánh dấu'}</button>`}
+    </div>
+    <h2 class="question-title" id="question-title" tabindex="-1">${esc(question.prompt)}</h2>
+    ${question.selectionCount > 1 && !revealed ? `<p class="multi-hint">Câu này có ${question.selectionCount} đáp án đúng. Chỉ tính đúng khi chọn đủ và không chọn thừa.</p>` : ''}
+    <div class="options" role="group" aria-labelledby="question-title">${optionList(question, attempt.answers[question.id], revealed, completed || submitting || feedback)}</div>
+    ${!completed && practice && question.selectionCount > 1 && !feedback ? `<div class="actions practice-check"><button type="button" id="check-answer" ${selected.length !== question.selectionCount ? 'disabled' : ''}>Kiểm tra đáp án</button><small class="muted">Đã chọn ${selected.length}/${question.selectionCount}</small></div>` : ''}
+    ${revealed ? verdict(question, attempt.answers[question.id], completed) + (feedback ? `<p class="lock-note">Lựa chọn đã được ghi và không đổi được.${answerMatches(attempt.answers[question.id], question.correct) ? '' : ' Câu này sẽ vào “Ôn câu sai” sau khi nộp bài.'}</p>` : '') + whyBlock(question) : ''}
+    ${!completed ? `<span class="save-status ${session.error ? 'notice' : ''}" role="status">${esc(saveText)}</span>${session.error ? '<button type="button" id="retry-save" class="link">Thử lưu lại</button>' : ''}` : ''}
+    ${question.sources?.length ? `<div class="actions source-links">${sourceLinks(question.sources)}</div>` : ''}`;
+  main.querySelectorAll('.tiles [data-index]').forEach(button => {
+    const index = Number(button.dataset.index), entry = items[index];
+    const chosen = answerIds(attempt.answers[entry.id]).length > 0;
+    const checked = completed || (practice && chosen && (entry.selectionCount <= 1 || session.checked.has(entry.id)));
+    const status = checked ? answerMatches(attempt.answers[entry.id], entry.correct) ? 'correct' : 'wrong' : chosen ? 'selected' : '';
+    const flaggedEntry = attempt.flags.includes(entry.id);
+    button.className = [status, index === attemptIndex ? 'current' : '', flaggedEntry ? 'flagged' : ''].filter(Boolean).join(' ');
+    button.setAttribute('aria-label', 'Câu ' + (index + 1) + ({correct:', đúng', wrong:', sai', selected:', đã trả lời'}[status] || ', chưa trả lời') + (flaggedEntry ? ', đã đánh dấu' : ''));
+    if (index === attemptIndex) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current');
+    button.disabled = submitting;
+  });
+  main.querySelector('#question-position').textContent = (attemptIndex + 1) + '/' + items.length;
+  main.querySelector('#prev').disabled = attemptIndex === 0 || submitting;
+  // Main button: check a completed two-answer pick, submit on the last
+  // question, return to the results when reviewing, otherwise go next.
+  const last = attemptIndex === items.length - 1;
+  const action = !completed && practice && question.selectionCount > 1 && !feedback && selected.length === question.selectionCount ? 'check'
+    : last ? (completed ? 'top' : 'finish') : 'next';
+  const next = main.querySelector('#next');
+  if (next.dataset.action !== action) {
+    next.dataset.action = action;
+    next.innerHTML = {check:'Kiểm tra đáp án', finish:'Nộp bài', top:'↑ Về kết quả', next:'<span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span>'}[action];
+    next.classList.toggle('is-check', action === 'check');
+    if (action === 'next') next.setAttribute('data-key-next', ''); else next.removeAttribute('data-key-next');
+  }
+  next.disabled = submitting;
+}
+// Two-answer questions reveal on an explicit check; the pick is then locked.
+function revealChecked(question) {
+  const session = sessionFor(activeAttempt);
+  if (answerIds(activeAttempt.answers[question.id]).length !== question.selectionCount) return;
+  session.checked.add(question.id);
+  renderQuestion();
+  main.querySelector('.verdict')?.scrollIntoView({block:'nearest'});
+}
+// In-page submit sheet: what is unanswered or flagged, with jumps back to it.
+function openSubmitSheet() {
+  const attempt = activeAttempt, practice = attempt.config.mode !== 'exam';
+  const view = main.querySelector('#attempt-view');
+  if (!view || attempt.finished) return;
+  const indexed = attempt.items.map((question, index) => [question, index]);
+  const unanswered = indexed.filter(([question]) => !answerIds(attempt.answers[question.id]).length);
+  const flagged = indexed.filter(([question]) => attempt.flags.includes(question.id));
+  const chips = list => list.map(([, index]) => `<button type="button" class="chip" data-jump="${index}">Câu ${index + 1}</button>`).join('');
+  const seconds = attempt.deadline ? Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000)) : null;
+  let sheet = view.querySelector('#submit-sheet');
+  if (!sheet) { view.insertAdjacentHTML('beforeend', '<dialog id="submit-sheet" class="sheet" aria-labelledby="submit-title"></dialog>'); sheet = view.querySelector('#submit-sheet'); }
+  sheet.innerHTML = `<form method="dialog" class="sheet-body">
+    <h2 id="submit-title">${practice ? 'Nộp lượt luyện tập?' : 'Nộp bài thi?'}</h2>
+    <p>Đã trả lời <strong>${attempt.items.length - unanswered.length}/${attempt.items.length}</strong> câu${seconds !== null ? ' · còn ' + Math.floor(seconds / 60) + ' phút ' + (seconds % 60) + ' giây' : ''}.</p>
+    ${unanswered.length ? `<div class="sheet-group"><h3>Chưa trả lời (${unanswered.length})</h3><div class="chips">${chips(unanswered)}</div></div>` : '<p class="verdict good"><strong>✓ Đã trả lời tất cả các câu</strong></p>'}
+    ${flagged.length ? `<div class="sheet-group"><h3>⚑ Đã đánh dấu để xem lại (${flagged.length})</h3><div class="chips">${chips(flagged)}</div></div>` : ''}
+    <p class="muted">${practice ? 'Kết quả tính theo lựa chọn đã ghi của từng câu.' : 'Sau khi nộp, bạn sẽ thấy điểm, đáp án đúng và giải thích của từng câu. Bài đã nộp không sửa được.'}</p>
+    <div class="sheet-actions"><button type="submit" value="cancel" autofocus>Làm tiếp</button><button type="button" class="primary" id="confirm-submit">Nộp bài</button></div>
+  </form>`;
+  sheet.showModal();
+}
+function moveAttempt(index) {
+  const items = attemptItems(activeAttempt);
+  if (index < 0 || index >= items.length) return;
+  attemptIndex = index;
+  renderQuestion();
+  const card = main.querySelector('#question-card');
+  document.querySelector('#question-title')?.focus({preventScroll:true});
+  if (card && (matchMedia('(max-width: 680px)').matches || card.getBoundingClientRect().top < 0)) card.scrollIntoView({block:'start'});
+}
+async function retryAttempt(wrong, element) {
+  element.disabled = true;
+  try {
+    const config = activeAttempt.config;
+    const result = await api('attempt', {...config, previous:activeAttempt.id, ...(wrong ? {ids:[], mode:'practice', count:activeAttempt.items.length} : {})});
+    rememberAttempt(result);
+    location.hash = 'attempt/' + result.id;
+  } finally { element.disabled = false; }
+}
 function updateSaveStatus(session) {
-  if(location.hash!=='#attempt/'+session.attempt.id) return;
+  if(!attemptMounted(session.attempt) || location.hash!=='#attempt/'+session.attempt.id) return;
   const label=main.querySelector('.save-status');
   if(label) {
     label.textContent=session.error || (session.saving || session.pending.size ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : 'Đã lưu bài làm');
@@ -406,7 +623,7 @@ async function flushAttempt(session) {
       } catch(error) {
         for(const change of changes) session.pending.set(change.question,{...change,...session.pending.get(change.question)});
         session.error='Chưa lưu được. Bài làm vẫn ở đây; hãy thử lưu lại.';
-        if(location.hash==='#attempt/'+session.attempt.id) drawAttempt(session.attempt);
+        if(location.hash==='#attempt/'+session.attempt.id) renderQuestion();
         toast(error.message);
         throw error;
       }
@@ -419,31 +636,37 @@ async function saveAttempt(data, method) {
   const session=sessionFor(activeAttempt);
   if(session.finishing || session.attempt.finished) return;
   if(method==='PATCH') {
+    let revealNow=false;
     if(data.option!==undefined) {
+      // Practice locks a question once its answer is shown: the first pick counts.
+      const question=session.attempt.items.find(q=>q.id===data.question), practice=session.attempt.config.mode!=='exam';
+      if(practice&&question&&(question.selectionCount>1?session.checked.has(question.id):answerIds(session.attempt.answers[question.id]).length>0)) return;
+      revealNow=practice&&!!question&&question.selectionCount<=1&&answerIds(data.option).length>0;
       session.attempt.answers[data.question]=data.option;
-      session.checked.delete(data.question);
     }
     if(typeof data.flag==='boolean') session.attempt.flags=data.flag?[...new Set([...session.attempt.flags,data.question])]:session.attempt.flags.filter(id=>id!==data.question);
     session.pending.set(data.question,{...session.pending.get(data.question),...data});
     session.error='';
-    const sheetOpen=main.querySelector('#answer-sheet')?.open;
-    drawAttempt(session.attempt);
-    const sheet=main.querySelector('#answer-sheet');
-    if(sheet) sheet.open=sheetOpen;
-    if(data.option!==undefined) {
+    renderQuestion();
+    if(revealNow) {
+      // The answer and "why" appear below the options: bring the verdict into view.
+      main.querySelector('.verdict')?.scrollIntoView({block:'nearest'});
+      main.querySelector('#next')?.focus({preventScroll:true});
+    } else if(data.option!==undefined) {
       const focused=Array.isArray(data.option)?data.option.at(-1):data.option;
-      if(focused) main.querySelector('[data-option="'+focused+'"]')?.focus({preventScroll:true});
-    }
+      if(focused) main.querySelector('[data-option="'+CSS.escape(focused)+'"]')?.focus({preventScroll:true});
+    } else main.querySelector('#flag')?.focus({preventScroll:true});
     clearTimeout(session.timer);
     session.timer=setTimeout(()=>flushAttempt(session).catch(()=>{}),120);
     return;
   }
   session.finishing=true;
-  drawAttempt(session.attempt);
+  renderQuestion();
   try {
     await flushAttempt(session);
     const saved=session.attempt.finished?session.attempt:await api('attempt/'+session.attempt.id,{},'POST');
     session.attempt=saved;
+    session.finishing=false;
     stateLoadedAt=0;
     loadState(true).catch(()=>{});
     if(location.hash==='#attempt/'+saved.id) {
@@ -453,10 +676,13 @@ async function saveAttempt(data, method) {
       window.scrollTo(0,0);
     }
   } finally {
-    session.finishing=false;
-    if(location.hash==='#attempt/'+session.attempt.id) drawAttempt(session.attempt);
+    if(session.finishing) {
+      session.finishing=false;
+      if(location.hash==='#attempt/'+session.attempt.id) renderQuestion();
+    }
   }
 }
+
 
 function docs() {
   const c=controls('docs');
@@ -464,7 +690,7 @@ function docs() {
   const update=()=>{
     const term=filter.search.toLocaleLowerCase('vi');
     const docs=state.documents.filter(q=>matches(q)&&[q.title,q.filename].some(s=>s.toLocaleLowerCase('vi').includes(term))).sort((a,b)=>(main.querySelector('[name=doc-sort]').value==='chapter'?chapterName(a.chapter).localeCompare(chapterName(b.chapter),'vi',{numeric:true}):0)||a.title.localeCompare(b.title,'vi',{numeric:true}));
-    main.querySelector('#doclist').innerHTML=docs.map(q=>`<article class="card listitem"><div><h3>${esc(q.title)}</h3><small>${esc(chapterName(q.chapter))} · ${esc(q.filename)}</small></div><div class="actions">${link('doc/'+q.id,'Xem tài liệu','link')}<a class="btn" href="/api/documents/${q.id}?download">Tải xuống</a></div></article>`).join('')||empty('Chưa có tài liệu phù hợp.');
+    main.querySelector('#doclist').innerHTML=docs.map(q=>`<article class="card listitem"><div><h3>${esc(docLabel(q))}</h3><small>${esc(chapterName(q.chapter))} · ${esc(q.filename)}</small></div><div class="actions">${link('doc/'+q.id,'Xem tài liệu','link')}<a class="btn" href="/api/documents/${q.id}?download">Tải xuống</a></div></article>`).join('')||empty('Chưa có tài liệu phù hợp.');
   };
   update();bindFilters();on('[name=doc-sort]','change',update);
   on('[name=search]','input',(_,el)=>{filter.search=el.value;update();});
@@ -528,7 +754,7 @@ async function doc(id,generation) {
     catch(error) {preview=empty(error.message+' Bạn có thể tải xuống để mở tệp.');}
   }
   if(generation!==viewGeneration) return;
-  main.innerHTML=`${title(d.title,chapterName(d.chapter))}<div class="actions"><a class="btn primary" href="${path}?download">Tải xuống</a>${link('docs','Về thư viện')}</div><div class="section">${preview||empty('Tải tệp DOCX xuống để đọc trong Word hoặc trình đọc tương thích.')}</div>`;
+  main.innerHTML=`${title(docLabel(d),chapterName(d.chapter))}<div class="actions"><a class="btn primary" href="${path}?download">Tải xuống</a>${link('docs','Về thư viện')}</div><div class="section">${preview||empty('Tải tệp DOCX xuống để đọc trong Word hoặc trình đọc tương thích.')}</div>`;
 }
 function stats() {
   const m=metrics();
@@ -708,7 +934,7 @@ function renderNavigation(group) {
   document.querySelector('#avatar').textContent = (state.user.name || 'V').charAt(0).toUpperCase();
   const visibleLinks = links.filter(([key]) => key !== 'admin' || state.user.isAdmin);
   nav.innerHTML = visibleLinks.map(([key, icon, label]) => `<a href="#${key}" ${group === key ? 'aria-current="page"' : ''}><b aria-hidden="true">${icon}</b>${label}</a>`).join('');
-  mobileNav.innerHTML = links.filter(([key]) => ['home','quiz','essay','docs'].includes(key)).map(([key, icon, label]) =>
+  mobileNav.innerHTML = links.filter(([key]) => ['home','subjects','quiz','essay'].includes(key)).map(([key, icon, label]) =>
     `<a href="#${key}" ${group === key ? 'aria-current="page"' : ''}><b aria-hidden="true">${icon}</b>${label}</a>`).join('')
     + '<button id="more-menu" aria-label="Mở tất cả chức năng" aria-controls="sidebar" aria-expanded="false"><b aria-hidden="true">☰</b>Thêm</button>';
   document.querySelector('#more-menu').onclick = () => setMenu(true);
@@ -723,7 +949,7 @@ async function render() {
   const route = current || 'home';
   const group = parents[route] || route;
   document.body.classList.toggle('taking-quiz', route === 'attempt' && activeAttempt?.id === id && !activeAttempt.finished);
-  document.body.classList.remove('review-quiz');
+  document.body.classList.remove('review-quiz', 'focus-study', 'has-start-bar');
   renderNavigation(group);
   if (previousHash !== location.hash) {
     if (['quiz','essay','docs'].includes(previousGroup)) filterMemory[previousGroup] = {...filter};
@@ -734,6 +960,10 @@ async function render() {
       filter = selected
         ? {subject:selected.subject, chapter:selected.id, tier:['main','extra'].includes(selectedTier)?selectedTier:'all', search:''}
         : {...(filterMemory[route] || {subject:'', chapter:'', tier:'all', search:''})};
+      // Links from the home review queue preselect a mode or status filter.
+      const wanted=new URLSearchParams(params);
+      if(route==='quiz'&&['practice','review','exam'].includes(wanted.get('mode')))quizSettings.mode=wanted.get('mode');
+      if(route==='essay'&&Object.hasOwn(studyStatuses,wanted.get('status')||''))studyStatusFilter=wanted.get('status');
     }
   }
   previousHash = location.hash;
@@ -762,6 +992,7 @@ async function render() {
   }
 }
 async function refresh() {
+  clearStudyCaches();
   await loadState(true);
   await render();
 }
@@ -780,6 +1011,41 @@ window.addEventListener('hashchange', async () => {
   window.scrollTo(0, 0);
 });
 const root = document.documentElement;
+// ChatGPT Sites can inject its own floating widget (e.g. "Edit site") into a
+// shadow root at the bottom-right. On phone layouts, when it sits over the
+// bottom bars, grow the bars by its height (CSS --site-lift) so "Câu tiếp" and
+// the navigation stay tappable. The widget itself is left untouched.
+function siteWidgetLift() {
+  let lift = 0;
+  if (innerWidth <= 900) {
+    for (const host of document.body.children) {
+      if (!host.shadowRoot) continue;
+      for (const element of host.shadowRoot.querySelectorAll('*')) {
+        const box = element.getBoundingClientRect();
+        if (!box.width || !box.height || box.width * box.height > innerWidth * innerHeight * 0.4) continue;
+        if (box.top < innerHeight && box.bottom > innerHeight - 140) lift = Math.max(lift, innerHeight - box.top + 6);
+      }
+    }
+  }
+  root.style.setProperty('--site-lift', Math.min(Math.round(lift), 96) + 'px');
+}
+let liftTimer;
+const scheduleLift = () => { clearTimeout(liftTimer); liftTimer = setTimeout(siteWidgetLift, 120); };
+const watchedHosts = new WeakSet();
+function watchSiteWidgets() {
+  for (const host of document.body.children) {
+    if (host.shadowRoot && !watchedHosts.has(host)) {
+      watchedHosts.add(host);
+      new MutationObserver(scheduleLift).observe(host.shadowRoot, {subtree:true, childList:true, attributes:true});
+    }
+  }
+  scheduleLift();
+}
+new MutationObserver(watchSiteWidgets).observe(document.body, {childList:true});
+window.addEventListener('resize', scheduleLift);
+watchSiteWidgets();
+setTimeout(siteWidgetLift, 1500);
+setTimeout(siteWidgetLift, 4000);
 function preference(name, fallback) {
   try { return localStorage.getItem(name) || fallback; }
   catch { return fallback; }
@@ -812,6 +1078,12 @@ document.addEventListener('click', event => {
   if (!event.target.closest('#appearance')) document.querySelector('#appearance').open = false;
 });
 window.addEventListener('keydown', event => {
+  // ← / → move between questions when focus is not in a form field.
+  if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey
+    && !event.target.closest?.('input, textarea, select, [contenteditable="true"]') && !document.body.classList.contains('open')) {
+    const control = main.querySelector(event.key === 'ArrowLeft' ? '[data-key-prev]' : '[data-key-next]');
+    if (control && !control.disabled && !control.hasAttribute('aria-disabled')) { event.preventDefault(); control.click(); }
+  }
   if (event.key === 'Escape') {
     setMenu(false);
     document.querySelector('#appearance').open = false;
@@ -850,7 +1122,9 @@ window.addEventListener('beforeunload', event => {
     event.returnValue = '';
   }
 });
-refresh().catch(error => {
+// First render: nothing cached yet, and study.js declarations finish loading
+// before the awaited state resolves.
+loadState(true).then(render).catch(error => {
   if (error.status === 401) {
     document.body.classList.add('signed-out');
     document.querySelector('#crumb').textContent = 'Ôn Tập Việt Quiz';

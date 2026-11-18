@@ -62,19 +62,24 @@ async function api(request, env, path, owner) {
   const chaptersExist = async chapter => needed(await sql('SELECT id FROM chapters WHERE id=?',chapter).first(),'Chương không tồn tại.',404);
   if (path === 'state' && method === 'GET') {
     await ensureCourseContent(env);
-    if (!(await sql("SELECT id FROM subjects WHERE id='lan'").first())) {
+    // One D1 batch = one round trip for the whole catalog and learner state.
+    const readState = async () => (await db.batch([
+      sql('SELECT * FROM subjects ORDER BY rowid'),sql('SELECT * FROM chapters ORDER BY position,rowid'),
+      sql('SELECT id,chapter,kind,tier,prompt,code FROM questions ORDER BY rowid'),
+      sql('SELECT id,chapter,title,filename,mime FROM documents ORDER BY rowid'),
+      // mode/total/answered/deadline let the home page name the attempt to resume.
+      sql("SELECT id,chapter,created,finished,result,deadline,json_extract(config,'$.mode') AS mode,json_array_length(attempts.items) AS total, CASE WHEN finished IS NULL THEN (SELECT count(*) FROM json_each(attempts.answers) AS a WHERE (a.type='text' AND a.value<>'') OR (a.type='array' AND json_array_length(a.value)>0)) END AS answered, CASE WHEN finished IS NOT NULL THEN (SELECT json_group_array(json_object('id',json_extract(value,'$.id'),'correct',json_extract(value,'$.correct'))) FROM json_each(attempts.items)) END AS items, CASE WHEN finished IS NOT NULL THEN answers END AS answers FROM attempts WHERE owner=? ORDER BY created DESC,rowid DESC",owner),
+      sql('SELECT question,learned,status,viewed_at,answered_at,updated_at FROM essays WHERE owner=?',owner),sql('SELECT name FROM profiles WHERE id=?',owner)
+    ])).map(result => result.results || []);
+    let rows = await readState();
+    if (!rows[0].some(subject => subject.id === 'lan')) {
       await db.batch(seed.flatMap(([id,title,chapters]) => [
         sql('INSERT OR IGNORE INTO subjects (id,title) VALUES (?,?)',id,title),
         ...chapters.map((name,i) => sql('INSERT OR IGNORE INTO chapters (id,subject,title) VALUES (?,?,?)',id+'-'+(i+1),id,name))
       ]));
+      rows = await readState();
     }
-    const [subjects,chapters,questions,documents,history,essays,profile] = await Promise.all([
-      list(sql('SELECT * FROM subjects ORDER BY rowid')),list(sql('SELECT * FROM chapters ORDER BY position,rowid')),
-      list(sql('SELECT id,chapter,kind,tier,prompt,code FROM questions ORDER BY rowid')),
-      list(sql('SELECT id,chapter,title,filename,mime FROM documents ORDER BY rowid')),
-      list(sql("SELECT id,chapter,created,finished,result, CASE WHEN finished IS NOT NULL THEN (SELECT json_group_array(json_object('id',json_extract(value,'$.id'),'correct',json_extract(value,'$.correct'))) FROM json_each(attempts.items)) END AS items, CASE WHEN finished IS NOT NULL THEN answers END AS answers FROM attempts WHERE owner=? ORDER BY created DESC,rowid DESC",owner)),
-      list(sql('SELECT question,learned,status,viewed_at,answered_at,updated_at FROM essays WHERE owner=?',owner)),sql('SELECT name FROM profiles WHERE id=?',owner).first()
-    ]);
+    const [subjects,chapters,questions,documents,history,essays,[profile]] = rows;
     let name = request.headers.get('oai-authenticated-user-full-name') || '';
     if (request.headers.get('oai-authenticated-user-full-name-encoding') === 'percent-encoded-utf-8') {
       try {name=decodeURIComponent(name);} catch {name='';}
@@ -157,23 +162,29 @@ async function api(request, env, path, owner) {
     const data=await body();
     needed(['practice','exam','review'].includes(data.mode) && ['main','extra','all'].includes(data.tier) && Number.isInteger(data.count) && data.count>=1 && data.count<=100,'Cấu hình bài làm không hợp lệ.');
     if (data.mode==='exam') needed(Number.isInteger(data.minutes) && data.minutes>=1 && data.minutes<=180,'Thời gian thi từ 1 đến 180 phút.');
-    await chaptersExist(data.chapter);
-    let qs=await list(sql("SELECT id,tier,prompt,options,correct,explanation,sources FROM questions WHERE chapter=? AND kind='quiz'",data.chapter));
+    if (Array.isArray(data.ids)) needed(data.previous,'Cần chọn bài để ôn lại.');
+    // Chapter, question pool and the previous attempt load in one round trip.
+    const [chapterRows,questionRows,previousRows=[]]=(await db.batch([
+      sql('SELECT id FROM chapters WHERE id=?',data.chapter),
+      sql("SELECT id,tier,prompt,options,correct,explanation,sources FROM questions WHERE chapter=? AND kind='quiz'",data.chapter),
+      ...(data.previous ? [sql('SELECT chapter,items,answers,finished FROM attempts WHERE id=? AND owner=?',String(data.previous),owner)] : [])
+    ])).map(result=>result.results || []);
+    needed(chapterRows.length,'Chương không tồn tại.',404);
+    const previous=previousRows[0];
+    let qs=questionRows;
     if(data.mode==='review'){const wrong=new Set(await unresolvedQuestions(db,owner,data.chapter));qs=qs.filter(q=>wrong.has(q.id)&&(data.tier==='all'||q.tier===data.tier));}
     else if (Array.isArray(data.ids)) {
-      needed(data.previous,'Cần chọn bài để ôn lại.');
-      const previous=await sql('SELECT items,answers FROM attempts WHERE id=? AND owner=? AND chapter=? AND finished IS NOT NULL',data.previous,owner,data.chapter).first();
-      needed(previous,'Không tìm thấy bài đã chấm.',404);
+      needed(previous && previous.chapter===data.chapter && previous.finished!==null,'Không tìm thấy bài đã chấm.',404);
       const answers=parse(previous.answers);
       const misses=new Set(parse(previous.items).filter(q=>!matchesAnswer(answers[q.id],q.correct)).map(q=>q.id));
       qs=qs.filter(q=>misses.has(q.id));
     } else if (data.tier!=='all') qs=qs.filter(q=>q.tier===data.tier);
     needed(qs.length,'Chương này chưa có câu hỏi phù hợp.');
     const pick=data.tier==='all'&&!data.ids ? [...shuffle(qs.filter(q=>q.tier==='main')),...shuffle(qs.filter(q=>q.tier==='extra'))] : shuffle(qs);
+    // Options are shuffled as whole {id,text} objects: the key stays on the option ID.
     const items=shuffle(pick.slice(0,data.count)).map(q=>({...q,sources:parse(q.sources),options:shuffle(parse(q.options))}));
-    if (data.previous) {
-      const previous=await sql('SELECT items FROM attempts WHERE id=? AND owner=?',data.previous,owner).first();
-      const prior=previous ? parse(previous.items) : [];
+    if (previous) {
+      const prior=parse(previous.items);
       if(items.length>1 && items.every((q,i)=>q.id===prior[i]?.id)) items.push(items.shift());
       for(const q of items) {
         const old=prior.find(x=>x.id===q.id);
@@ -181,12 +192,15 @@ async function api(request, env, path, owner) {
       }
     }
     const attempt=uid(), now=Date.now(), deadline=data.mode==='exam'?now+data.minutes*60000:null;
-    await sql('INSERT INTO attempts (id,owner,chapter,created,deadline,config,items) VALUES (?,?,?,?,?,?,?)',attempt,owner,data.chapter,now,deadline,JSON.stringify({chapter:data.chapter,tier:data.tier,mode:data.mode,count:data.count,minutes:data.minutes}),JSON.stringify(items)).run();
-    return json({id:attempt});
+    const config=JSON.stringify({chapter:data.chapter,tier:data.tier,mode:data.mode,count:data.count,minutes:data.minutes});
+    await sql('INSERT INTO attempts (id,owner,chapter,created,deadline,config,items) VALUES (?,?,?,?,?,?,?)',attempt,owner,data.chapter,now,deadline,config,JSON.stringify(items)).run();
+    // Return the new attempt so the browser can open it without a second request.
+    return json({id:attempt, attempt:publicAttempt({id:attempt,owner,chapter:data.chapter,created:now,deadline,config,items:JSON.stringify(items),answers:'{}',flags:'[]',finished:null,result:null})});
   }
   if (group==='attempt' && id) {
     let entry=await sql('SELECT * FROM attempts WHERE id=? AND owner=?',id,owner).first();
     needed(entry,'Không tìm thấy bài làm.',404);
+    let reread=false, saved=false;
     if (method==='PATCH' && !entry.finished && (!entry.deadline || Date.now()<entry.deadline)) {
       const payload=await body();
       const changes=Array.isArray(payload.changes)?payload.changes:[payload];
@@ -204,19 +218,26 @@ async function api(request, env, path, owner) {
           updates.push(sql('UPDATE attempts SET flags=(SELECT json_group_array(value) FROM (SELECT value FROM json_each(flags) WHERE value<>? UNION ALL SELECT ? WHERE ?=1)) WHERE id=? AND owner=? AND finished IS NULL AND (deadline IS NULL OR deadline>?)',question,question,flag?1:0,id,owner,Date.now()));
         }
       }
-      if (updates.length) await db.batch(updates);
+      if (updates.length) {
+        // Every guarded UPDATE changes one row while the attempt is open; a
+        // zero means it was submitted elsewhere, so read the final state.
+        saved=(await db.batch(updates)).every(result=>result.meta?.changes>0);
+        reread=true;
+      }
     }
     if (!entry.finished && (method==='POST' || (entry.deadline && Date.now()>=entry.deadline))) {
       for (let retry=0; retry<5; retry++) {
         entry=await sql('SELECT * FROM attempts WHERE id=? AND owner=?',id,owner).first();
         if (entry.finished) break;
         const finished=Date.now();
-        const saved=await sql('UPDATE attempts SET finished=?,result=? WHERE id=? AND owner=? AND finished IS NULL AND answers=?',finished,JSON.stringify(graded({...entry,finished})),id,owner,entry.answers).run();
-        if (saved.meta.changes) break;
+        const result=await sql('UPDATE attempts SET finished=?,result=? WHERE id=? AND owner=? AND finished IS NULL AND answers=?',finished,JSON.stringify(graded({...entry,finished})),id,owner,entry.answers).run();
+        if (result.meta.changes) break;
         needed(retry<4,'Bài làm vừa thay đổi. Hãy nộp lại.',409);
       }
+      reread=true; saved=false;
     }
-    entry=await sql('SELECT * FROM attempts WHERE id=? AND owner=?',id,owner).first();
+    if(method==='PATCH' && saved && new URL(request.url).searchParams.get('compact')==='1') return json({ok:true,id:entry.id,finished:null});
+    if(reread) entry=await sql('SELECT * FROM attempts WHERE id=? AND owner=?',id,owner).first();
     if(method==='PATCH' && !entry.finished && new URL(request.url).searchParams.get('compact')==='1') return json({ok:true,id:entry.id,finished:null});
     return json(publicAttempt(entry));
   }
@@ -268,14 +289,29 @@ export default {async fetch(request,env,ctx) {
       return await api(request,env,path.slice(5),owner);
     }
     if(path==='/') {
-      let boot;
-      if(owner) {
-        const initial=await api(new Request(new URL('/api/state?compact=1',request.url),request),env,'state',owner);
-        boot=await initial.json();
-      } else boot={signedOut:true};
-      const serialized=JSON.stringify(boot).replaceAll('<','\\u003c').replaceAll('>','\\u003e').replaceAll('&','\\u0026');
-      const page=assets['/'].replace('<!--BOOT_STATE-->','<script type="application/json" id="initial-state">'+serialized+'</script>');
-      return new Response(page,{headers:{'Content-Type':'text/html; charset=utf-8','X-Content-Type-Options':'nosniff','Cache-Control':'private, no-store'}});
+      // Stream the shell (with links to the cached CSS/JS) before reading the
+      // learner's state, then append the state in the same response.
+      const [head,tail]=assets['/'].split('<!--BOOT_STATE-->');
+      const {readable,writable}=new TransformStream();
+      const writer=writable.getWriter(), encoder=new TextEncoder();
+      // A closed tab must not surface as an unhandled stream error.
+      const write=chunk=>writer.write(encoder.encode(chunk)).catch(()=>{});
+      const send=(async()=>{
+        try {
+          write(head);
+          let boot;
+          try {
+            boot=owner ? await (await api(new Request(new URL('/api/state?compact=1',request.url),{headers:request.headers}),env,'state',owner)).json() : {signedOut:true};
+          } catch(error) {
+            console.error(error);
+            boot={error:error.status ? error.message : 'Không thể tải dữ liệu học tập. Hãy thử lại.'};
+          }
+          const serialized=JSON.stringify(boot).replaceAll('<','\\u003c').replaceAll('>','\\u003e').replaceAll('&','\\u0026');
+          await write('<script type="application/json" id="initial-state">'+serialized+'</script>'+tail);
+        } finally { await writer.close().catch(()=>{}); }
+      })();
+      ctx?.waitUntil?.(send);
+      return new Response(readable,{headers:{'Content-Type':'text/html; charset=utf-8','X-Content-Type-Options':'nosniff','Cache-Control':'private, no-store'}});
     }
     if(Object.hasOwn(assets,path)) {
       const type=path.endsWith('.js')?'text/javascript':path.endsWith('.css')?'text/css':'text/html';

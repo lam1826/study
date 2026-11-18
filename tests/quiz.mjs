@@ -6,12 +6,17 @@ const sqlite=new DatabaseSync(':memory:');
 sqlite.exec(readFileSync('drizzle/0000_quiz.sql','utf8'));
 sqlite.exec(readFileSync('drizzle/0001_content_imports.sql','utf8'));
 sqlite.exec(readFileSync('drizzle/0002_study_workspace.sql','utf8'));
+// D1 shim. `trips` counts network round trips as on Cloudflare: one per
+// statement call, one per batch (however many statements it carries).
+let trips=0;
 const db={prepare(query){return {bind(...params){
   const s=sqlite.prepare(query);
-  return {all:async()=>({results:s.all(...params)}),first:async()=>s.get(...params),run:async()=>/^\s*(SELECT|PRAGMA)/i.test(query)?{results:s.all(...params)}:{meta:s.run(...params)}};
+  const exec=()=>/^\s*(SELECT|PRAGMA)/i.test(query)?{results:s.all(...params)}:{meta:s.run(...params)};
+  return {all:async()=>{trips++;return {results:s.all(...params)};},first:async()=>{trips++;return s.get(...params);},run:async()=>{trips++;return exec();},exec};
 }};},async batch(statements){
+  trips++;
   sqlite.exec('BEGIN');
-  try {const result=[];for(const s of statements) result.push(await s.run());sqlite.exec('COMMIT');return result;}
+  try {const result=statements.map(s=>s.exec());sqlite.exec('COMMIT');return result;}
   catch(e){sqlite.exec('ROLLBACK');throw e;}
 }};
 const files=new Map();
@@ -174,3 +179,83 @@ assert.equal(sqlite.prepare('SELECT count(*) AS n FROM attempts').get().n,attemp
 await call('api/quiz-answers?chapter=missing','GET',undefined,'u',404);
 await call('api/quiz-answers?chapter=distributed-2','GET',undefined,'',401);
 console.log('PASS: all 118 quiz answer keys and option IDs match the bank, chapter scope, learner access and no progress mutations.');
+
+// Shuffled attempts keep every option's text with its own ID and the stored
+// key on the same IDs, including multi-answer questions.
+const bankById=new Map(bank.map(q=>[q.id,q]));
+const ids=value=>(Array.isArray(value)?value:[value]).slice().sort();
+let shuffledItems=0;
+for(let round=0;round<20;round++) for(const chapter of ['distributed-1','distributed-2','history-1']){
+  const created=await call('api/attempt','POST',{chapter,tier:'all',mode:'practice',count:100});
+  for(const q of created.attempt.items){
+    const source=bankById.get(q.id);
+    assert.deepEqual(new Map(q.options.map(o=>[o.id,o.text])),new Map(source.options.map(o=>[o.id,o.text])));
+    assert.deepEqual(ids(q.correct),ids(source.correct));
+    assert.equal(q.selectionCount,ids(source.correct).length);
+    shuffledItems++;
+  }
+}
+assert.equal(shuffledItems,20*(15+15+30));
+console.log('PASS: '+shuffledItems+' shuffled attempt items keep option text, IDs and (multi-)answer keys together.');
+
+// Creating an attempt returns it (no second request); an exam still hides keys.
+const createdNow=await call('api/attempt','POST',cfg);
+const openedNow=await call('api/attempt/'+createdNow.id);
+assert.deepEqual(createdNow.attempt.items,openedNow.items);
+assert.deepEqual(createdNow.attempt.config,openedNow.config);
+const examNow=await call('api/attempt','POST',{...cfg,mode:'exam',minutes:5});
+assert.ok(examNow.attempt.items.every(q=>!('correct' in q)&&!('explanation' in q)&&q.selectionCount>=1));
+assert.equal(examNow.attempt.items.filter(q=>q.selectionCount===2).length,4);
+// A save that arrives after submission reports the finished attempt, not "saved".
+await call('api/attempt/'+examNow.id,'POST',{});
+const late=await call('api/attempt/'+examNow.id+'?compact=1','PATCH',{changes:[{question:examNow.attempt.items[0].id,option:examNow.attempt.items[0].options[0].id}]});
+assert.ok(late.finished&&late.items.every(q=>q.correct&&q.explanation));
+assert.deepEqual(late.answers,{});
+console.log('PASS: new attempts are returned on creation; exam keys stay hidden until submission; late saves see the submitted result.');
+
+// D1 round trips per request (each is a network hop on Cloudflare).
+const roundTrips=async(...args)=>{const before=trips;const result=await call(...args);return {count:trips-before,result};};
+assert.equal((await roundTrips('api/state?compact=1')).count,1);
+assert.equal((await roundTrips('api/essay/'+essay.id)).count,1);
+assert.equal((await roundTrips('api/quiz-answers?chapter=distributed-1')).count,1);
+assert.equal((await roundTrips('api/essay-answers?chapter=distributed-1')).count,1);
+const timedCreate=await roundTrips('api/attempt','POST',cfg);
+assert.equal(timedCreate.count,2);
+assert.equal((await roundTrips('api/attempt/'+timedCreate.result.id)).count,1);
+const first=timedCreate.result.attempt.items[0];
+const patched=await roundTrips('api/attempt/'+timedCreate.result.id+'?compact=1','PATCH',{changes:[{question:first.id,option:first.options[0].id}]});
+assert.equal(patched.count,2);
+assert.deepEqual(patched.result,{ok:true,id:timedCreate.result.id,finished:null});
+console.log('PASS: one D1 round trip for state, essay, quiz/essay answer pages and opening an attempt; two for creating or saving.');
+
+// The page streams the shell with cached, content-hashed CSS/JS, then the state.
+const page=await call('');
+const css=page.match(/<link rel="stylesheet" href="(\/style\.[a-f0-9]{12}\.css)">/)?.[1], js=page.match(/<script src="(\/app\.[a-f0-9]{12}\.js)" defer><\/script>/)?.[1];
+assert.ok(css&&js,'page links hashed assets');
+assert.ok(!page.includes('<style>')&&page.indexOf('id="initial-state"')>page.indexOf('<main'));
+const boot=JSON.parse(page.match(/<script type="application\/json" id="initial-state">(.*?)<\/script>/s)[1]);
+assert.equal(boot.questions.length,346);
+assert.equal(boot.history.length,sqlite.prepare("SELECT count(*) AS n FROM attempts WHERE owner='u'").get().n);
+assert.ok(boot.questions.every(q=>!('correct' in q)&&!('explanation' in q)));
+const signedOutPage=await call('','GET',undefined,'');
+assert.deepEqual(JSON.parse(signedOutPage.match(/id="initial-state">(.*?)<\/script>/s)[1]),{signedOut:true});
+for(const asset of [css,js]){
+  const res=await worker.fetch(new Request('https://example.test'+asset),{DB:db,BUCKET:bucket});
+  assert.equal(res.status,200);assert.match(res.headers.get('cache-control'),/immutable/);
+  assert.ok((await res.text()).length>1000);
+}
+console.log('PASS: the page streams its shell with immutable hashed CSS/JS and embeds the private state without answer keys.');
+// A fresh isolate checks all content revisions in one query before the state batch.
+const coldWorker=(await import('../dist/server/index.js?cold-isolate')).default;
+const coldBefore=trips;
+const coldState=await coldWorker.fetch(new Request('https://example.test/api/state?compact=1',{headers:{'oai-authenticated-user-id':'u','oai-authenticated-user-email':'owner@example.test'}}),{DB:db,BUCKET:bucket,QUIZ_OWNER_EMAIL:'owner@example.test'});
+assert.equal(coldState.status,200);assert.equal((await coldState.json()).questions.length,346);
+assert.equal(trips-coldBefore,2);
+console.log('PASS: a cold isolate loads the page state in two D1 round trips (was 11 calls, 5 of them sequential).');
+// The home review queue names unfinished attempts: mode, size, answers given, deadline.
+const homeExam=await call('api/attempt','POST',{...cfg,mode:'exam',minutes:7,count:5});
+await call('api/attempt/'+homeExam.id+'?compact=1','PATCH',{changes:homeExam.attempt.items.slice(0,2).map(q=>({question:q.id,option:q.selectionCount>1?q.options.slice(0,2).map(o=>o.id):q.options[0].id}))});
+const homeEntry=(await call('api/state?compact=1')).history.find(entry=>entry.id===homeExam.id);
+assert.equal(homeEntry.mode,'exam');assert.equal(homeEntry.total,5);assert.equal(homeEntry.answered,2);assert.ok(homeEntry.deadline>Date.now());assert.equal(homeEntry.finished,null);
+assert.ok(!('items' in homeEntry)&&!('answers' in homeEntry),'compact state carries no answer keys');
+console.log('PASS: unfinished attempts in the state carry mode, size, answered count and deadline (no keys).');

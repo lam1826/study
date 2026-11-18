@@ -34,3 +34,12 @@
 - Sắp xếp chương, chặn thứ tự lẫn môn, chặn xóa chương có dữ liệu.
 - Backup 47 tệp giả lập cùng dữ liệu thật, khôi phục bản gốc và tự tạo checkpoint.
 - Browser QA: hiện/ẩn, học từng ý, soạn/lưu/tải lại, đối chiếu, quản trị và tạo bản sao; viewport 390/320 không tràn ngang. Kiểm thử local dùng tài khoản giả lập, không tự thực hiện đăng ký/đổi mật khẩu hoặc đăng nhập trên thiết bị thật của người dùng.
+
+## Cải tiến màn hình học và hiệu năng — 18/11/2026
+
+- Không thêm migration, không đổi schema, ID câu hỏi/phương án, đáp án, lời giải gốc, bản nháp, lịch sử hay liên kết tài liệu. API cũ giữ nguyên dạng; `POST /api/attempt` chỉ thêm trường `attempt` bên cạnh `id`.
+- Lời giải không bị sửa nội dung. Giao diện tách phần lý giải và nguồn đối chiếu; test kiểm tra 118 lời giải giữ nguyên toàn bộ chữ, 30 dòng “Đáp án đúng: …” trùng khóa đã lưu (dòng không trùng sẽ vẫn hiện), 228 đáp án tự luận giữ nguyên mọi dòng khi chia mục.
+- Xáo trộn: 1.200 câu trong 60 lượt làm bài có ID phương án, nội dung và khóa (kể cả 7 câu nhiều đáp án) khớp ngân hàng; 200 lượt xáo trộn mỗi câu ở phía giao diện cho chữ cái đáp án đúng khớp nội dung.
+- Thi thử: dữ liệu khi tạo bài, khi mở và khi lưu đều không có `correct`/`explanation` trước khi nộp; lượt lưu đến sau khi đã nộp nhận kết quả đã chấm.
+- Kiểm tra trên trình duyệt (bản local, tài khoản giả lập, 320/360 px và 1280 px, sáng/tối): câu nhiều đáp án ở chế độ luyện tập, một lượt thi thử 15 câu (5 phút) từ lúc làm đến khi nộp, câu tự luận dài với bản nháp 18.239 ký tự được lưu và đọc lại, trang quản trị với tài khoản chủ trang. Chưa kiểm tra trên website ChatGPT Sites thật và trên điện thoại thật.
+

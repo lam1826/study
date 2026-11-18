@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Giảng viên chỉ muốn đổi hạn nộp của một bài tập, giữ nguyên tiêu đề và mô tả. Với hợp đồng theo bảng phương thức HTTP của giáo trình, lựa chọn nào thể hiện đúng ý định?",
+    "options": [
+      "PATCH tài nguyên bài tập với dữ liệu thay đổi hạn nộp.",
+      "PUT với chỉ hạn nộp rồi mặc nhiên yêu cầu mọi trường không gửi vẫn giữ nguyên.",
+      "GET có thân yêu cầu chứa hạn nộp mới để đồng thời đọc và sửa bài tập.",
+      "POST để tạo thêm một bài tập khác rồi dùng nó thay cho thao tác cập nhật."
+    ],
+    "correct": 0,
+    "explanation": "PATCH thể hiện cập nhật một phần. PUT trong hợp đồng này mang ý nghĩa thay thế toàn bộ; GET không yêu cầu đổi trạng thái nghiệp vụ; tạo một tài nguyên mới không tương đương sửa hạn nộp của tài nguyên đang có.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 5, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi PUT thay thế thông tin bài tập nhưng hết thời gian chờ trước khi đọc được phản hồi. Khi đánh giá khả năng gửi lại cùng yêu cầu, hiểu lũy đẳng thế nào là đúng?",
+    "options": [
+      "Mọi lần gửi lại bắt buộc có thời gian xử lý và toàn bộ byte phản hồi giống hệt nhau.",
+      "Cùng yêu cầu được lặp lại phải có hiệu ứng dự kiến giống nhau đối với trạng thái tài nguyên.",
+      "Lũy đẳng có nghĩa không lần gọi nào được phép thay đổi dữ liệu.",
+      "Vì đã hết thời gian chờ nên có thể khẳng định lần PUT trước chưa đến máy chủ."
+    ],
+    "correct": 1,
+    "explanation": "Lũy đẳng nói về hiệu ứng dự kiến của cùng yêu cầu, không bảo đảm thời gian hay phản hồi giống từng byte. Nó khác tính an toàn của GET. Hết thời gian chờ cũng không tự chứng minh máy chủ chưa nhận hoặc chưa xử lý yêu cầu.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 5, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một API sau bộ cân bằng tải chỉ lưu mã sinh viên đang thao tác trong bộ nhớ của máy chủ A. Yêu cầu tiếp theo đến máy chủ B không gửi mã sinh viên nên thất bại. Sửa nào đáp ứng nguyên tắc stateless?",
+    "options": [
+      "Xóa toàn bộ cơ sở dữ liệu để bảo đảm hệ thống không lưu bất cứ trạng thái nào.",
+      "Đổi mọi GET thành POST nhưng giữ phụ thuộc vào phiên ngầm trên máy A.",
+      "Gửi rõ thông tin cần thiết trong mỗi yêu cầu và dùng nơi lưu dữ liệu thích hợp cho dữ liệu nghiệp vụ.",
+      "Tăng số máy chủ trong khi vẫn không gửi thông tin nhận diện cần thiết."
+    ],
+    "correct": 2,
+    "explanation": "Stateless yêu cầu mỗi yêu cầu có đủ thông tin xử lý, không cấm lưu dữ liệu nghiệp vụ trong cơ sở dữ liệu. Đổi method hay tăng số máy không giải quyết phụ thuộc vào phiên ngầm của riêng một máy chủ.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 5, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "API tạo sản phẩm để máy chủ cấp Id. Một lập trình viên muốn dùng luôn ProductDto làm đầu vào vì nó đã có đủ Name, Price và Id. Quyết định nào giữ rõ quyền cấp mã?",
+    "options": [
+      "Cho máy khách tự chọn Id và chỉ kiểm tra Name, vì DTO phản hồi có trường đó.",
+      "Bỏ Id khỏi cả phản hồi để không còn phải quản lý định danh sản phẩm.",
+      "Cho tất cả thao tác dùng chung một DTO và coi mọi trường là dữ liệu máy khách được phép sửa.",
+      "Giữ DTO tạo mới không chứa Id, còn DTO phản hồi có Id do máy chủ cấp."
+    ],
+    "correct": 3,
+    "explanation": "Tách request và response làm rõ dữ liệu được phép gửi và dữ liệu do máy chủ quyết định. Dùng trực tiếp DTO có Id làm hợp đồng tạo mới làm mờ ranh giới này; bỏ Id ở phản hồi hoặc cho sửa mọi trường không giải quyết đúng yêu cầu.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 11, mục 2.2.3.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau POST tạo sản phẩm thành công, máy chủ trả 201 cùng Location. Máy khách cần đọc lại sản phẩm nhưng cấu trúc đường dẫn API có thể thay đổi. Cách làm nào giảm việc đoán đường dẫn?",
+    "options": [
+      "Dùng URI tài nguyên được máy chủ cung cấp trong Location theo hợp đồng phản hồi.",
+      "Tự ghép một URL từ tên lớp ProductService trong mã máy chủ.",
+      "Bỏ Location rồi gọi lại POST để yêu cầu máy chủ trả bản sao sản phẩm mới.",
+      "Coi 201 là phản hồi lỗi vì máy khách chỉ chấp nhận mã 200."
+    ],
+    "correct": 0,
+    "explanation": "Location chỉ ra URI đọc lại tài nguyên vừa tạo. Tên lớp nội bộ không phải hợp đồng URI; gửi lại POST có thể tạo thêm tài nguyên; 201 là trạng thái tạo thành công chứ không phải lỗi vì khác 200.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 11, mục 2.2.4.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.2.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một sinh viên đã xác thực thành công nhưng gọi thao tác chỉ dành cho giảng viên. Theo phân biệt mã trạng thái trong chương, phản hồi nào thể hiện rõ tình huống này?",
+    "options": [
+      "401 Unauthorized, vì mọi trường hợp từ chối đều có nghĩa chưa xác thực.",
+      "403 Forbidden, vì đã xác thực nhưng thiếu quyền thực hiện thao tác.",
+      "201 Created, vì máy chủ đã tiếp nhận một yêu cầu hợp lệ về cú pháp.",
+      "204 No Content, vì không muốn gửi thông tin chi tiết về quyền."
+    ],
+    "correct": 1,
+    "explanation": "403 thể hiện thiếu quyền sau khi đã xác thực. 401 mô tả chưa xác thực; 201 và 204 đều thuộc nhóm thành công, nên dùng chúng sẽ khiến máy khách hiểu sai kết quả thao tác bị từ chối.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 6, mục 2.1.3.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách nhận HTTP 400 với JSON {\"code\":\"invalid_name\",\"message\":\"Tên không hợp lệ\"} nhưng vẫn cố đọc nó như ProductDto. Cần sửa luồng xử lý thế nào?",
+    "options": [
+      "Chỉ kiểm tra JSON có hợp lệ cú pháp rồi coi như tạo sản phẩm thành công.",
+      "Đổi tên các thuộc tính lỗi thành Id và Name ở phía máy khách để ép thành sản phẩm.",
+      "Kiểm tra mã trạng thái rồi đọc DTO lỗi và xử lý lý do thất bại theo hợp đồng.",
+      "Gửi lại vô hạn cùng dữ liệu mà không kiểm tra nội dung lỗi."
+    ],
+    "correct": 2,
+    "explanation": "JSON hợp lệ không đồng nghĩa nghiệp vụ thành công. Với 400, máy khách cần đọc DTO lỗi và sửa nguyên nhân; ép dữ liệu lỗi thành sản phẩm hoặc gửi lại cùng đầu vào không hợp lệ làm mất thông tin và không giải quyết vấn đề.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 7, mục 2.1.5.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một màn hình cần mở lượt nộp đã biết mã 42; màn hình khác cần liệt kê các lượt nộp của SV001. Cách tổ chức URI nào phân biệt đúng định danh với điều kiện lọc?",
+    "options": [
+      "Dùng /api/submissions/SV001 cho cả hai mà không xác định đó là mã lượt nộp hay mã sinh viên.",
+      "Đặt mọi điều kiện lọc vào tên lớp dịch vụ nội bộ rồi công bố tên lớp làm URI.",
+      "Tạo đường dẫn mới ngẫu nhiên cho mỗi lần tìm kiếm để máy chủ phân biệt yêu cầu.",
+      "Dùng /api/submissions/42 cho đối tượng đã biết và /api/submissions?studentCode=SV001 cho danh sách lọc."
+    ],
+    "correct": 3,
+    "explanation": "Đường dẫn xác định tài nguyên; chuỗi truy vấn diễn đạt việc chọn một phần của danh sách. Trộn hai loại mã gây mơ hồ, còn tên lớp nội bộ và đường dẫn ngẫu nhiên không thể hiện ổn định đối tượng hay bộ lọc nghiệp vụ.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 4, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm mở rộng API từ mô hình học tập sang dữ liệu người dùng có cờ nội bộ và giá trị băm mật khẩu. Những thay đổi nào phù hợp với thiết kế DTO ở biên hệ thống? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Trả nguyên thực thể lưu trữ để giảm một bước ánh xạ, kể cả mọi trường kỹ thuật.",
+      "Chỉ cho DTO yêu cầu chứa dữ liệu máy khách được phép gửi và kiểm tra trước khi xử lý nghiệp vụ.",
+      "Ánh xạ sang DTO phản hồi chứa dữ liệu cần thiết, tránh lộ trường nhạy cảm hoặc nội bộ.",
+      "Dựa vào việc máy khách không hiển thị trường nhạy cảm để cho phép API gửi chúng."
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "DTO yêu cầu xác định phạm vi dữ liệu được phép gửi; kiểm tra ở biên và ánh xạ phản hồi kiểm soát dữ liệu đi qua API. Trả toàn bộ thực thể làm lộ chi tiết lưu trữ; việc giao diện không hiển thị không xóa dữ liệu đã truyền cho máy khách.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 6, mục 2.1.4.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một yêu cầu REST khởi đầu luồng xử lý dài qua nhiều thành phần. Để điều tra người dùng báo \"nộp bài chậm\", những thông tin nào giúp quan sát tương tác theo giáo trình? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Điểm cuối, phương thức, mã trạng thái và thời gian xử lý yêu cầu.",
+      "Chỉ tên lớp nội bộ, vì URI và mã HTTP không liên quan đến hành vi máy khách.",
+      "Chỉ lưu phản hồi thành công; bỏ qua yêu cầu lỗi để dữ liệu đo không bị nhiễu.",
+      "Mã tương quan khi có, để hỗ trợ liên hệ các bản ghi thuộc cùng luồng xử lý."
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "Thông tin endpoint, method, trạng thái, thời gian và mã tương quan giúp xác định yêu cầu chậm hoặc lỗi và liên hệ các bước. Chỉ biết lớp nội bộ không mô tả đầy đủ hợp đồng bên ngoài; loại bỏ yêu cầu lỗi làm mất bằng chứng cần thiết.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 6, mục 2.1.3.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, mục 2.1.3"
+  }
+]

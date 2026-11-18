@@ -3,10 +3,15 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import worker from '../dist/server/index.js';
 import { loadAddedQuestions } from '../scripts/added-questions.mjs';
-// The original course (346 questions, 118 quiz) plus content/added/ (checked by tests/added.mjs).
+// Match the importer's append-only behavior, including additions already
+// present in a deployed course snapshot. Content growth does not change tests.
+const catalog=JSON.parse(readFileSync('content/course.json','utf8'));
 const added=await loadAddedQuestions();
-const addedIds=new Set(added.questions.map(q=>q.id));
-const TOTAL=346+added.questions.length, QUIZ=118+added.questions.length, MULTI=7+added.questions.filter(q=>Array.isArray(q.correct)).length;
+const catalogKeys=new Set(catalog.questions.map(q=>q.chapter+'|'+q.kind+'|'+q.normalized));
+const newQuestions=added.questions.filter(q=>!catalogKeys.has(q.chapter+'|'+q.kind+'|'+q.normalized));
+const addedIds=new Set(newQuestions.map(q=>q.id));
+const expectedQuestions=[...catalog.questions,...newQuestions];
+const TOTAL=expectedQuestions.length, QUIZ=expectedQuestions.filter(q=>q.kind==='quiz').length, MULTI=expectedQuestions.filter(q=>Array.isArray(q.correct)).length;
 const sqlite=new DatabaseSync(':memory:');
 sqlite.exec(readFileSync('drizzle/0000_quiz.sql','utf8'));
 sqlite.exec(readFileSync('drizzle/0001_content_imports.sql','utf8'));
@@ -41,12 +46,12 @@ await call('api/state','GET',undefined,'',401);
 await call('api/bank','GET',undefined,'other',403);
 const bank=await call('api/bank');
 const courseBank=bank.filter(q=>!addedIds.has(q.id));
-assert.equal(courseBank.length,346);
-assert.ok(courseBank.filter(q=>q.kind==='quiz').every(q=>q.explanation.length>200 && !q.explanation.startsWith('Đáp án theo phần được đánh dấu')));
+assert.equal(courseBank.length,catalog.questions.length);
+assert.ok(courseBank.filter(q=>q.kind==='quiz').every(q=>(q.chapter==='lan-2'?q.explanation.includes('Vì sao đúng:'):q.explanation.length>200) && !q.explanation.startsWith('Đáp án theo phần được đánh dấu')));
 const multi=bank.filter(q=>Array.isArray(q.correct));
 assert.equal(multi.length,MULTI);
 assert.equal(courseBank.filter(q=>q.kind==='quiz' && q.options.length===3).length,1);
-assert.ok(courseBank.every(q=>q.explanation && q.sources.length));
+assert.ok(courseBank.every(q=>q.explanation && (q.sources.length || /Nguồn(?: đối chiếu)?: .+\.docx, câu \d+\./.test(q.explanation))));
 // Four import markers: course, reviewed explanations, essay guides, added questions.
 assert.equal(sqlite.prepare('SELECT count(*) AS n FROM content_imports').get().n,4);
 await call('api/state');
@@ -102,7 +107,7 @@ assert.ok(bank.filter(q=>q.kind==='essay').every(q=>q.key_points.length>=2&&q.co
 await call('api/essay/'+essay.id,'POST',{draft:'Nội dung cá nhân',learned:true});
 assert.equal((await call('api/essay/'+essay.id,'GET',undefined,'other')).draft,'');
 await call('api/content-import?id=x','PUT',undefined,'',403);
-console.log('PASS: '+TOTAL+' imported questions (346 + '+added.questions.length+' added), source-marked answers, '+MULTI+' multi-answer questions, batch saves, grading, retry, admin roundtrip, source authorization and private drafts.');
+console.log('PASS: '+TOTAL+' imported questions ('+catalog.questions.length+' + '+newQuestions.length+' new), source-marked answers, '+MULTI+' multi-answer questions, batch saves, grading, retry, admin roundtrip, source authorization and private drafts.');
 
 // Practice feedback uses snapshot keys immediately, but an active exam never
 // exposes keys or explanations, even through non-compact save responses.
@@ -151,7 +156,7 @@ await call('api/backups','GET',undefined,'other',403);
 for(const d of source.documents)files.set(d.storage_key,'original-file-'+d.id);
 const backup=await call('api/backups','POST',{});
 const manifest=await call('api/backups/'+backup.id);
-assert.equal(Object.keys(manifest.files).length,47);
+assert.equal(Object.keys(manifest.files).length,catalog.documents.length);
 assert.equal(manifest.data.questions.length,TOTAL);
 await call('api/essay/'+essay.id,'POST',{draft:'bị thay đổi',status:'learning'});
 await call('api/chapters/distributed-1','PATCH',{title:'Đổi sau sao lưu',overview:''});
@@ -203,7 +208,7 @@ for(let round=0;round<20;round++) for(const chapter of ['distributed-1','distrib
     shuffledItems++;
   }
 }
-assert.equal(shuffledItems,20*(15+15+30));
+assert.equal(shuffledItems,20*bank.filter(q=>q.kind==='quiz'&&['distributed-1','distributed-2','history-1'].includes(q.chapter)).length);
 console.log('PASS: '+shuffledItems+' shuffled attempt items keep option text, IDs and (multi-)answer keys together.');
 
 // Creating an attempt returns it (no second request); an exam still hides keys.

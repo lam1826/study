@@ -1,0 +1,168 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Một dịch vụ gửi một yêu cầu theo dõi tác vụ và muốn nhận liên tiếp nhiều cập nhật tiến độ từ dịch vụ xử lý. Kiểu gRPC nào khớp số lượng thông điệp hai phía?",
+    "options": [
+      "Server streaming: một yêu cầu từ máy khách, một luồng phản hồi từ máy chủ.",
+      "Unary: mỗi yêu cầu luôn chứa sẵn mọi cập nhật tương lai.",
+      "Client streaming: máy khách gửi nhiều yêu cầu và chỉ nhận một kết quả tổng hợp.",
+      "One-way: máy khách không nhận phản hồi nghiệp vụ nào."
+    ],
+    "correct": 0,
+    "explanation": "Tình huống có một đầu vào và nhiều đầu ra theo thời gian nên phù hợp server streaming. Unary chỉ một phản hồi, client streaming đảo phía gửi luồng, còn one-way không đáp ứng nhu cầu nhận cập nhật kết quả.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 3, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách cần gửi nhiều mẩu dữ liệu đầu vào để máy chủ xử lý, sau đó chỉ nhận một kết quả tổng hợp. Kiểu giao tiếp nào khớp nhất?",
+    "options": [
+      "Server streaming RPC vì máy chủ là bên tổng hợp dữ liệu.",
+      "Client streaming RPC.",
+      "Unary RPC vì mọi luồng nhiều thông điệp đều tương đương một yêu cầu.",
+      "Bidirectional streaming là bắt buộc dù máy chủ chỉ cần gửi một phản hồi cuối."
+    ],
+    "correct": 1,
+    "explanation": "Client streaming xác định luồng yêu cầu từ máy khách và một phản hồi từ máy chủ. Server streaming có hướng luồng ngược; unary không mô tả chuỗi yêu cầu; hai chiều không phải yêu cầu bắt buộc khi chỉ cần một kết quả tổng hợp.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 4, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai dịch vụ cần liên tục trao đổi cập nhật, mỗi phía có thể gửi chuỗi dữ liệu riêng mà không phải đợi phía kia hoàn tất toàn bộ chuỗi. Kiểu RPC nào được giáo trình mô tả đúng yêu cầu này?",
+    "options": [
+      "Unary RPC vì mọi lượt gửi cần ghép thành một cặp độc lập bắt buộc.",
+      "Client streaming với quy tắc máy chủ tuyệt đối chỉ trả một kết quả cuối.",
+      "Bidirectional streaming RPC.",
+      "Server streaming với quy tắc máy khách chỉ gửi một yêu cầu ban đầu."
+    ],
+    "correct": 2,
+    "explanation": "Luồng hai chiều cho phép cả hai phía gửi luồng riêng. Unary không mô tả hai luồng; client streaming và server streaming chỉ có một phía gửi luồng nên không khớp điều kiện cả hai bên cần cập nhật độc lập.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 4, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai nhóm sinh mã từ cùng file .proto nên thống nhất kiểu request và response, nhưng lại hiểu khác nhau khi nào thao tác ChấmLại được phép thay điểm cũ. Cần bổ sung gì?",
+    "options": [
+      "Chỉ chạy lại trình sinh mã nhiều lần để tự thống nhất quy tắc thay điểm.",
+      "Đổi protobuf sang JSON vì JSON tự suy ra ý nghĩa nghiệp vụ.",
+      "Coi việc biên dịch thành công là bằng chứng hai bên hiểu hoàn toàn giống nhau.",
+      "Tài liệu ngữ nghĩa nghiệp vụ của thao tác, vì IDL mô tả cú pháp nhưng không tự diễn đạt đầy đủ ý nghĩa xử lý."
+    ],
+    "correct": 3,
+    "explanation": "Hợp đồng kiểu dữ liệu và thủ tục không thay cho quy tắc nghiệp vụ. Giáo trình phân biệt cú pháp IDL với ngữ nghĩa cần mô tả trong tài liệu. Sinh lại mã, đổi định dạng hoặc biên dịch thành công không tự giải quyết khác biệt ý nghĩa thao tác.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 4, mục 5.1.3.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một dịch vụ gRPC chuyển triển khai từ C# sang ngôn ngữ khác, nhưng vẫn giữ hợp đồng giao tiếp tương thích và ý nghĩa các thao tác. Điều gì cho phép giảm tác động tới máy khách?",
+    "options": [
+      "Máy khách làm việc theo interface/hợp đồng nên không phụ thuộc trực tiếp vào công nghệ triển khai nội bộ của máy chủ.",
+      "Máy khách và máy chủ bắt buộc phải cùng ngôn ngữ nên chuyển đổi luôn bất khả thi.",
+      "File .proto phải chứa toàn bộ mã nguồn máy chủ để máy khách biên dịch lại cùng.",
+      "Hợp đồng không còn cần thiết khi cả hai bên đều dùng mạng nội bộ."
+    ],
+    "correct": 0,
+    "explanation": "Khả năng tương tác và chuyển đổi dựa trên hợp đồng cho phép thay triển khai khi giữ interface tương thích và ngữ nghĩa. Hai phía không cần cùng ngôn ngữ, .proto không phải toàn bộ mã nghiệp vụ, và mạng nội bộ vẫn cần hợp đồng rõ ràng.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 5, mục 5.1.3.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một máy khách gọi cùng máy chủ gRPC hàng nghìn lần và hiện tạo channel mới cho mỗi lời gọi. Theo kỹ thuật trong chương, thay đổi nào hợp lý?",
+    "options": [
+      "Tạo thêm channel cho từng trường trong request để tăng mức song song.",
+      "Tạo channel phù hợp rồi tái sử dụng cho nhiều lời gọi để tận dụng kết nối và multiplexing.",
+      "Giữ cách tạo mới vì một channel chỉ có thể phục vụ đúng một RPC trong suốt đời nó.",
+      "Bỏ client sinh từ .proto rồi tự ghép chuỗi JSON cho tất cả lời gọi."
+    ],
+    "correct": 1,
+    "explanation": "Giáo trình khuyến nghị tái sử dụng channel, vốn có thể phục vụ nhiều lời gọi nhờ multiplexing. Tạo kênh cho từng lời gọi hoặc từng trường lãng phí tài nguyên; đổi sang tự ghép JSON không giải quyết quản lý channel trong giao tiếp gRPC.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 11, mục 5.2.4.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.2.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "CalcGrpcClient gọi Divide với B = 0 và nhận InvalidArgument. Cách xử lý nào phù hợp nhất với bản chất lỗi của ví dụ?",
+    "options": [
+      "Gửi lại vô hạn cùng B = 0 vì mọi lỗi gRPC đều là lỗi mạng tạm thời.",
+      "Coi kết quả phép chia bằng 0 vì máy chủ đã trả một mã lỗi.",
+      "Nhận diện đầu vào không hợp lệ qua StatusCode và sửa dữ liệu hoặc báo lỗi phù hợp trước khi gọi lại.",
+      "Bỏ qua StatusCode và chỉ kiểm tra đã tạo channel thành công hay chưa."
+    ],
+    "correct": 2,
+    "explanation": "InvalidArgument trong ví dụ biểu thị tham số chia cho 0 bị từ chối, không phải một kết quả phép tính hay bằng chứng lỗi mạng. Máy khách cần rẽ nhánh theo trạng thái; lặp nguyên đầu vào sai hoặc chỉ kiểm tra channel không sửa được nguyên nhân.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 12, mục 5.2.5.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một lời gọi gRPC chưa hoàn tất có deadline 5 giây; người dùng hủy ở giây thứ 2 và token hủy được truyền tới lời gọi. Theo tình huống minh họa trong chương, kết quả nào phù hợp?",
+    "options": [
+      "Luôn chờ đủ 5 giây vì deadline vô hiệu hóa mọi yêu cầu hủy.",
+      "Luôn báo DeadlineExceeded ngay giây thứ 2 dù deadline chưa tới.",
+      "Tự coi lời gọi thành công vì người dùng không còn chờ kết quả.",
+      "Lời gọi bị hủy theo điều kiện đến trước, tương ứng Cancelled khi token bị hủy ở giây thứ 2."
+    ],
+    "correct": 3,
+    "explanation": "Trong giả định lời gọi còn đang chạy và hủy được áp dụng trước deadline, điều kiện hủy đến trước nên kết thúc với Cancelled. Deadline không buộc bỏ qua token; người dùng ngừng chờ cũng không biến kết quả thành thành công hay làm deadline hết hạn sớm.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 13, mục 5.2.5.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một API gọi dịch vụ gRPC nội bộ trong lúc xử lý yêu cầu người dùng. Những biện pháp nào kiểm soát đúng thời gian và vòng đời lời gọi? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Đặt deadline phù hợp với thời gian xử lý bình thường và yêu cầu không giữ tài nguyên quá lâu.",
+      "Bỏ xử lý lỗi vì mã được sinh từ .proto bảo đảm mạng luôn thành công.",
+      "Truyền cancellation khi yêu cầu phía trên bị hủy và kết quả không còn cần thiết.",
+      "Dùng một deadline đã hết hạn cho mọi yêu cầu để bảo đảm mọi phép tính đều hoàn tất nhanh."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Deadline đặt giới hạn thời gian; cancellation cho phép dừng chờ khi luồng phía trên bị hủy. Sinh mã chỉ hỗ trợ hợp đồng và truyền dữ liệu, không xóa lỗi mạng. Deadline quá khứ minh họa thất bại do hết hạn, không phải cách làm xử lý nghiệp vụ nhanh hơn.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 13, mục 5.2.5.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một sản phẩm vừa phục vụ trình duyệt và đối tác, vừa cần giao tiếp nội bộ giữa các dịch vụ với hợp đồng kiểu rõ ràng. Những lựa chọn nào phù hợp với ranh giới API trong chương? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Bắt buộc dùng một công nghệ duy nhất cho mọi ranh giới để hệ thống mới được xem là phân tán.",
+      "Giữ REST hoặc GraphQL ở phía máy khách khi đáp ứng nhu cầu tương thích và sử dụng API.",
+      "Cho API Gateway nhận yêu cầu bên ngoài rồi gọi dịch vụ nội bộ qua gRPC khi phù hợp.",
+      "Công bố mọi chi tiết triển khai của dịch vụ nội bộ trực tiếp thành hợp đồng trình duyệt."
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Giáo trình phân biệt ưu tiên của API hướng máy khách và API nội bộ, đồng thời nêu gateway làm cầu nối. Hai công nghệ có thể phối hợp theo nhu cầu; không bắt buộc thống nhất một công nghệ và cũng không cần lộ toàn bộ triển khai nội bộ cho bên ngoài.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 5, mục 5.1.4.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, mục 5.1.4"
+  }
+]

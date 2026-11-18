@@ -20,6 +20,8 @@
 | Mở lại "Đáp án trắc nghiệm"/"Đáp án tự luận" của chương | Luôn gọi lại API (2 D1) | Giữ trong bộ nhớ của phiên 5 phút: 0 yêu cầu, 13 ms. Quản trị lưu thay đổi thì xóa bộ nhớ này |
 | Trang kế tiếp sau khi tạo bài làm | Tải lại toàn bộ dữ liệu khởi động (9 D1) | Không: bài mới được thêm vào lịch sử ngay trên máy |
 | "Đánh dấu đã thuộc" trong danh sách tự luận | Lưu rồi tải lại toàn bộ dữ liệu | Lưu rồi cập nhật dữ liệu đang có trên máy |
+| Đáp án tự luận cả chương (36 câu, 375 px, vòng 4) | Mở sẵn 36/36 đáp án: trang cao 73.369 px, 1.577 phần tử, ~2.002 px mỗi câu, câu đầu ở y≈620 | Hiện đề + ý chính, đáp án đầy đủ dựng khi mở: 24.912 px, 972 phần tử, ~677 px mỗi câu, câu đầu ở y=492 |
+| Danh sách tự luận / Tài liệu / Thống kê (375 px, vòng 4) | 6.210 / 9.916 / 4.805 px | 3.462 / 6.025 / 3.016 px (hàng gọn, bộ lọc thu về một dòng) |
 
 ## Đã sửa ở đâu
 

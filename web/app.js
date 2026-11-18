@@ -152,7 +152,6 @@ function coverage(chapters) {
     ? Math.round(questions.filter(question => learnedQuestions.has(question.id)).length / questions.length * 100)
     : 0;
 }
-const metric = (name, value, detail = '') => `<article class="card metric"><small>${name}</small><strong>${value}</strong>${detail ? `<small class="metric-detail">${detail}</small>` : ''}</article>`;
 // Scores use the Vietnamese decimal comma (7,5/10).
 const scoreText = value => String(value).replace('.', ',');
 const shortDate = value => { const d = new Date(value), two = n => String(n).padStart(2, '0'); return two(d.getHours()) + ':' + two(d.getMinutes()) + ' ' + two(d.getDate()) + '/' + two(d.getMonth() + 1); };
@@ -173,8 +172,14 @@ function subjectCards() {
       <span class="row-end">Mở<span aria-hidden="true"> →</span></span></a>`;
   }).join('')}</div>`;
 }
+// One row per attempt: mode and score first, then chapter, answers and time.
 function historyList(entries) {
-  return entries.length?`<div class="list">${entries.map(a=>`<article class="card listitem"><div><h3>${esc(chapterName(a.chapter))}</h3><small>${shortDate(a.created)} · ${a.result?`${scoreText(a.result.score)}/10 · ${a.result.correct}/${a.result.total} câu đúng`:'Đang làm'}</small></div>${link('attempt/'+a.id,a.result?'Xem kết quả':'Tiếp tục','link')}</article>`).join('')}</div>`:empty('Các bài làm sẽ xuất hiện ở đây.');
+  return entries.length?`<div class="panel">${entries.map(a=>{
+    const mode=esc(attemptModes[a.mode]||'Bài làm');
+    const head=a.result?`${mode} · ${scoreText(a.result.score)}/10`:`${mode} · đang làm`;
+    const detail=a.result?`${a.result.correct}/${a.result.total} câu đúng`:a.total?`${a.answered||0}/${a.total} câu đã trả lời`:'';
+    return taskRow('attempt/'+a.id,head,[esc(chapterName(a.chapter)),detail,shortDate(a.created)].filter(Boolean).join(' · '),a.result?'Xem kết quả':'Làm tiếp');
+  }).join('')}</div>`:empty('Các bài làm sẽ xuất hiện ở đây.');
 }
 // Home leads with what to review now: unfinished attempts, unresolved quiz
 // mistakes and essays marked for review, each one tap from the work itself.
@@ -216,7 +221,7 @@ function home() {
       ${recentRows ? section('Học gần đây', recentRows) : ''}
     </div>
     <aside class="home-side"><section class="home-section"><h2>Môn học</h2>${subjectCards()}</section>
-      <p class="home-stats">${summary.h.length ? summary.h.length + ' bài đã nộp · đúng ' + summary.accuracy + '% · điểm trung bình ' + summary.average + '/10' : 'Chưa nộp bài nào.'} <a href="#stats">Xem thống kê</a></p></aside>
+      <p class="home-stats">${summary.h.length ? summary.h.length + ' bài đã nộp · đúng ' + summary.accuracy + '% · điểm trung bình ' + scoreText(summary.average) + '/10' : 'Chưa nộp bài nào.'} <a href="#stats">Xem thống kê</a></p></aside>
     </div></div>`;
 }
 function subject(id) {
@@ -230,18 +235,20 @@ function subject(id) {
 }
 function chapterRow(c) {
   const n=chapterCounts(c.id), progress=coverage([c]);
-  return `<article class="card chapter-row"><div class="chapter-row-head"><h2><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a></h2><span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span></div>${chapterActions(c.id,n)}</article>`;
+  return `<article class="card chapter-row"><div class="chapter-row-head"><h2><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a></h2><span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span></div>${chapterActions(c.id,n,false)}</article>`;
 }
 function chapterCounts(id) {
   const questions=state.questions.filter(q=>q.chapter===id);
   return {quiz:questions.filter(q=>q.kind==='quiz').length, essay:questions.filter(q=>q.kind==='essay').length, docs:state.documents.filter(d=>d.chapter===id).length};
 }
-// Actions grouped by kind (quiz, essay, documents), one clear primary per chapter.
-function chapterActions(id,n=chapterCounts(id)) {
+// Actions grouped by kind (quiz, essay, documents). The chapter page gets one
+// primary action; a list of several chapters (subject page) gets none.
+function chapterActions(id,n=chapterCounts(id),primary=true) {
+  const lead=primary?'primary':'';
   const row=(label,count,buttons,cls='')=>`<div class="action-row ${cls}"><span class="action-label">${label}<small>${count}</small></span><div class="action-buttons">${buttons}</div></div>`;
   const rows=[
-    n.quiz&&row('Trắc nghiệm',n.quiz+' câu',link('quiz/'+id,'Làm bài','primary')+link('quizanswers/'+id,'Xem đáp án')),
-    n.essay&&row('Tự luận',n.essay+' câu',link('essay/'+id,'Học từng câu',n.quiz?'':'primary')+link('essayanswers/'+id,'Đáp án cả chương')),
+    n.quiz&&row('Trắc nghiệm',n.quiz+' câu',link('quiz/'+id,'Làm bài',lead)+link('quizanswers/'+id,'Xem đáp án')),
+    n.essay&&row('Tự luận',n.essay+' câu',link('essay/'+id,'Học từng câu',n.quiz?'':lead)+link('essayanswers/'+id,'Đáp án cả chương')),
     n.docs&&row('Tài liệu',n.docs+' tệp',link('docs/'+id,'Mở tài liệu','link'),'docs-row')
   ].filter(Boolean);
   return `<div class="chapter-actions">${rows.join('')||'<p class="muted">Chương đang chờ bổ sung nội dung.</p>'}</div>`;
@@ -354,17 +361,41 @@ function optionList(question, chosenValue, revealed, disabled) {
     </button>`;
   }).join('');
 }
-// "Vì sao đúng" block shared by practice feedback, results and answer pages.
-function whyBlock(question) {
+// One colour per kind of content, the same on every page, always with a
+// written label: Đáp án (green), Giải thích (blue), Ví dụ (amber),
+// Lưu ý (orange), Nguồn (grey).
+const contentKinds = {answer:'Đáp án', explain:'Giải thích', example:'Ví dụ', note:'Lưu ý', source:'Nguồn'};
+// `title` is trusted HTML (already escaped); it is shown under the label only
+// when it says more than the label itself ("Trả lời trọng tâm", "Vì sao…").
+function contentBlock(kind, level, title, body) {
+  const label = contentKinds[kind] || '';
+  const plainTitle = title ? title.replace(/<[^>]+>/g, '') : '';
+  const extra = plainTitle && !(label && plainKey(plainTitle).startsWith(plainKey(label)));
+  const head = extra && label ? `<p class="cblock-tag">${label}</p><h${level} class="cblock-title">${title}</h${level}>`
+    : `<h${level} class="cblock-tag">${label || title || ''}</h${level}>`;
+  return `<section class="cblock cblock-${label ? kind : 'other'}">${head}${body}</section>`;
+}
+function contentLegend() {
+  return `<p class="content-legend"><span class="legend-label">Màu nội dung:</span>${Object.entries(contentKinds).map(([kind, label]) => `<span class="legend-chip cblock-${kind}">${label}</span>`).join('')}</p>`;
+}
+// Reasoning ("Vì sao … đúng?"), any "Lưu ý:" note and the sources of a quiz
+// question, as separate labelled blocks. Text is only regrouped, never cut.
+function whyBlock(question, level = 3) {
   const keys = lettered(question).filter(option => option.correct);
   const parts = explanationParts(question.explanation, keys.map(option => option.text));
   const letters = joinLetters(keys.map(option => option.letter));
-  const paragraphs = parts.why ? parts.why.split(/\n\s*\n/).map(text => `<p>${esc(text.trim())}</p>`).join('') : '<p>Chưa có giải thích cho câu này.</p>';
-  return `<section class="why" aria-label="Giải thích đáp án">
-    <h3><span class="why-mark" aria-hidden="true">✓</span>Vì sao ${letters ? (keys.length > 1 ? 'các đáp án ' : 'đáp án ') + letters : 'đáp án này'} đúng?</h3>
-    ${paragraphs}
-    ${parts.source ? `<p class="why-source"><strong>Nguồn đối chiếu:</strong> ${esc(parts.source)}</p>` : ''}
-  </section>`;
+  let reasoning = '', notes = '';
+  for (const paragraph of parts.why ? parts.why.split(/\n\s*\n/) : []) {
+    for (const part of noteParts(paragraph)) {
+      if (part.kind === 'note') notes += `<p>${esc(part.text)}</p>`;
+      else reasoning += `<p>${esc(part.text)}</p>`;
+    }
+  }
+  const heading = 'Vì sao ' + (letters ? (keys.length > 1 ? 'các đáp án ' : 'đáp án ') + letters : 'đáp án này') + ' đúng?';
+  const links = sourceLinks(question.sources || []);
+  return contentBlock('explain', level, heading, reasoning || '<p>Chưa có giải thích cho câu này.</p>')
+    + (notes ? contentBlock('note', level, '', notes) : '')
+    + (parts.source || links ? contentBlock('source', level, '', (parts.source ? `<p>${esc(parts.source)}</p>` : '') + (links ? `<div class="actions source-links">${links}</div>` : '')) : '');
 }
 function verdict(question, value, completed) {
   const picked = chosenLetters(question, value), key = joinLetters(keyLetters(question));
@@ -415,6 +446,7 @@ function drawAttempt(attempt) {
         <span class="question-position" id="question-position" aria-live="polite"></span>
         <button type="button" id="next" class="primary" data-key-next><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></button>
       </nav>
+      <p class="kbd-hint">Phím tắt: <kbd>1</kbd>–<kbd>4</kbd> hoặc <kbd>A</kbd>–<kbd>D</kbd> chọn · <kbd>Enter</kbd> nút chính · <kbd>←</kbd> <kbd>→</kbd> chuyển câu · <kbd>M</kbd> đánh dấu</p>
       </div>
       <aside class="card attempt-side">
         <details id="answer-sheet" ${sheetOpen ? 'open' : ''}>
@@ -511,7 +543,7 @@ function renderQuestion() {
   const flagged = attempt.flags.includes(question.id);
   const saveText = session.error || (session.saving || session.pending.size ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : answered ? 'Đã lưu bài làm' : 'Chọn phương án để trả lời');
   main.querySelector('#question-card').innerHTML = `
-    <div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
+    <div class="qa-main"><div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
       ${question.selectionCount > 1 ? `<span class="badge multi-badge">Chọn ${question.selectionCount} đáp án</span>` : ''}
       ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button type="button" class="icon flag-button" id="flag" aria-pressed="${flagged}" ${submitting ? 'disabled' : ''}>${flagged ? '⚑ Đã đánh dấu' : '⚐ Đánh dấu'}</button>`}
     </div>
@@ -519,9 +551,10 @@ function renderQuestion() {
     ${question.selectionCount > 1 && !revealed ? `<p class="multi-hint">Câu này có ${question.selectionCount} đáp án đúng. Chỉ tính đúng khi chọn đủ và không chọn thừa.</p>` : ''}
     <div class="options" role="group" aria-labelledby="question-title">${optionList(question, attempt.answers[question.id], revealed, completed || submitting || feedback)}</div>
     ${!completed && practice && question.selectionCount > 1 && !feedback ? `<div class="actions practice-check"><button type="button" id="check-answer" ${selected.length !== question.selectionCount ? 'disabled' : ''}>Kiểm tra đáp án</button><small class="muted">Đã chọn ${selected.length}/${question.selectionCount}</small></div>` : ''}
-    ${revealed ? verdict(question, attempt.answers[question.id], completed) + (feedback ? `<p class="lock-note">Lựa chọn đã được ghi và không đổi được.${answerMatches(attempt.answers[question.id], question.correct) ? '' : ' Câu này sẽ vào “Ôn câu sai” sau khi nộp bài.'}</p>` : '') + whyBlock(question) : ''}
     ${!completed ? `<span class="save-status ${session.error ? 'notice' : ''}" role="status">${esc(saveText)}</span>${session.error ? '<button type="button" id="retry-save" class="link">Thử lưu lại</button>' : ''}` : ''}
-    ${question.sources?.length ? `<div class="actions source-links">${sourceLinks(question.sources)}</div>` : ''}`;
+    ${!revealed && question.sources?.length ? `<div class="actions source-links">${sourceLinks(question.sources)}</div>` : ''}</div>
+    ${revealed ? `<div class="qa-aside">${verdict(question, attempt.answers[question.id], completed) + (feedback ? `<p class="lock-note">Lựa chọn đã được ghi và không đổi được.${answerMatches(attempt.answers[question.id], question.correct) ? '' : ' Câu này sẽ vào “Ôn câu sai” sau khi nộp bài.'}</p>` : '') + whyBlock(question)}</div>` : ''}`;
+  main.querySelector('#question-card').classList.toggle('is-revealed', revealed);
   main.querySelectorAll('.tiles [data-index]').forEach(button => {
     const index = Number(button.dataset.index), entry = items[index];
     const chosen = answerIds(attempt.answers[entry.id]).length > 0;
@@ -555,7 +588,15 @@ function revealChecked(question) {
   if (answerIds(activeAttempt.answers[question.id]).length !== question.selectionCount) return;
   session.checked.add(question.id);
   renderQuestion();
-  main.querySelector('.verdict')?.scrollIntoView({block:'nearest'});
+  showVerdict();
+}
+// After an answer is shown, bring the verdict and the start of "Vì sao" into
+// view (on phones it otherwise sits under the bottom bar). Wide screens show
+// them beside the options, so they only scroll when still out of view.
+function showVerdict() {
+  const box = main.querySelector('#question-card .verdict');
+  if (!box) return;
+  box.scrollIntoView({block:matchMedia('(min-width: 1200px)').matches ? 'nearest' : 'start'});
 }
 // In-page submit sheet: what is unanswered or flagged, with jumps back to it.
 function openSubmitSheet() {
@@ -650,7 +691,7 @@ async function saveAttempt(data, method) {
     renderQuestion();
     if(revealNow) {
       // The answer and "why" appear below the options: bring the verdict into view.
-      main.querySelector('.verdict')?.scrollIntoView({block:'nearest'});
+      showVerdict();
       main.querySelector('#next')?.focus({preventScroll:true});
     } else if(data.option!==undefined) {
       const focused=Array.isArray(data.option)?data.option.at(-1):data.option;
@@ -684,15 +725,27 @@ async function saveAttempt(data, method) {
 }
 
 
+// Documents: the search box always shows, subject/chapter/sort open on demand;
+// compact rows grouped by chapter (or one A–Z list).
+let docSort='chapter';
 function docs() {
   const c=controls('docs');
-  main.innerHTML=`${title('Thư viện tài liệu','Tìm và đọc tài liệu theo môn học và chương.')}<section class="card">${c.html}${field('Tìm tài liệu',input('search',filter.search,'search','placeholder="Tên tài liệu hoặc tên tệp"'))}${field('Sắp xếp',select('doc-sort',opt('title','Tên tài liệu A–Z')+opt('chapter','Theo chương')))}</section><div id="doclist" class="list section"></div>`;
+  const chapter=chapterLookup.get(filter.chapter), sub=state.subjects.find(s=>s.id===filter.subject);
+  const scope=chapter?chapterShort(chapter)+' · '+subjectName(chapter.subject):sub?sub.title:'Tất cả môn học';
+  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${chapter?link('chapter/'+chapter.id,'← '+chapterShort(chapter),'link'):link('home','← Tổng quan','link')}</nav>${title('Thư viện tài liệu','','compact-heading')}<section class="card filter-card"><label class="search-field"><span class="sr-only">Tìm tài liệu</span>${input('search',filter.search,'search','placeholder="Tìm theo tên tài liệu hoặc tên tệp"')}</label><details class="filter-more"><summary>Lọc và sắp xếp<small>${esc(scope)}</small></summary><div class="filter-more-body">${c.html}<div class="filters">${field('Sắp xếp',select('doc-sort',opt('chapter','Theo chương',docSort)+opt('title','Tên tài liệu A–Z',docSort)))}</div></div></details></section><div id="doclist" class="section"></div>`;
+  const order=new Map(state.chapters.map((chapter,i)=>[chapter.id,i]));
+  const row=(d,detail)=>`<div class="list-row"><a class="row-link" href="#doc/${esc(d.id)}"><strong>${esc(docLabel(d))}</strong><small>${detail}</small></a><a class="row-side" href="/api/documents/${esc(d.id)}?download" aria-label="Tải xuống: ${esc(docLabel(d))}">Tải xuống</a></div>`;
   const update=()=>{
     const term=filter.search.toLocaleLowerCase('vi');
-    const docs=state.documents.filter(q=>matches(q)&&[q.title,q.filename].some(s=>s.toLocaleLowerCase('vi').includes(term))).sort((a,b)=>(main.querySelector('[name=doc-sort]').value==='chapter'?chapterName(a.chapter).localeCompare(chapterName(b.chapter),'vi',{numeric:true}):0)||a.title.localeCompare(b.title,'vi',{numeric:true}));
-    main.querySelector('#doclist').innerHTML=docs.map(q=>`<article class="card listitem"><div><h3>${esc(docLabel(q))}</h3><small>${esc(chapterName(q.chapter))} · ${esc(q.filename)}</small></div><div class="actions">${link('doc/'+q.id,'Xem tài liệu','link')}<a class="btn" href="/api/documents/${q.id}?download">Tải xuống</a></div></article>`).join('')||empty('Chưa có tài liệu phù hợp.');
+    const docs=state.documents.filter(q=>matches(q)&&[q.title,q.filename].some(s=>s.toLocaleLowerCase('vi').includes(term))).sort((a,b)=>a.title.localeCompare(b.title,'vi',{numeric:true}));
+    let html;
+    if(docSort==='chapter'){
+      const groups=new Map();for(const d of docs){if(!groups.has(d.chapter))groups.set(d.chapter,[]);groups.get(d.chapter).push(d);}
+      html=[...groups].sort((a,b)=>(order.get(a[0])??1e9)-(order.get(b[0])??1e9)).map(([id,list])=>`<section class="doc-group"><h2>${esc(chapterName(id))}<small>${list.length} tài liệu</small></h2><div class="panel">${list.map(d=>row(d,esc(d.filename))).join('')}</div></section>`).join('');
+    } else html=docs.length?`<div class="panel">${docs.map(d=>row(d,esc(chapterName(d.chapter))+' · '+esc(d.filename))).join('')}</div>`:'';
+    main.querySelector('#doclist').innerHTML=html||empty('Chưa có tài liệu phù hợp.');
   };
-  update();bindFilters();on('[name=doc-sort]','change',update);
+  update();bindFilters();on('[name=doc-sort]','change',(_,el)=>{docSort=el.value;update();});
   on('[name=search]','input',(_,el)=>{filter.search=el.value;update();});
 }
 async function readDocx(path) {
@@ -760,10 +813,18 @@ function stats() {
   const m=metrics();
   const misses = new Map(Object.entries(state.progress.mistakes));
   const frequent=[...misses].filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
-  main.innerHTML=`${title('Thống kê học tập')}<div class="grid metrics">${metric('Bài đã làm',m.h.length)}${metric('Câu đã trả lời',m.answered)}${metric('Tổng câu đúng',m.correct)}${metric('Tổng câu sai',m.wrong)}${metric('Tỷ lệ chính xác',m.accuracy+'%')}${metric('Điểm trung bình',m.average+'/10')}${metric('Câu sai từ 2 lần',frequent.length)}</div>
-  <div class="split"><section class="card"><h2>Tiến độ theo môn và chương</h2>${state.subjects.map(s=>{const chapters=state.chapters.filter(c=>c.subject===s.id), n=coverage(chapters);return `<details class="section"><summary>${esc(s.title)} · ${n}%</summary>${bar(n)}${chapters.map(c=>`<small>${esc(c.title)} · ${coverage([c])}%</small>${bar(coverage([c]))}`).join('')}</details>`;}).join('')}</section><section class="card"><h2>Câu thường trả lời sai</h2>${frequent.length?`<ol>${frequent.map(([id,n])=>`<li>${esc(questionLookup.get(id)?.prompt||'Câu hỏi đã xóa')} · ${n} lần</li>`).join('')}</ol>`:'<p class="muted">Chưa có câu nào sai từ hai lần.</p>'}</section></div>
+  // One summary line instead of number tiles; each frequent mistake opens its
+  // answer and the chapter's "Ôn câu sai" practice.
+  const summary=m.h.length?`${m.h.length} bài đã nộp · ${m.answered} câu đã trả lời · đúng ${m.accuracy}% (${m.correct}/${m.answered} câu) · điểm trung bình ${scoreText(m.average)}/10`:'Chưa nộp bài nào.';
+  const mistakeRow=([id,n])=>{const q=questionLookup.get(id);
+    return q?`<div class="list-row"><a class="row-link is-clamped" href="#quizanswers/${esc(q.chapter)}?q=${esc(q.id)}"><strong>${esc(q.prompt)}</strong><small>Sai ${n} lần · ${esc(chapterName(q.chapter))}</small></a><a class="row-side" href="#quiz/${esc(q.chapter)}?mode=review">Ôn câu sai</a></div>`
+      :`<div class="list-row"><span class="row-link"><strong>Câu hỏi đã xóa</strong><small>Sai ${n} lần</small></span></div>`;};
+  const progress=state.subjects.map(s=>{const chapters=state.chapters.filter(c=>c.subject===s.id), n=coverage(chapters);
+    return `<details class="progress-group"><summary><span>${esc(s.title)}</span><span class="progress-value">${bar(n)}<small>${n}%</small></span></summary><ul class="progress-list">${chapters.map(c=>{const v=coverage([c]);return `<li><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a><span class="progress-value">${bar(v)}<small>${v}%</small></span></li>`;}).join('')}</ul></details>`;}).join('');
+  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('home','← Tổng quan','link')}</nav>${title('Thống kê học tập','','compact-heading')}<p class="stats-summary">${summary}${frequent.length?` · ${frequent.length} câu sai từ 2 lần`:''}</p>
+  <div class="split stats-split"><section><h2>Tiến độ theo môn và chương</h2><div class="panel progress-panel">${progress}</div></section><section><h2>Câu thường trả lời sai</h2>${frequent.length?`<div class="panel">${frequent.map(mistakeRow).join('')}</div>`:'<p class="muted">Chưa có câu nào sai từ hai lần.</p>'}</section></div>
+  ${studyStats()}
   <section class="section"><h2>Lịch sử học tập</h2>${historyList(state.history.slice(0,historyLimit))}${state.history.length>historyLimit?'<div class="pager"><button id="more-history">Xem thêm bài làm</button></div>':''}</section>`;
-  main.insertAdjacentHTML('beforeend',studyStats());
   on('#more-history','click',()=>{historyLimit+=20;stats();});
 }
 function account() {
@@ -949,7 +1010,7 @@ async function render() {
   const route = current || 'home';
   const group = parents[route] || route;
   document.body.classList.toggle('taking-quiz', route === 'attempt' && activeAttempt?.id === id && !activeAttempt.finished);
-  document.body.classList.remove('review-quiz', 'focus-study', 'has-start-bar');
+  document.body.classList.remove('review-quiz', 'focus-study', 'has-start-bar', 'reading-page');
   renderNavigation(group);
   if (previousHash !== location.hash) {
     if (['quiz','essay','docs'].includes(previousGroup)) filterMemory[previousGroup] = {...filter};
@@ -1083,6 +1144,25 @@ window.addEventListener('keydown', event => {
     && !event.target.closest?.('input, textarea, select, [contenteditable="true"]') && !document.body.classList.contains('open')) {
     const control = main.querySelector(event.key === 'ArrowLeft' ? '[data-key-prev]' : '[data-key-next]');
     if (control && !control.disabled && !control.hasAttribute('aria-disabled')) { event.preventDefault(); control.click(); }
+  }
+  // Desktop shortcuts on question screens: 1–6 or A–F pick an option, Enter
+  // presses the main button (check / next / submit / reveal), M flags.
+  if (!event.target.closest?.('input, textarea, select, [contenteditable="true"]') && !event.altKey && !event.ctrlKey && !event.metaKey
+    && !document.body.classList.contains('open') && !document.querySelector('dialog[open]')) {
+    const attemptCard = main.querySelector('#question-card');
+    const scope = attemptCard || (main.querySelector('#quiz-answer-list[data-mode="single"]') && main.querySelector('.quiz-answer-card'));
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    const pick = '123456'.includes(key) ? '123456'.indexOf(key) : 'abcdef'.includes(key) ? 'abcdef'.indexOf(key) : -1;
+    if (scope && pick >= 0 && !event.shiftKey) {
+      const option = scope.querySelectorAll('[data-option], [data-guess-option]')[pick];
+      if (option && !option.disabled) { event.preventDefault(); option.click(); }
+    } else if (scope && key === 'Enter' && (!event.target.closest?.('button, a, summary') || event.target.closest('[data-option], [data-guess-option]'))) {
+      const action = attemptCard ? main.querySelector('#next') : (main.querySelector('.study-nav [data-reveal]') || main.querySelector('.study-nav [data-key-next]'));
+      if (action && !action.disabled) { event.preventDefault(); action.click(); }
+    } else if (attemptCard && key === 'm') {
+      const flag = main.querySelector('#flag');
+      if (flag && !flag.disabled) { event.preventDefault(); flag.click(); }
+    }
   }
   if (event.key === 'Escape') {
     setMenu(false);

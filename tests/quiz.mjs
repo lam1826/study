@@ -259,3 +259,26 @@ const homeEntry=(await call('api/state?compact=1')).history.find(entry=>entry.id
 assert.equal(homeEntry.mode,'exam');assert.equal(homeEntry.total,5);assert.equal(homeEntry.answered,2);assert.ok(homeEntry.deadline>Date.now());assert.equal(homeEntry.finished,null);
 assert.ok(!('items' in homeEntry)&&!('answers' in homeEntry),'compact state carries no answer keys');
 console.log('PASS: unfinished attempts in the state carry mode, size, answered count and deadline (no keys).');
+
+// Self-test retry ("Luyện lại các câu đoán sai"): an explicit list of quiz
+// questions from one chapter, still two D1 round trips; anything else is refused.
+const ownQuiz=bank.filter(q=>q.kind==='quiz'&&q.chapter==='distributed-1'), otherQuiz=bank.find(q=>q.kind==='quiz'&&q.chapter!=='distributed-1');
+const ownEssay=bank.find(q=>q.kind==='essay'&&q.chapter==='distributed-1');
+const pickedIds=[ownQuiz[3].id,ownQuiz[0].id,ownQuiz.at(-1).id];
+const guessRetry=await roundTrips('api/attempt','POST',{chapter:'distributed-1',tier:'all',mode:'practice',count:3,questionIds:pickedIds});
+assert.equal(guessRetry.count,2);
+assert.deepEqual(guessRetry.result.attempt.items.map(q=>q.id).sort(),[...pickedIds].sort());
+for(const q of guessRetry.result.attempt.items){const source=ownQuiz.find(x=>x.id===q.id);assert.ok(q.options.every(o=>source.options.find(x=>x.id===o.id)?.text===o.text));assert.deepEqual(q.correct,source.correct);}
+const examRetry=await call('api/attempt','POST',{chapter:'distributed-1',tier:'all',mode:'exam',minutes:5,count:2,questionIds:pickedIds.slice(0,2)});
+assert.ok(examRetry.attempt.items.every(q=>!('correct' in q)&&!('explanation' in q)));
+const refused=[
+  {questionIds:[otherQuiz.id],count:1},
+  {questionIds:[ownEssay.id],count:1},
+  {questionIds:[pickedIds[0],pickedIds[0]],count:2},
+  {questionIds:pickedIds,count:2},
+  {questionIds:[],count:1},
+  {questionIds:'x',count:1},
+  {questionIds:pickedIds,count:3,mode:'review'}
+];
+for(const extra of refused) await call('api/attempt','POST',{chapter:'distributed-1',tier:'all',mode:'practice',...extra},'u',400);
+console.log('PASS: a practice attempt can be built from an explicit list of the chapter’s quiz questions (2 D1 round trips); other chapters, essays, duplicates, a wrong count and review mode are refused.');

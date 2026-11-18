@@ -10,7 +10,7 @@ const same = (actual, expected, message) => assert.deepEqual(JSON.parse(JSON.str
 const helpers = {};
 vm.createContext(helpers);
 vm.runInContext(readFileSync('web/answer-key.js', 'utf8'), helpers);
-const {answerIds, answerMatches, lettered, keyLetters, chosenLetters, joinLetters, explanationParts, answerSections} = helpers;
+const {answerIds, answerMatches, lettered, keyLetters, chosenLetters, joinLetters, explanationParts, answerSections, noteParts} = helpers;
 const course = JSON.parse(readFileSync('content/course.json', 'utf8'));
 const explanations = JSON.parse(readFileSync('content/explanations.json', 'utf8'));
 const guides = JSON.parse(readFileSync('content/essay-guides.json', 'utf8'));
@@ -86,3 +86,37 @@ for (const q of essays) {
 same(answerSections('Chỉ một đoạn.').map(s => s.kind), ['main']);
 assert.equal(answerSections('### Trả lời\n```\n### không phải tiêu đề\n```').length, 1);
 console.log('PASS: 228 essay answers keep every line and show answer → explanation → example → source.');
+
+// 4. "Lưu ý:" notes get their own block: a display split only, no text lost.
+const squash = value => String(value).replace(/\s/g, '');
+const checkNotes = (paragraph, label) => {
+  const parts = noteParts(paragraph);
+  assert.equal(squash(parts.map(part => part.text).join(' ')), squash(paragraph), 'note split keeps every character: ' + label);
+  assert.ok(parts.every(part => ['text', 'note'].includes(part.kind) && part.text), label);
+  return parts.filter(part => part.kind === 'note').length;
+};
+// Notes: the two "Lưu ý:" sentences and seven warnings about the question bank
+// itself (disputed key kept, question worded too broadly, figure without source).
+const noted = ['83c7d4a2', 'f6c3af57', '8175e08c', 'aedf5225', '44c96e78', 'ff928cd4', '8e50f356', 'db8bda76', '43fef432'];
+let quizNotes = 0, quizParagraphs = 0;
+const withNotes = [];
+for (const q of quiz) {
+  const paragraphs = explanationParts(explanations[q.id], keyTexts(q)).why.split(/\n\s*\n/);
+  let notes = 0;
+  for (const paragraph of paragraphs) { quizParagraphs++; notes += checkNotes(paragraph, q.id); }
+  if (notes) withNotes.push(q.id.slice(0, 8));
+  quizNotes += notes;
+  // A note never takes the whole explanation: some reasoning is always left.
+  assert.ok(paragraphs.flatMap(paragraph => noteParts(paragraph)).some(part => part.kind === 'text'), 'reasoning kept: ' + q.id);
+}
+same(withNotes.sort(), [...noted].sort(), 'explanations with a note');
+assert.equal(quizNotes, 9);
+same(noteParts('Lý do. Có mâu thuẫn về ngày trong đáp án gốc: A. Giữ nguyên khóa chấm.'), [{kind:'text', text:'Lý do.'}, {kind:'note', text:'Có mâu thuẫn về ngày trong đáp án gốc: A. Giữ nguyên khóa chấm.'}]);
+same(noteParts('Mâu thuẫn dân tộc là mâu thuẫn chủ yếu.'), [{kind:'text', text:'Mâu thuẫn dân tộc là mâu thuẫn chủ yếu.'}]);
+let essayNotes = 0, essayParagraphs = 0;
+for (const q of essays) for (const section of answerSections(guides[q.id].explanation)) for (const paragraph of section.body.split(/\n\s*\n/)) { essayParagraphs++; essayNotes += checkNotes(paragraph, q.id); }
+assert.equal(essayNotes, 0);
+same(noteParts('Lý do chính. Lưu ý: đây là ghi chú.'), [{kind:'text', text:'Lý do chính.'}, {kind:'note', text:'Lưu ý: đây là ghi chú.'}]);
+same(noteParts('Lưu ý: chỉ có ghi chú.'), [{kind:'note', text:'Lưu ý: chỉ có ghi chú.'}]);
+same(noteParts('Không lưu ý gì ở đây: chữ thường.'), [{kind:'text', text:'Không lưu ý gì ở đây: chữ thường.'}]);
+console.log('PASS: "Lưu ý" notes split from ' + quizParagraphs + ' paragraphs of 118 quiz explanations (9 notes: 2 "Lưu ý:" + 7 question-bank warnings) and ' + essayParagraphs + ' paragraphs of 228 essay answers without losing text.');

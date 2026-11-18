@@ -163,6 +163,9 @@ async function api(request, env, path, owner) {
     needed(['practice','exam','review'].includes(data.mode) && ['main','extra','all'].includes(data.tier) && Number.isInteger(data.count) && data.count>=1 && data.count<=100,'Cấu hình bài làm không hợp lệ.');
     if (data.mode==='exam') needed(Number.isInteger(data.minutes) && data.minutes>=1 && data.minutes<=180,'Thời gian thi từ 1 đến 180 phút.');
     if (Array.isArray(data.ids)) needed(data.previous,'Cần chọn bài để ôn lại.');
+    // Optional explicit question list (self-test "Luyện lại các câu đoán sai"):
+    // unique IDs of quiz questions in this chapter, practice/exam only.
+    if (data.questionIds!==undefined) needed(Array.isArray(data.questionIds) && data.questionIds.length>=1 && data.questionIds.length<=100 && data.questionIds.every(qid=>typeof qid==='string' && qid) && new Set(data.questionIds).size===data.questionIds.length && data.mode!=='review' && !Array.isArray(data.ids) && data.count===data.questionIds.length,'Danh sách câu hỏi không hợp lệ.');
     // Chapter, question pool and the previous attempt load in one round trip.
     const [chapterRows,questionRows,previousRows=[]]=(await db.batch([
       sql('SELECT id FROM chapters WHERE id=?',data.chapter),
@@ -178,6 +181,10 @@ async function api(request, env, path, owner) {
       const answers=parse(previous.answers);
       const misses=new Set(parse(previous.items).filter(q=>!matchesAnswer(answers[q.id],q.correct)).map(q=>q.id));
       qs=qs.filter(q=>misses.has(q.id));
+    } else if (Array.isArray(data.questionIds)) {
+      const wanted=new Set(data.questionIds);
+      qs=qs.filter(q=>wanted.has(q.id));
+      needed(qs.length===wanted.size,'Có câu hỏi không thuộc chương này.');
     } else if (data.tier!=='all') qs=qs.filter(q=>q.tier===data.tier);
     needed(qs.length,'Chương này chưa có câu hỏi phù hợp.');
     const pick=data.tier==='all'&&!data.ids ? [...shuffle(qs.filter(q=>q.tier==='main')),...shuffle(qs.filter(q=>q.tier==='extra'))] : shuffle(qs);

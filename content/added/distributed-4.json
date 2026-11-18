@@ -1,6 +1,172 @@
 [
   {
     "tier": "extra",
+    "prompt": "Ứng dụng di động chỉ cần mã và tiêu đề bài tập, trong khi API hiện trả thêm mô tả dài và nhiều trường không dùng. Truy vấn GraphQL nào thể hiện đúng mục tiêu giảm dữ liệu thừa?",
+    "options": [
+      "Chỉ chọn id và title trong trường assignments của lược đồ đã công bố.",
+      "Yêu cầu mọi trường rồi xóa các trường thừa sau khi đã tải toàn bộ xuống máy khách.",
+      "Đổi HTTP POST thành GET nhưng vẫn yêu cầu toàn bộ trường cũ.",
+      "Yêu cầu thêm nhiều quan hệ lồng không dùng để máy chủ tự suy đoán nhu cầu giao diện."
+    ],
+    "correct": 0,
+    "explanation": "GraphQL cho máy khách mô tả tập trường cần trả. Bỏ trường sau khi tải không giảm dữ liệu truyền; đổi method không tự thay đổi tập trường; yêu cầu thêm quan hệ không dùng đi ngược mục tiêu tránh over-fetching.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 2, mục 4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một truy vấn GraphQL lấy 20 bài tập bằng một truy vấn cơ sở dữ liệu; resolver của từng bài tập lại chạy một truy vấn riêng lấy lượt nộp. Nếu không gom truy vấn, nhận định nào đúng?",
+    "options": [
+      "Chỉ có đúng một truy vấn cơ sở dữ liệu vì máy khách chỉ gọi một endpoint.",
+      "Có thể phát sinh 21 truy vấn cơ sở dữ liệu; một yêu cầu GraphQL không đồng nghĩa một truy vấn cơ sở dữ liệu.",
+      "Có đúng 20 truy vấn vì truy vấn lấy danh sách cha không được tính vào chi phí.",
+      "Không thể có N+1 vì GraphQL tự động gom mọi resolver trong mọi triển khai."
+    ],
+    "correct": 1,
+    "explanation": "Tình huống gồm một truy vấn cha và 20 truy vấn con, tổng 21, đúng dạng N+1. Số yêu cầu HTTP không quyết định số truy vấn dữ liệu. Cần cơ chế gom tải phù hợp; không được giả định mọi resolver tự động được gộp.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 4, mục 4.1.3.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một API công khai trả danh sách khóa học với cấu trúc ổn định và cần tận dụng bộ nhớ đệm HTTP ở CDN, proxy. Theo tiêu chí trong chương, phương án khởi đầu hợp lý nhất là gì?",
+    "options": [
+      "Chọn GraphQL chỉ vì có một endpoint, rồi mặc nhiên cho rằng mọi POST được CDN lưu đệm như GET.",
+      "Tạo subscription cho mỗi lần xem danh sách dù dữ liệu và nhu cầu hiển thị ít thay đổi.",
+      "Ưu tiên endpoint REST đọc tài nguyên và thiết kế việc lưu đệm HTTP phù hợp.",
+      "Đổi sang GraphQL chỉ vì tên công nghệ mới hơn, không phân tích nhu cầu máy khách."
+    ],
+    "correct": 2,
+    "explanation": "Giáo trình ưu tiên REST khi tài nguyên ổn định và cần bộ nhớ đệm HTTP nhiều tầng. GraphQL vẫn có thể dùng chiến lược cache riêng, nhưng một endpoint hay POST không tự bảo đảm cache như GET; subscription và lựa chọn theo xu hướng không xuất phát từ nhu cầu đã nêu.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 5, mục 4.1.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi truy vấn có trường price nhưng lược đồ không định nghĩa trường đó. Trong quy trình GraphQL được mô tả, xử lý nào bảo vệ hợp đồng trước khi lấy dữ liệu?",
+    "options": [
+      "Tự thêm price vào lược đồ từ yêu cầu của máy khách rồi tiếp tục.",
+      "Luôn trả 0 cho mọi trường không có trong lược đồ để tránh báo lỗi.",
+      "Thực thi tất cả resolver trước rồi mới kiểm tra truy vấn có hợp lệ không.",
+      "Kiểm tra truy vấn với lược đồ và báo lỗi trường không hợp lệ trước khi thực thi resolver."
+    ],
+    "correct": 3,
+    "explanation": "Lược đồ xác định những trường được phép truy vấn; bước kiểm tra chặn yêu cầu không hợp lệ trước resolver. Tự thêm trường hoặc gán giá trị giả làm sai hợp đồng. Thực thi trước rồi mới kiểm tra đảo thứ tự được mô tả và có thể làm công việc không cần thiết.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 4, mục 4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Màn hình danh sách chỉ cần id, title; màn hình chi tiết cần thêm description và submissions. Nếu các trường đều đã có trong lược đồ, cách phát triển nào tận dụng GraphQL?",
+    "options": [
+      "Gửi hai truy vấn với tập trường khác nhau tới cùng endpoint và lược đồ hiện có.",
+      "Bắt buộc tạo hai endpoint mới tương ứng đúng tên hai màn hình.",
+      "Bắt mọi màn hình nhận cùng một tập trường đầy đủ bất kể nhu cầu.",
+      "Đổi toàn bộ tên trường trong lược đồ mỗi khi thêm một màn hình."
+    ],
+    "correct": 0,
+    "explanation": "Khác biệt nằm ở truy vấn của máy khách khi lược đồ đã hỗ trợ dữ liệu. Không cần tạo endpoint mới cho từng tổ hợp, ép mọi bên lấy dữ liệu thừa hoặc đổi hợp đồng đang có chỉ vì thêm cách hiển thị.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 4, mục 4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hệ thống có API danh mục đơn giản phục vụ đối tác và bảng điều khiển giảng viên cần nhiều tổ hợp dữ liệu. Quyết định nào phù hợp với phân tích lựa chọn API trong chương?",
+    "options": [
+      "Đã chọn GraphQL cho một màn hình thì bắt buộc xóa toàn bộ REST trong hệ thống.",
+      "Có thể giữ REST cho danh mục và dùng GraphQL cho bảng điều khiển khi nhu cầu truy vấn linh hoạt đủ rõ.",
+      "Mọi API công khai đều phải dùng GraphQL bất kể hợp đồng và yêu cầu cache.",
+      "Một ứng dụng không thể đồng thời có endpoint REST và GraphQL."
+    ],
+    "correct": 1,
+    "explanation": "REST và GraphQL có thể cùng phục vụ các ca sử dụng khác nhau. Giáo trình nêu cách phối hợp endpoint đơn giản cần cache với màn hình phức tạp. Không có ràng buộc phải thay toàn bộ công nghệ hay cấm chúng cùng tồn tại.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 6, mục 4.1.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi mở truy vấn lồng cho bảng điều khiển, một số truy vấn tiêu tốn nhiều thời gian phân giải và làm chậm máy chủ. Biện pháp nào giải quyết trực tiếp rủi ro nêu trong chương?",
+    "options": [
+      "Chỉ rút ngắn URL /graphql vì chi phí chủ yếu do độ dài địa chỉ.",
+      "Tăng số trường được phép lồng vô hạn để máy khách ít phải sửa truy vấn.",
+      "Giới hạn độ sâu, độ phức tạp truy vấn và cân nhắc bộ nhớ đệm ở tầng resolver.",
+      "Xóa bước kiểm tra lược đồ để mọi truy vấn đều được thực thi ngay."
+    ],
+    "correct": 2,
+    "explanation": "Chi phí phát sinh từ phân tích và thực thi những quan hệ phức tạp; giới hạn truy vấn và cache resolver tác động trực tiếp đến việc này. Rút ngắn URL không giải quyết chi phí dữ liệu; mở rộng vô hạn hoặc bỏ kiểm tra làm giảm kiểm soát thay vì khắc phục.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 6, mục 4.1.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách GraphQL nhận phản hồi có dữ liệu cho một số trường và errors cho trường khác bị lỗi lúc phân giải. Cách hiểu nào phù hợp với phần mở rộng thực tế trong giáo trình?",
+    "options": [
+      "GraphQL cấm tuyệt đối data và errors cùng xuất hiện nên mọi dữ liệu nhận được đều giả.",
+      "Chỉ cần thấy data là được bỏ qua errors và coi mọi trường đã tải đầy đủ.",
+      "Hễ có errors thì máy chủ chắc chắn chưa thực thi bất kỳ resolver nào.",
+      "Phản hồi có thể chứa đồng thời data và errors; máy khách cần xét cả dữ liệu sử dụng được lẫn lỗi."
+    ],
+    "correct": 3,
+    "explanation": "Lỗi khi phân giải một vài trường có thể đi kèm dữ liệu của các trường còn lại. Vì vậy không được mặc nhiên coi mọi trường thành công, cũng không thể suy ra chưa có resolver nào chạy. Cần phân biệt trường hợp này với truy vấn không hợp lệ bị chặn trước thực thi.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 12, mục 4.2.4–4.2.5.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.2.4–4.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm thiết kế lược đồ và resolver cho một màn hình mới. Những nhận định nào phân định đúng hợp đồng với triển khai? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Máy khách có thể yêu cầu bất kỳ trường nào tồn tại trong cơ sở dữ liệu dù lược đồ không công bố.",
+      "Lược đồ xác định kiểu, trường, tham số và thao tác được phép.",
+      "Resolver chịu trách nhiệm lấy dữ liệu cho trường tương ứng phía máy chủ.",
+      "Truy vấn của máy khách phải chứa toàn bộ mã truy cập cơ sở dữ liệu của resolver."
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Lược đồ là hợp đồng các khả năng công bố; resolver hiện thực việc lấy dữ liệu ở máy chủ. Trường trong cơ sở dữ liệu không tự thành trường được phép truy vấn, và máy khách mô tả dữ liệu cần chứ không gửi mã triển khai resolver.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 3, mục 4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Những tình huống nào cung cấp lý do cụ thể để cân nhắc GraphQL cho giao diện, theo vấn đề over-fetching và under-fetching? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Điện thoại phải tải nhiều trường dài mà màn hình chỉ dùng mã và tiêu đề.",
+      "Màn hình cần dữ liệu cố định từ một endpoint đơn giản đã đáp ứng đủ, và không có nhu cầu mới.",
+      "API có một lỗi chính tả trong tên biến nội bộ nên phải thay công nghệ giao tiếp.",
+      "Một màn hình phải gọi nhiều endpoint và ghép kết quả chỉ để có đủ dữ liệu liên quan cần hiển thị."
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "Tải dư trường là over-fetching; phải gọi nhiều điểm cuối để đủ dữ liệu màn hình là under-fetching. Đây là những nhu cầu GraphQL có thể hỗ trợ. Endpoint đơn giản đã đủ không tự tạo lý do đổi, còn lỗi tên biến nội bộ là vấn đề triển khai khác.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 2, mục 4.1.1–4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.1–4.1.2"
+  },
+  {
+    "tier": "extra",
     "prompt": "Màn hình chỉ cần tên và điểm của bài nộp, nhưng endpoint REST hiện trả thêm nhiều trường không dùng. GraphQL hỗ trợ giải quyết vấn đề này theo cách nào?",
     "options": [
       "Tự xóa những trường không dùng khỏi cơ sở dữ liệu.",

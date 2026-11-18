@@ -1,6 +1,172 @@
 [
   {
     "tier": "extra",
+    "prompt": "API nhận nhiều tác vụ dựng báo cáo, mỗi tác vụ mất vài phút. Sau khi chuyển tác vụ sang hàng đợi, chỉ số nào có cơ sở cải thiện trực tiếp dù thuật toán dựng báo cáo chưa đổi?",
+    "options": [
+      "Thời gian API giữ yêu cầu HTTP chờ tác vụ hoàn tất.",
+      "Thời gian CPU cần để dựng từng báo cáo chắc chắn giảm.",
+      "Mỗi báo cáo chắc chắn được xử lý ngay dù mọi worker đều dừng.",
+      "Mọi báo cáo đều hoàn tất trước khi API trả trạng thái đã tiếp nhận."
+    ],
+    "correct": 0,
+    "explanation": "Hàng đợi chuyển phần chờ xử lý sang worker, cho phép API phản hồi trạng thái tiếp nhận sớm. Nó không tự tối ưu thuật toán, không thay thế worker và không biến phản hồi tiếp nhận thành kết quả đã hoàn tất.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 12, mục 6.3.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một vòng lặp cần kiểm tra hàng đợi rồi tiếp tục công việc khác ngay nếu chưa có thông điệp. Theo giao diện hàng đợi trong giáo trình, thao tác nào phù hợp nhất?",
+    "options": [
+      "get: chờ đến khi có thông điệp mới.",
+      "poll: trả về ngay khi hàng đợi rỗng.",
+      "put: đưa thêm một thông điệp kiểm tra vào hàng đợi.",
+      "notify: bắt buộc vòng lặp chờ trong lời gọi đến khi có thông điệp."
+    ],
+    "correct": 1,
+    "explanation": "poll là thao tác lấy không chặn nên đáp ứng yêu cầu kiểm tra tức thời. get có thể chặn khi rỗng; put dùng để gửi. notify đăng ký callback, không có đặc tính bắt buộc chờ như phương án nêu.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 2, mục 6.1.1.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.1.1"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai worker cùng nhận việc từ một hàng đợi, nhưng nhóm vận hành muốn mỗi công việc được cả hai worker xử lý độc lập. Vì sao cấu hình hiện tại chưa đáp ứng mục tiêu đó?",
+    "options": [
+      "Chỉ worker khởi động đầu tiên có thể nhận mọi công việc vĩnh viễn.",
+      "Producer bắt buộc phải gọi HTTP tới từng worker trước khi gửi hàng đợi.",
+      "Các worker cùng hàng đợi chia nhau công việc; cấu hình này không tạo một bản sao cho từng worker.",
+      "Thêm worker tự động biến mỗi công việc thành hai bản sao riêng biệt."
+    ],
+    "correct": 2,
+    "explanation": "Mẫu worker dùng hàng đợi để phân phối công việc giữa các consumer, không phải phát bản sao cho mọi consumer. Thứ tự khởi động không trao độc quyền vĩnh viễn; producer cũng không cần biết hay gọi trực tiếp từng worker. Vì vậy tăng worker chưa tạo cơ chế phát đến tất cả.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 4, mục 6.1.3.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.1.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Worker đã ghi kết quả một tác vụ vào cơ sở dữ liệu nhưng mất kết nối trước khi ACK; sau đó tác vụ được giao lại. Thiết kế nào xử lý đúng nguy cơ này?",
+    "options": [
+      "ACK ngay khi nhận trước mọi xử lý để bảo đảm kết quả không bao giờ mất.",
+      "Đổi tên hàng đợi sau mỗi tác vụ để loại bỏ nhu cầu nhận diện trùng.",
+      "Cho rằng đã dùng ACK thì broker bảo đảm nghiệp vụ chỉ chạy đúng một lần.",
+      "Dùng định danh tác vụ và cơ chế xử lý lũy đẳng hoặc khử trùng lặp ở ứng dụng."
+    ],
+    "correct": 3,
+    "explanation": "At-least-once có thể giao lại thông điệp sau khi kết quả nghiệp vụ đã được ghi, nên ứng dụng cần nhận diện và xử lý lần lặp an toàn. ACK sớm có thể mất công việc chưa hoàn tất; đổi tên hàng đợi không giải quyết tác dụng phụ đã xảy ra. ACK không tự cung cấp đúng một lần ở cấp nghiệp vụ.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một thông điệp thiếu dữ liệu bắt buộc nên luôn thất bại; thử lại không thể sửa nội dung. Với dead-letter exchange đã cấu hình, cách xử lý nào tránh vòng lặp vô ích và giữ khả năng xem xét thông điệp lỗi?",
+    "options": [
+      "NACK với requeue=false để thông điệp được chuyển theo cấu hình dead-letter.",
+      "NACK với requeue=true vô hạn để tăng cơ hội nội dung tự thay đổi.",
+      "ACK thông điệp rồi kỳ vọng broker vẫn đưa nó sang dead-letter.",
+      "Giữ thông điệp chưa ACK mãi để các worker khác không nhận được việc."
+    ],
+    "correct": 0,
+    "explanation": "requeue=false ngừng đưa thông điệp hỏng trở lại hàng đợi đang xử lý; cấu hình dead-letter cho phép cách ly nó. requeue=true vô hạn không sửa dữ liệu. ACK xác nhận hoàn tất nên không phải đường đưa lỗi sang dead-letter, còn giữ chưa ACK mãi gây chiếm tài nguyên.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trên cùng channel, thông điệp có delivery tag 41 còn đang xử lý, còn tag 42 đã xong. Nếu chỉ muốn xác nhận tag 42, lựa chọn nào tránh xác nhận nhầm tag 41?",
+    "options": [
+      "ACK tag 42 với multiple=true.",
+      "ACK tag 42 với multiple=false.",
+      "ACK tag 41 với multiple=true.",
+      "ACK tag 41 với multiple=false."
+    ],
+    "correct": 1,
+    "explanation": "multiple=false chỉ áp dụng cho delivery tag được chỉ định. multiple=true với tag 42 còn bao gồm các tag nhỏ hơn hoặc bằng 42 nên có thể xác nhận sớm tag 41. Hai phương án ACK tag 41 đều xác nhận sai công việc và chưa xác nhận riêng tag 42.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Producer dùng default exchange (tên rỗng), worker nghe queue demo.task.queue, nhưng producer đặt routing key là demo.tasks.queue. Điều chỉnh nào sửa đúng sai lệch định tuyến trong mô hình này?",
+    "options": [
+      "Giữ nguyên routing key, chỉ đổi ContentType thành application/json.",
+      "Giữ nguyên routing key, chỉ tăng số worker nghe queue cũ.",
+      "Dùng chung hằng tên queue và đặt routing key đúng bằng demo.task.queue.",
+      "Giữ nguyên routing key, chỉ tăng thời gian chờ ACK của consumer."
+    ],
+    "correct": 2,
+    "explanation": "Với default exchange, routing key phải trùng tên hàng đợi đích. Hằng dùng chung giúp tránh lỗi gõ tên giữa các project. ContentType mô tả định dạng, số worker thay đổi năng lực xử lý, còn thời gian ACK liên quan xác nhận; cả ba không sửa địa chỉ hàng đợi bị viết sai.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 8, mục 6.2.3.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.2.3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một API tạo kết nối TCP RabbitMQ mới cho từng tác vụ nhỏ rồi đóng ngay; chi phí thiết lập kết nối tăng cao. Cải tiến nào phù hợp với hướng dẫn vận hành kết nối của giáo trình?",
+    "options": [
+      "Chuyển toàn bộ payload sang văn bản ngắn nhưng vẫn mở kết nối mới mỗi lần.",
+      "Đưa mật khẩu vào mã nguồn để tránh đọc cấu hình mỗi lần gửi.",
+      "Bỏ consumer ACK để chi phí bắt tay TCP tự biến mất.",
+      "Tái sử dụng kết nối TCP sống lâu thay vì tạo mới cho mỗi thông điệp."
+    ],
+    "correct": 3,
+    "explanation": "Chi phí được nêu nằm ở việc tạo kết nối TCP lặp lại, nên tái sử dụng kết nối giải quyết trực tiếp. Rút ngắn payload không loại bỏ bắt tay kết nối; hardcode thông tin truy cập không phải cách quản lý kết nối tốt. ACK thuộc cơ chế xác nhận thông điệp, không thay cho quá trình mở TCP.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 10, mục 6.2.6.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.2.6"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm muốn tăng khả năng giữ công việc qua lần khởi động lại broker theo cơ chế bền vững trong giáo trình. Hai cấu hình nào cần phối hợp? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Khai báo hàng đợi durable.",
+      "Chỉ tăng số consumer, giữ mọi cấu hình lưu trữ như cũ.",
+      "Đánh dấu thông điệp là persistent.",
+      "Chỉ đặt ContentType=application/json."
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Hàng đợi durable nhằm giữ định nghĩa hàng đợi qua khởi động lại; thông điệp persistent yêu cầu cơ chế lưu bền cho nội dung. Đây là hai khía cạnh cần phối hợp, không phải cam kết tuyệt đối cho mọi dạng sự cố. Tăng consumer hoặc khai báo ContentType không thiết lập độ bền dữ liệu.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 6, mục 6.1.4.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.1.4"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi tách chức năng chấm bài sang worker, nhóm cần diễn giải đúng ranh giới giữa tiếp nhận và hoàn tất. Hai phát biểu nào đúng? (Chọn 2 đáp án đúng.)",
+    "options": [
+      "Producer chỉ được phản hồi sau khi đã tính xong điểm.",
+      "Producer có thể trả trạng thái đã tiếp nhận sau khi đưa công việc vào hàng đợi.",
+      "Worker phải biết danh tính mọi producer để xử lý được payload.",
+      "Worker xử lý công việc và có thể cập nhật trạng thái hoặc kết quả về sau."
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "Producer đóng gói và đưa việc vào hàng đợi, còn consumer thực hiện tác vụ và cập nhật kết quả. Vì vậy trạng thái tiếp nhận không đồng nghĩa đã chấm xong. Mẫu này tách producer khỏi consumer, nên worker cần hiểu hợp đồng thông điệp chứ không phải danh sách mọi bên gửi.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 4, mục 6.1.3.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, mục 6.1.3"
+  },
+  {
+    "tier": "extra",
     "prompt": "Lượng yêu cầu chấm bài tăng mạnh trong vài phút rồi giảm. Vai trò phù hợp nhất của hàng đợi giữa API và worker là gì?",
     "options": [
       "Đệm công việc để worker xử lý theo năng lực, giảm phụ thuộc thời điểm giữa tiếp nhận và xử lý.",

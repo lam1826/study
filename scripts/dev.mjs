@@ -13,7 +13,12 @@ import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 process.chdir(fileURLToPath(new URL('..', import.meta.url)));
-const arg = name => process.argv.find(value => value.startsWith('--' + name + '='))?.split('=')[1];
+const arg = name => {
+  const inline = process.argv.find(value => value.startsWith('--' + name + '='));
+  if (inline) return inline.slice(name.length + 3);
+  const index = process.argv.indexOf('--' + name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+};
 const port = Number(arg('port') || process.env.PORT || 8787);
 const latency = Number(arg('latency') || process.env.DEV_DB_LATENCY_MS || 0);
 const file = arg('db') || process.env.DEV_DB || '.dev/local.sqlite';

@@ -1,0 +1,482 @@
+[
+  {
+    "tier": "main",
+    "prompt": "Tại sao chuyển mạch lại giúp tăng băng thông trong mạng LAN?",
+    "options": [
+      "Giảm số lượng thiết bị kết nối",
+      "Tách biệt giao thông trên từng Segment (phân đoạn mạng)",
+      "Tăng tốc độ của từng thiết bị",
+      "Giảm số lượng Frame nhận"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Tách biệt giao thông trên từng Segment (phân đoạn mạng)\n\nVì sao đúng: Switch tách các miền va chạm theo cổng và cho phép nhiều cặp cổng truyền đồng thời.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 1.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Mục đích của việc đặt mật khẩu cho chế độ đặc quyền Privilege là gì?",
+    "options": [
+      "Để tăng tốc độ xử lý",
+      "Để bảo mật việc cấu hình Switch",
+      "Để ngăn chặn kết nối không dây",
+      "Để ngăn chặn kết nối từ xa"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Để bảo mật việc cấu hình Switch\n\nVì sao đúng: Chế độ đặc quyền cho phép truy cập các thao tác quản trị, nên cần giới hạn người được vào.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 2.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Tại sao cần xóa tập tin vlan.dat trước khi cấu hình Switch mới?",
+    "options": [
+      "Để giải phóng dung lượng",
+      "Để tránh xung đột thông tin VLAN cũ",
+      "Để cập nhật firmware",
+      "Để tăng cường bảo mật"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Để tránh xung đột thông tin VLAN cũ\n\nVì sao đúng: vlan.dat lưu cơ sở dữ liệu VLAN trên một số switch Cisco. VLAN cũ có thể tồn tại riêng với cấu hình khởi động.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 3.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Để xóa cấu hình khởi động của Switch, tập tin nào cần được xóa?",
+    "options": [
+      "config.text",
+      "vlan.dat",
+      "startup-config",
+      "running-config"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: startup-config\n\nVì sao đúng: startup-config là cấu hình được nạp khi khởi động. Trên Cisco IOS, thường dùng erase startup-config, với cách lưu vật lý tùy mẫu thiết bị.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 4.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Tại sao bộ đệm chia sẻ lại có ưu điểm hơn bộ đệm theo Port?",
+    "options": [
+      "Dung lượng bộ đệm lớn hơn",
+      "Giúp tối ưu hóa việc chuyển Frame",
+      "Không cần ghi nhận thời gian",
+      "Không cần phân bổ băng thông"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Giúp tối ưu hóa việc chuyển Frame\n\nVì sao đúng: Bộ nhớ dùng chung cấp phát dung lượng theo nhu cầu của từng cổng, giúp hấp thụ các đợt lưu lượng tăng tạm thời.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 5.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Thiết bị nào thường được sử dụng để thay thế Hub trong mạng LAN?",
+    "options": [
+      "Router",
+      "Switch",
+      "Firewall",
+      "Repeater"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Switch\n\nVì sao đúng: Switch thay hub bằng cách học địa chỉ MAC và gửi unicast đã biết tới đúng cổng.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 6.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chuyển mạch là kỹ thuật giúp giảm tắc nghẽn trong mạng nào?",
+    "options": [
+      "Ethernet",
+      "Token Bus",
+      "WAN",
+      "GAN"
+    ],
+    "correct": 0,
+    "explanation": "Đáp án đúng: Ethernet\n\nVì sao đúng: Chuyển mạch Ethernet tách luồng giữa các cổng và giảm việc dùng chung môi trường truyền.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 7.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Phương pháp chuyển mạch nào yêu cầu Switch nhận toàn bộ Frame trước khi chuyển đi?",
+    "options": [
+      "Fast-forward",
+      "Store-and-Forward",
+      "Fragment-free",
+      "Adaptive cut-through"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Store-and-Forward\n\nVì sao đúng: Store-and-forward nhận toàn bộ khung và kiểm tra FCS trước khi chuyển tiếp.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 8.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Switch có những thành phần nào cơ bản?",
+    "options": [
+      "CPU, RAM, Hệ điều hành",
+      "CPU, Ổ cứng, Màn hình",
+      "RAM, Đĩa quang, Card mạng",
+      "Flash, Hệ điều hành, Card âm thanh"
+    ],
+    "correct": 0,
+    "explanation": "Đáp án đúng: CPU, RAM, Hệ điều hành\n\nVì sao đúng: Switch quản lý có bộ xử lý, bộ nhớ và hệ điều hành để vận hành và cấu hình.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 9.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Lệnh nào được sử dụng để di chuyển từ chế độ đặc quyền Privilege sang chế độ cấu hình tổng thể Configuration mode?",
+    "options": [
+      "start",
+      "enable",
+      "config terminal",
+      "exit"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: config terminal\n\nVì sao đúng: configure terminal mở chế độ cấu hình toàn cục từ privileged EXEC.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 10.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chuyển mạch đối xứng yêu cầu các Port có đặc điểm gì?",
+    "options": [
+      "Khác băng thông",
+      "Cùng băng thông",
+      ". Được kết nối cố định",
+      "Được kết nối ngẫu nhiên"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Cùng băng thông\n\nVì sao đúng: Chuyển mạch đối xứng kết nối các cổng cùng tốc độ.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 11.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Lệnh nào được sử dụng để di chuyển từ chế độ EXEC người dùng sang chế độ đặc quyền Privilege?",
+    "options": [
+      "Start",
+      "Enable",
+      "Config",
+      "exit"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Enable\n\nVì sao đúng: enable chuyển từ user EXEC sang privileged EXEC.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 12.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "VLAN mặc định cho quản lý Switch là gì?",
+    "options": [
+      "VLAN 10",
+      "VLAN 100",
+      "VLAN 1",
+      "VLAN 1000"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: VLAN 1\n\nVì sao đúng: Trên nhiều switch Cisco, VLAN 1 là VLAN mặc định ban đầu. VLAN quản trị có thể được cấu hình sang VLAN khác.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 13.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Để cấu hình Switch, người dùng cần kết nối máy tính qua cổng nào của Switch?",
+    "options": [
+      "Port Ethernet",
+      "Port Console",
+      "Port USB",
+      "Port WAN"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Port Console\n\nVì sao đúng: Cổng console cho phép cấu hình cục bộ khi thiết bị chưa có kết nối quản trị qua IP.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 14.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Thời gian trễ của Switch được đo bằng đơn vị nào?",
+    "options": [
+      "Giây",
+      "Phút",
+      "Nano giây",
+      "Kilobyte"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: Nano giây\n\nVì sao đúng: Độ trễ là thời gian khung đi qua switch và thường được biểu diễn bằng microgiây.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 15.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Đèn LED nào trên Switch cho biết hệ thống đã được cấp nguồn và hoạt động tốt?",
+    "options": [
+      "Port Status LED",
+      "System LED",
+      "Remote Power Supply LED",
+      "Port Mode LED"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: System LED\n\nVì sao đúng: Đèn System báo trạng thái chung của thiết bị, với màu cụ thể tùy mẫu switch.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 16.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Đèn LED nào hiển thị trạng thái kết nối của từng Port?",
+    "options": [
+      "System LED",
+      "Remote Power Supply LED",
+      "Port Status LED",
+      "Start Mode LED"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: Port Status LED\n\nVì sao đúng: Ở chế độ hiển thị trạng thái cổng, LED tương ứng cho biết trạng thái liên kết của từng cổng.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 17.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Khi Switch nhận gói dữ liệu từ Port nào, nó sẽ ghi nhận địa chỉ MAC của thiết bị nào?",
+    "options": [
+      "Thiết bị nhận",
+      "Thiết bị gửi",
+      "Tất cả thiết bị",
+      "Thiết bị không hoạt động"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Thiết bị gửi\n\nVì sao đúng: Switch học địa chỉ MAC nguồn từ khung nhận được và liên kết nó với cổng vào.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 18.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Để cấu hình địa chỉ IP cho Switch, cần phải thực hiện ở chế độ nào?",
+    "options": [
+      "User EXEC",
+      "Privilege EXEC",
+      "VLAN",
+      "Management"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: VLAN\n\nVì sao đúng: IP quản trị thường được cấu hình ở chế độ giao diện của SVI, chẳng hạn interface vlan, tùy kiểu switch.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 19.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chuyển mạch bất đối xứng cho phép điều gì trong mạng?",
+    "options": [
+      "Sử dụng nhiều Port đồng thời",
+      "Dành băng thông nhiều hơn cho Port kết nối Server",
+      "Giảm thiểu thời gian trễ",
+      "Tăng số lượng Packet được chuyển"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Dành băng thông nhiều hơn cho Port kết nối Server\n\nVì sao đúng: Các cổng khác tốc độ có thể giao tiếp nhờ bộ đệm điều hòa chênh lệch tốc độ.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 20.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Trong chế độ chuyển mạch nào Switch sẽ kiểm tra lỗi bằng cách nhận đủ 64 byte đầu tiên của Frame?",
+    "options": [
+      "Store-and-Forward",
+      "Fast-forward",
+      "Fragment-free",
+      "Adaptive cut-through"
+    ],
+    "correct": 2,
+    "explanation": "Đáp án đúng: Fragment-free\n\nVì sao đúng: Fragment-free đợi 64 byte đầu để tránh chuyển tiếp nhiều khung quá ngắn. Việc kiểm tra FCS toàn khung cần store-and-forward.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 21.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chuyển mạch Lớp 2 dựa vào thông tin nào để quyết định cổng ra?",
+    "options": [
+      "Địa chỉ IP",
+      "Địa chỉ MAC",
+      "Địa chỉ Number Port",
+      "Địa chỉ Logic"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Địa chỉ MAC\n\nVì sao đúng: Switch tra MAC đích trong bảng MAC để xác định cổng ra khi đã học địa chỉ đó.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 22.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Tại sao Switch không có công tắc điện để bật tắt?",
+    "options": [
+      "Switch chỉ cần cắm điện là hoạt động",
+      "Switch không tiêu tốn điện năng",
+      "Switch tự động tắt khi không sử dụng",
+      "Switch sử dụng nguồn pin"
+    ],
+    "correct": 0,
+    "explanation": "Đáp án đúng: Switch chỉ cần cắm điện là hoạt động\n\nVì sao đúng: Nhiều mẫu switch được thiết kế chạy liên tục khi cấp nguồn, nhưng cách bật tắt còn tùy phần cứng.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 23.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Hai loại bộ đệm nào được sử dụng trong Ethernet Switch?",
+    "options": [
+      "Bộ đệm tĩnh và động",
+      "Bộ đệm theo Port và bộ đệm chia sẻ",
+      "Bộ đệm tuần tự và đồng thời",
+      "Bộ đệm dự phòng và chính"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Bộ đệm theo Port và bộ đệm chia sẻ\n\nVì sao đúng: Bộ đệm có thể được cấp theo từng cổng hoặc chia sẻ giữa các cổng.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 24.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Bridge và Switch học địa chỉ MAC bằng cách nào?",
+    "options": [
+      "Ghi nhận địa chỉ IP",
+      "Ghi nhận địa chỉ MAC nguồn trong Frame",
+      "Tham khảo bảng định tuyến",
+      "Ghi nhận địa chỉ Number Port"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Ghi nhận địa chỉ MAC nguồn trong Frame\n\nVì sao đúng: Bridge và switch học từ MAC nguồn của khung nhận trên cổng vào.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 25.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Chức năng chính của Ethernet Switch là gì?",
+    "options": [
+      "Tái tạo tín hiệu",
+      "Chọn lựa đường dẫn để gửi Frame",
+      "Phát sóng tín hiệu",
+      "Chọn lựa đường dẫn để gửi Packet"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Chọn lựa đường dẫn để gửi Frame\n\nVì sao đúng: Switch chuyển tiếp khung Ethernet giữa các cổng phù hợp dựa vào địa chỉ MAC.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 26.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Khi sử dụng lệnh help trong CLI, để hiển thị danh sách các lệnh có thể sử dụng, bạn phải làm gì?",
+    "options": [
+      "Nhập “!”",
+      "Nhập lệnh và “?”",
+      "Nhập lệnh mà không có khoảng trắng",
+      "Nhập lệnh sau đó nhấn Enter"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Nhập lệnh và “?”\n\nVì sao đúng: Dấu ? gọi trợ giúp theo ngữ cảnh của chế độ CLI hiện tại.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 27.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Switch thuần chuyển mạch hoạt động ở lớp nào của mô hình OSI?",
+    "options": [
+      "Lớp 1",
+      "Lớp 2",
+      "Lớp 3",
+      "Lớp 4"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Lớp 2\n\nVì sao đúng: Switch lớp 2 dùng địa chỉ MAC để chuyển tiếp khung ở lớp liên kết dữ liệu.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 28.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "Khi Switch vừa mới được cắm điện, LED hệ thống sẽ như thế nào trong quá trình POST?",
+    "options": [
+      "Bật màu xanh ngay lập tức",
+      "Tắt",
+      "Bật màu đỏ",
+      "Bật màu vàng"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Tắt\n\nVì sao đúng: Đèn System phản ánh trạng thái tự kiểm tra POST. Cách hiển thị cụ thể phụ thuộc model.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 29.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  },
+  {
+    "tier": "main",
+    "prompt": "LED trạng thái Port chuyển sang màu cam trong quá trình nào?",
+    "options": [
+      "Khi Port đang hoạt động",
+      "Khi Switch xây dựng bảng chuyển mạch theo cấu trúc mạng",
+      "Khi có lỗi phần cứng",
+      "Khi có thiết bị ngắt kết nối vào Port"
+    ],
+    "correct": 1,
+    "explanation": "Đáp án đúng: Khi Switch xây dựng bảng chuyển mạch theo cấu trúc mạng\n\nVì sao đúng: Đèn cam có thể báo cổng chưa chuyển tiếp trong quá trình hội tụ STP, tùy model và chế độ LED.\n\nNguồn đối chiếu: Mạng-lan-bài-2.docx, câu 30.",
+    "sources": [
+      "161a0a7b-f18a-5bf3-acb5-758d3e8b60df"
+    ],
+    "from": "Có trên website (do GPT nhập), chép về ngày 2026-11-18"
+  }
+]

@@ -1010,7 +1010,7 @@ async function render() {
   const route = current || 'home';
   const group = parents[route] || route;
   document.body.classList.toggle('taking-quiz', route === 'attempt' && activeAttempt?.id === id && !activeAttempt.finished);
-  document.body.classList.remove('review-quiz', 'focus-study', 'has-start-bar');
+  document.body.classList.remove('review-quiz', 'focus-study', 'has-start-bar', 'reading-page');
   renderNavigation(group);
   if (previousHash !== location.hash) {
     if (['quiz','essay','docs'].includes(previousGroup)) filterMemory[previousGroup] = {...filter};

@@ -117,7 +117,7 @@ async function essayItem(rawId,generation){
   const siblings=chapterEssays(item.chapter), index=siblings.findIndex(q=>q.id===id);
   const previous=siblings[index-1], next=siblings[index+1];
   let mode=initialMode,shown=initialShown;
-  document.body.classList.add('focus-study');
+  document.body.classList.add('focus-study','reading-page');
   const tabs=[['read','Đáp án'],['memorize','Học từng ý'],['write','Tự viết'],['compare','Đối chiếu']];
   main.innerHTML=`<div class="essay-view">
   <nav class="study-crumbs" aria-label="Vị trí câu hỏi">${link('essay/'+item.chapter,'← Danh sách câu','link')}<span>${esc(chapterName(item.chapter))}${index>=0?' · Câu '+(index+1)+'/'+siblings.length:''}</span>${link('essayanswers/'+item.chapter,'Đáp án cả chương','link')}</nav>
@@ -218,7 +218,7 @@ async function chapterAnswers(id,generation){
  const questions=await cachedApi(chapterAnswerCache,id,'essay-answers?chapter='+encodeURIComponent(id));if(generation!==viewGeneration)return;
  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('essay/'+id,'← Danh sách câu hỏi','link')}${link('chapter/'+id,'Tổng quan chương','link')}</nav>`+title('Đáp án tự luận cả chương',chapter.title,'compact-heading');
  if(!questions.length){main.insertAdjacentHTML('beforeend',empty('Chương này chưa có câu tự luận.'));return;}
- document.body.classList.add('focus-study');
+ document.body.classList.add('focus-study','reading-page');
  const byId=new Map(questions.map(q=>[q.id,q]));
  main.insertAdjacentHTML('beforeend',`<section class="card answer-toolbar"><div class="toolbar-row"><p class="toolbar-note-inline">${questions.length} câu · mỗi câu hiện câu hỏi và ý chính; mở đáp án đầy đủ khi cần.</p><button type="button" id="toggle-all-answers" aria-pressed="false">Mở tất cả đáp án</button></div>${contentLegend()}</section>
  <div id="chapter-answer-list">${['main','extra'].map(t=>{const group=questions.filter(q=>q.tier===t);if(!group.length)return '';return `<section class="answer-group"><h2>${tierLabel(t)} · ${group.length} câu</h2>${group.map(q=>{const i=questions.indexOf(q);return `<article class="answer-item chapter-answer" id="answer-${esc(q.id)}" data-index="${i}" tabindex="-1"><div class="question-top"><span class="badge">Câu ${i+1}/${questions.length}${q.code?' · '+esc(q.code):''}</span></div><h3 class="question-title">${esc(q.prompt)}</h3>${keyPointsBlock(q.key_points,4)}<details class="full-answer" data-answer="${esc(q.id)}"><summary><span class="when-closed">Xem đáp án đầy đủ</span><span class="when-open">Ẩn đáp án đầy đủ</span></summary><div class="full-answer-body"></div></details><div class="actions answer-item-actions">${link('essayitem/'+q.id+'?mode=answer','Học riêng câu này','link')}${link('essayitem/'+q.id+'?mode=write','Tự viết bài','link')}</div></article>`;}).join('')}</section>`;}).join('')}</div>

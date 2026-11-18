@@ -800,3 +800,8 @@ kbd { display:inline-block; min-width:1.5em; padding:0 .35rem; border:1px solid 
 /* Inside the attempt card the verdict and blocks are flat colour bands: the
    card is the only outline (no box inside a box). */
 .question-card .cblock, .question-card .verdict { border-color:transparent; }
+/* Essay reading pages (one question, whole chapter): one reading column. Text
+   runs the full width of each block, so the text, the coloured blocks, the
+   question and the buttons share one right edge (about 80 characters a line). */
+.reading-page main > * { max-width:46rem; }
+.reading-page .cblock p, .reading-page .answer-content p { max-width:none; }

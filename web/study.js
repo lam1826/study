@@ -145,11 +145,11 @@ async function flushEssay(session){
 window.addEventListener('beforeunload',event=>{if([...draftSessions.values()].some(s=>s.saving||Object.keys(s.pending).length)){event.preventDefault();event.returnValue='';}});
 window.addEventListener('online',()=>{for(const s of draftSessions.values())if(Object.keys(s.pending).length)flushEssay(s).catch(()=>{});});
 function chapterPage(id){
-  const c=chapterLookup.get(id);if(!c)return main.innerHTML=empty('Không tìm thấy chương.');
-  const n=chapterCounts(id), docs=state.documents.filter(d=>d.chapter===id);
+  const c=chapterLookup.get(id);if(!c)return main.innerHTML=empty('Không tìm thấy chương.')+`<div class="actions section">${link('subjects','← Danh sách môn học')}</div>`;
+  const n=chapterCounts(id), docs=state.documents.filter(d=>d.chapter===id), progress=coverage([c]);
   // Actions first so the learner reaches practice or answers in one tap;
   // the long overview follows (closed on phones).
-  main.innerHTML=title(c.title,subjectName(c.subject))+`<section class="card chapter-start"><h2>Bắt đầu học</h2><p class="muted">${[n.quiz&&n.quiz+' câu trắc nghiệm',n.essay&&n.essay+' câu tự luận',n.docs&&n.docs+' tài liệu'].filter(Boolean).join(' · ')||'Chương đang chờ bổ sung nội dung.'}</p>${chapterActions(id,n)}</section>
+  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('subject/'+c.subject,'← '+subjectName(c.subject),'link')}</nav>`+title(c.title,'')+`<section class="card chapter-start"><div class="chapter-row-head"><h2>Bắt đầu học</h2>${n.quiz||n.essay?`<span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span>`:''}</div>${chapterActions(id,n)}</section>
   <details class="card section chapter-overview" ${matchMedia('(min-width: 681px)').matches?'open':''}><summary><h2>Tổng quan kiến thức</h2></summary><div class="answer-content">${c.overview?richAnswer(c.overview):'<p>Đọc tài liệu của chương để ôn kiến thức nền, sau đó luyện trắc nghiệm và tự luận.</p>'}</div></details>
   ${docs.length?`<section class="card section"><h2>Tài liệu học tập</h2><div class="actions">${sourceLinks(docs.map(d=>d.id))}</div></section>`:''}`;
 }

@@ -252,3 +252,10 @@ const coldState=await coldWorker.fetch(new Request('https://example.test/api/sta
 assert.equal(coldState.status,200);assert.equal((await coldState.json()).questions.length,346);
 assert.equal(trips-coldBefore,2);
 console.log('PASS: a cold isolate loads the page state in two D1 round trips (was 11 calls, 5 of them sequential).');
+// The home review queue names unfinished attempts: mode, size, answers given, deadline.
+const homeExam=await call('api/attempt','POST',{...cfg,mode:'exam',minutes:7,count:5});
+await call('api/attempt/'+homeExam.id+'?compact=1','PATCH',{changes:homeExam.attempt.items.slice(0,2).map(q=>({question:q.id,option:q.selectionCount>1?q.options.slice(0,2).map(o=>o.id):q.options[0].id}))});
+const homeEntry=(await call('api/state?compact=1')).history.find(entry=>entry.id===homeExam.id);
+assert.equal(homeEntry.mode,'exam');assert.equal(homeEntry.total,5);assert.equal(homeEntry.answered,2);assert.ok(homeEntry.deadline>Date.now());assert.equal(homeEntry.finished,null);
+assert.ok(!('items' in homeEntry)&&!('answers' in homeEntry),'compact state carries no answer keys');
+console.log('PASS: unfinished attempts in the state carry mode, size, answered count and deadline (no keys).');

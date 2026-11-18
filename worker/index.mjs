@@ -67,7 +67,8 @@ async function api(request, env, path, owner) {
       sql('SELECT * FROM subjects ORDER BY rowid'),sql('SELECT * FROM chapters ORDER BY position,rowid'),
       sql('SELECT id,chapter,kind,tier,prompt,code FROM questions ORDER BY rowid'),
       sql('SELECT id,chapter,title,filename,mime FROM documents ORDER BY rowid'),
-      sql("SELECT id,chapter,created,finished,result, CASE WHEN finished IS NOT NULL THEN (SELECT json_group_array(json_object('id',json_extract(value,'$.id'),'correct',json_extract(value,'$.correct'))) FROM json_each(attempts.items)) END AS items, CASE WHEN finished IS NOT NULL THEN answers END AS answers FROM attempts WHERE owner=? ORDER BY created DESC,rowid DESC",owner),
+      // mode/total/answered/deadline let the home page name the attempt to resume.
+      sql("SELECT id,chapter,created,finished,result,deadline,json_extract(config,'$.mode') AS mode,json_array_length(attempts.items) AS total, CASE WHEN finished IS NULL THEN (SELECT count(*) FROM json_each(attempts.answers) AS a WHERE (a.type='text' AND a.value<>'') OR (a.type='array' AND json_array_length(a.value)>0)) END AS answered, CASE WHEN finished IS NOT NULL THEN (SELECT json_group_array(json_object('id',json_extract(value,'$.id'),'correct',json_extract(value,'$.correct'))) FROM json_each(attempts.items)) END AS items, CASE WHEN finished IS NOT NULL THEN answers END AS answers FROM attempts WHERE owner=? ORDER BY created DESC,rowid DESC",owner),
       sql('SELECT question,learned,status,viewed_at,answered_at,updated_at FROM essays WHERE owner=?',owner),sql('SELECT name FROM profiles WHERE id=?',owner)
     ])).map(result => result.results || []);
     let rows = await readState();

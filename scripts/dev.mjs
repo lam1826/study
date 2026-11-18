@@ -5,6 +5,8 @@
 //   DEV_ADMIN=1 npm run dev          owner (admin) account
 //   DEV_DB_LATENCY_MS=120 npm run dev  add latency to every D1 round trip
 //   node scripts/dev.mjs --port=8788 --latency=120 --admin --db=.dev/x.sqlite
+//   --host=0.0.0.0 opens it to the local network (phone testing). Anyone on
+//   that network then acts as the test account; the default is this machine only.
 import http from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
 import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
@@ -105,4 +107,4 @@ http.createServer(async (req, res) => {
     console.error(error);
     res.writeHead(500); res.end('Dev server error');
   }
-}).listen(port, () => console.log('Ôn Tập Việt Quiz (local): http://localhost:' + port + ' as ' + identity.email + (latency ? ', D1 latency ' + latency + ' ms' : '')));
+}).listen(port, arg('host') || '127.0.0.1', () => console.log('Ôn Tập Việt Quiz (local): http://' + (arg('host') || 'localhost') + ':' + port + ' as ' + identity.email + (latency ? ', D1 latency ' + latency + ' ms' : '')));

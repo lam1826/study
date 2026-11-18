@@ -4,7 +4,7 @@ Website ôn tập cá nhân bằng tiếng Việt với ngân hàng câu hỏi, 
 
 ## Phát triển
 
-Chạy `npm run check` và `npm run build` bằng Node.js. Bản dựng đặt tại `dist/server/index.js`. Worker cần binding `DB` (D1) và `BUCKET` (R2) và danh tính do ChatGPT Sites cấp. Cài đặt schema từ `drizzle/` khi xuất bản. Môi trường local và hosted dùng dữ liệu riêng.
+Chạy `npm run check`, `npm test` và `npm run build` bằng Node.js 24. Bản dựng đặt tại `dist/server/index.js`. `npm run dev` dựng rồi chạy bản local tại http://localhost:8787 với D1 giả lập bằng SQLite (`.dev/`), R2 trong bộ nhớ và tài khoản thử; thêm `--admin` để đăng nhập với vai trò chủ trang, `--latency=60` để giả lập độ trễ D1. Bản local không có tệp tài liệu gốc. Worker cần binding `DB` (D1) và `BUCKET` (R2) và danh tính do ChatGPT Sites cấp. Cài đặt schema từ `drizzle/` khi xuất bản. Môi trường local và hosted dùng dữ liệu riêng.
 
 ## Nạp nội dung
 
@@ -19,7 +19,7 @@ Ví dụ mỗi phần tử JSON có các trường `chapter`, `kind` (`quiz` ho�
 
 Tái tạo bằng `python3 scripts/extract-content.py <thư-mục-tài-liệu>` (cần python-docx). Dataset được nhập có đánh dấu phiên bản, ngoài migration, theo nhóm 50 câu; không ghi đè câu đã sửa. Tệp gốc nằm trong R2. Điểm nhập dịch vụ `/api/content-import?id=<id>` chỉ nhận PUT với bearer secret `CONTENT_IMPORT_TOKEN`, trước `CONTENT_IMPORT_EXPIRES_AT` (epoch milliseconds), đúng ID, kích thước và SHA-256 trong manifest. Không truyền danh tính người dùng giả; không có secret thì điểm nhập bị khóa. Không lưu giá trị secret trong source.
 
-Khởi động gửi CSS, JavaScript và dữ liệu cần thiết trong cùng trang HTML riêng tư; không chờ ba lượt mạng nối tiếp. Chuyển mục dùng dữ liệu trong bộ nhớ và cập nhật nền. Chọn đáp án cập nhật ngay, lưu theo nhóm, có thử lại khi mất mạng; nộp bài chờ xác nhận lưu. API lưu chỉ trả xác nhận nhỏ thay vì toàn bộ đề. Tự luận tải hiển thị 20 câu mỗi lượt. `npm test` kiểm tra nhập dữ liệu, đáp án nhiều lựa chọn, chấm điểm, bảo vệ nguồn và bài làm cá nhân.
+Trang `/` gửi khung giao diện ngay, kèm liên kết tới `/style.<hash>.css` và `/app.<hash>.js` (lưu đệm vĩnh viễn theo mã băm), rồi gửi tiếp dữ liệu riêng của người học trong cùng phản hồi; trình duyệt tải JS/CSS trong lúc server đọc D1, từ lần thứ hai không tải lại. Dữ liệu khởi động đọc bằng một lượt D1. Số đo trước/sau ở `PERFORMANCE.md`. Chuyển mục dùng dữ liệu trong bộ nhớ và cập nhật nền. Chọn đáp án cập nhật ngay, lưu theo nhóm, có thử lại khi mất mạng; nộp bài chờ xác nhận lưu. API lưu chỉ trả xác nhận nhỏ thay vì toàn bộ đề. Tạo bài làm trả về luôn bài làm nên mở bài không cần yêu cầu thứ hai. Tự luận tải hiển thị 20 câu mỗi lượt. `npm test` kiểm tra nhập dữ liệu, đáp án nhiều lựa chọn, chấm điểm, bảo vệ nguồn, bài làm cá nhân, việc xáo trộn giữ đáp án đi cùng nội dung, số lượt D1 của từng API và các hàm hiển thị trong `web/answer-key.js`.
 
 Chế độ Luyện tập trả đáp án trong đề để hiển thị đúng/sai ngay khi bấm, không chờ lưu qua mạng. Câu nhiều đáp án dùng nút Kiểm tra đáp án sau khi chọn đủ. Có thể thay lựa chọn để ôn tập; kết quả bài luyện tập tính theo các đáp án đang chọn khi nộp. Chế độ Thi thử không gửi đáp án hay giải thích xuống trình duyệt trước khi nộp hoặc hết giờ.
 
@@ -39,3 +39,11 @@ Trong Tự luận, nút **Xem đáp án** mở nội dung của một câu, có 
 
 ### Xem đáp án trắc nghiệm
 Vào Trắc nghiệm → chọn môn/chương → Xem đáp án trắc nghiệm. Trang `#quizanswers/<chapter>` hỗ trợ xem từng câu hoặc cả chương, lọc nhóm chính/bổ sung, hiện/ẩn đáp án, đánh dấu đủ các phương án đúng và hiển thị giải thích/nguồn. Xem đáp án không ghi lượt làm hay thay đổi tiến độ; chế độ thi thử vẫn chỉ trả đáp án sau khi nộp bài.
+
+## Màn hình học (bản cải tiến 18/11/2026)
+
+- **Trắc nghiệm**: thanh trên cùng gọn (chế độ, số câu đã trả lời, giờ thi, Nộp bài), đề bài hiện ngay. Mỗi phương án có chữ cái và nhãn chữ: `✓ Đáp án đúng`, `✕ Bạn chọn · Sai`, `● Đã chọn`; màu chỉ nhắc lại nhãn. Sau khi được xem đáp án có dòng kết luận (Chính xác / Chưa đúng, kèm chữ cái bạn chọn và đáp án đúng) và khối **“Vì sao đáp án … đúng?”** tách phần lý giải với nguồn đối chiếu. Dòng “Đáp án đúng: …” trong lời giải chỉ được ẩn khi trùng khớp khóa đáp án đã lưu. Thi thử chỉ hiện các nhãn này sau khi nộp.
+- **Điện thoại**: Câu trước / Câu tiếp nằm ở thanh cố định cuối màn hình (thay thanh điều hướng chính trong lúc làm bài và xem đáp án), ô số câu có dấu ✓/✕, phím ← → trên máy tính. Trang môn và chương chỉ hiện các nút chương đó thực sự có (Làm trắc nghiệm, Đáp án trắc nghiệm, Học tự luận, Đáp án tự luận, Tài liệu). Kiểm tra không tràn ngang ở 320 px.
+- **Xem đáp án trắc nghiệm**: Từng câu (mặc định trên điện thoại) hoặc Cả chương, nhớ lựa chọn trên máy; “Che đáp án để tự kiểm tra” rồi mở từng câu.
+- **Tự luận**: mở thẳng vào câu hỏi; bốn cách học (Đáp án, Học từng ý, Tự viết, Đối chiếu). Đáp án mở đầu bằng khung **Ý chính cần nhớ** đánh số, sau đó là Trả lời → Giải thích → Ví dụ → Nguồn (nguồn chữ nhỏ). Bản nháp, trạng thái và bảng tự đánh giá lưu như trước.
+- Màu đáp án đúng/sai dùng tông dịu, đạt tương phản WCAG AA ở cả chế độ sáng và tối.

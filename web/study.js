@@ -119,7 +119,7 @@ async function essayItem(rawId,generation){
   let mode=initialMode,shown=initialShown;
   document.body.classList.add('focus-study','reading-page');
   const tabs=[['read','Đáp án'],['memorize','Học từng ý'],['write','Tự viết'],['compare','Đối chiếu']];
-  main.innerHTML=`<div class="essay-view">
+  main.innerHTML=`<div class="reading-cols"><div class="essay-view reading-main">
   <nav class="study-crumbs" aria-label="Vị trí câu hỏi">${link('essay/'+item.chapter,'← Danh sách câu','link')}<span>${esc(chapterName(item.chapter))}${index>=0?' · Câu '+(index+1)+'/'+siblings.length:''}</span>${link('essayanswers/'+item.chapter,'Đáp án cả chương','link')}</nav>
   <article class="essay-sheet">
     <div class="question-top"><span class="badge">${esc(item.code||'Tự luận')}</span><small>${tierLabel(item.tier)} · <span id="essay-status-label"></span></small></div>
@@ -135,7 +135,8 @@ async function essayItem(rawId,generation){
       <details class="more-tools"><summary>Thêm thao tác</summary><div class="more-panel"><div class="actions"><button type="button" id="copy-answer">Sao chép đáp án</button><button type="button" id="print-answer">In đáp án</button></div>${field('Trạng thái chi tiết',select('study-state',Object.entries(studyStatuses).map(([v,t])=>opt(v,t,item.status)).join('')))}</div></details></div>
     ${item.sources.length?contentBlock('source',2,'Tài liệu liên quan',`<div class="actions source-links">${item.sources.map(sid=>state.documents.find(d=>d.id===sid)).filter(Boolean).map(d=>`<a class="btn link" target="_blank" rel="noopener" href="#doc/${esc(d.id)}">${esc(docLabel(d))}</a>`).join('')}</div>`):''}
   </article>
-  <nav class="answer-navigation study-nav" aria-label="Chuyển câu tự luận">${previous?`<a class="btn" data-essay-step="${esc(previous.id)}" data-key-prev href="#essayitem/${esc(previous.id)}"><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></a>`:'<span class="btn" aria-disabled="true"><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></span>'}<span class="question-position">${index+1}/${siblings.length}</span>${next?`<a class="btn primary" data-essay-step="${esc(next.id)}" data-key-next href="#essayitem/${esc(next.id)}"><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></a>`:'<span class="btn" aria-disabled="true"><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></span>'}</nav></div>`;
+  <nav class="answer-navigation study-nav" aria-label="Chuyển câu tự luận">${previous?`<a class="btn" data-essay-step="${esc(previous.id)}" data-key-prev href="#essayitem/${esc(previous.id)}"><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></a>`:'<span class="btn" aria-disabled="true"><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></span>'}<span class="question-position">${index+1}/${siblings.length}</span>${next?`<a class="btn primary" data-essay-step="${esc(next.id)}" data-key-next href="#essayitem/${esc(next.id)}"><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></a>`:'<span class="btn" aria-disabled="true"><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></span>'}</nav></div>
+  ${chapterToc(siblings,(q,at,inner)=>`<a class="toc-link" href="#essayitem/${esc(q.id)}" data-essay-step="${esc(q.id)}"${q.id===id?' aria-current="page"':''}>${inner}</a>`)}</div>`;
   const statusLabel=()=>{if(!location.hash.startsWith('#essayitem/'+id))return;const e=main.querySelector('#essay-save');if(e)e.textContent=session.error||(session.saving||Object.keys(session.pending).length?'Đang lưu…':'Đã lưu vào tài khoản');const retry=main.querySelector('#retry-essay');if(retry)retry.hidden=!session.error;const status=main.querySelector('#essay-status-label');if(status)status.textContent=(item.status==='mastered'?'✓ ':'')+studyStatuses[item.status||'unseen'];main.querySelectorAll('[data-status-toggle]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.statusToggle===item.status)));const select=main.querySelector('[name=study-state]');if(select)select.value=item.status||'unseen';};session.notify=statusLabel;
   function save(patch){Object.assign(item,patch);Object.assign(session.pending,patch);session.error='';setEssayProgress(id,{status:item.status,viewed_at:item.viewed_at,answered_at:item.draft?.trim()?item.answered_at||Date.now():item.answered_at});statusLabel();clearTimeout(session.timer);session.timer=setTimeout(()=>flushEssay(session).catch(()=>{}),700);}
   function viewed(){if(!item.viewed_at){item.viewed_at=Date.now();save({viewed:true,...(item.status==='unseen'?{status:'viewed'}:{})});main.querySelector('[name=study-state]').value=item.status;}}
@@ -173,6 +174,7 @@ async function essayItem(rawId,generation){
   on('.recall-point,.kp-peek','toggle',(_,d)=>{if(d.open)viewed();});
   draw();
   if(mode==='write')main.querySelector('#essay-draft').focus();
+  tocReveal(main.querySelector('.chapter-toc'),main.querySelector('.chapter-toc [aria-current]'));
   prefetchEssay(next?.id);prefetchEssay(previous?.id);
 }
 async function flushEssay(session){
@@ -210,6 +212,21 @@ function mountStudyAdmin(){
  on('[data-rename-doc]','click',async(_,b)=>{const d=state.documents.find(x=>x.id===b.dataset.renameDoc),name=prompt('Tên tài liệu',d.title);if(!name?.trim())return;await api('documents/'+d.id,{title:name},'PATCH');await refresh();});
 }
 
+// The chapter's questions as a list on the right of the essay reading pages
+// (shown from 1200 px): number, prompt and a written status mark. `link`
+// builds each entry from (question, position in the page order, inner HTML).
+function chapterToc(questions,link){
+ const groups=['main','extra'].map(t=>[t,questions.filter(q=>q.tier===t)]).filter(([,group])=>group.length);
+ const mark=q=>{const status=essayStatusOf(q.id);return status==='mastered'?'<span class="toc-mark" title="Đã thuộc">✓<span class="sr-only"> đã thuộc</span></span>':status==='review'?'<span class="toc-mark is-review" title="Cần ôn lại">↻<span class="sr-only"> cần ôn lại</span></span>':'';};
+ let position=0;
+ return `<aside class="chapter-toc" aria-label="Câu trong chương"><h2>Câu trong chương <small>${questions.length} câu</small></h2>${groups.map(([t,group])=>`${groups.length>1?`<h3>${tierLabel(t)}</h3>`:''}<ol>${group.map(q=>`<li>${link(q,position++,`<span class="toc-num">${questions.indexOf(q)+1}</span><span class="toc-text">${esc(q.prompt)}</span>${mark(q)}`)}</li>`).join('')}</ol>`).join('')}</aside>`;
+}
+// Keeps the marked entry visible inside the scrolling list (not the page).
+function tocReveal(toc,entry){
+ if(!toc||!entry||!toc.offsetParent)return;
+ const top=entry.offsetTop,bottom=top+entry.offsetHeight;
+ if(top<toc.scrollTop+48)toc.scrollTop=Math.max(0,top-48);else if(bottom>toc.scrollTop+toc.clientHeight-8)toc.scrollTop=bottom-toc.clientHeight+8;
+}
 // Whole-chapter essay answers, compact by default: each question shows its
 // key points; the full model answer is rendered only when opened, so a long
 // chapter stays light. Read-only: nothing here changes study status.
@@ -220,10 +237,13 @@ async function chapterAnswers(id,generation){
  if(!questions.length){main.insertAdjacentHTML('beforeend',empty('Chương này chưa có câu tự luận.'));return;}
  document.body.classList.add('focus-study','reading-page');
  const byId=new Map(questions.map(q=>[q.id,q]));
- main.insertAdjacentHTML('beforeend',`<section class="card answer-toolbar"><div class="toolbar-row"><p class="toolbar-note-inline">${questions.length} câu · mỗi câu hiện câu hỏi và ý chính; mở đáp án đầy đủ khi cần.</p><button type="button" id="toggle-all-answers" aria-pressed="false">Mở tất cả đáp án</button></div>${contentLegend()}</section>
+ main.innerHTML=`<div class="reading-cols"><div class="reading-main">${main.innerHTML}<section class="card answer-toolbar"><div class="toolbar-row"><p class="toolbar-note-inline">${questions.length} câu · mỗi câu hiện câu hỏi và ý chính; mở đáp án đầy đủ khi cần.</p><button type="button" id="toggle-all-answers" aria-pressed="false">Mở tất cả đáp án</button></div>${contentLegend()}</section>
  <div id="chapter-answer-list">${['main','extra'].map(t=>{const group=questions.filter(q=>q.tier===t);if(!group.length)return '';return `<section class="answer-group"><h2>${tierLabel(t)} · ${group.length} câu</h2>${group.map(q=>{const i=questions.indexOf(q);return `<article class="answer-item chapter-answer" id="answer-${esc(q.id)}" data-index="${i}" tabindex="-1"><div class="question-top"><span class="badge">Câu ${i+1}/${questions.length}${q.code?' · '+esc(q.code):''}</span></div><h3 class="question-title">${esc(q.prompt)}</h3>${keyPointsBlock(q.key_points,4)}<details class="full-answer" data-answer="${esc(q.id)}"><summary><span class="when-closed">Xem đáp án đầy đủ</span><span class="when-open">Ẩn đáp án đầy đủ</span></summary><div class="full-answer-body"></div></details><div class="actions answer-item-actions">${link('essayitem/'+q.id+'?mode=answer','Học riêng câu này','link')}${link('essayitem/'+q.id+'?mode=write','Tự viết bài','link')}</div></article>`;}).join('')}</section>`;}).join('')}</div>
- <nav class="answer-navigation study-nav" aria-label="Chuyển câu tự luận"><button type="button" data-chapter-step="-1" data-key-prev><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></button><label class="jump"><span class="sr-only">Chuyển đến câu</span><select data-chapter-jump>${questions.map((q,i)=>opt(String(i),'Câu '+(i+1)+'/'+questions.length)).join('')}</select></label><button type="button" class="primary" data-chapter-step="1" data-key-next><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></button></nav>`);
+ <nav class="answer-navigation study-nav" aria-label="Chuyển câu tự luận"><button type="button" data-chapter-step="-1" data-key-prev><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></button><label class="jump"><span class="sr-only">Chuyển đến câu</span><select data-chapter-jump>${questions.map((q,i)=>opt(String(i),'Câu '+(i+1)+'/'+questions.length)).join('')}</select></label><button type="button" class="primary" data-chapter-step="1" data-key-next><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></button></nav></div>
+ ${chapterToc(questions,(q,at,inner)=>`<button type="button" class="toc-link" data-toc="${at}" aria-current="false">${inner}</button>`)}</div>`;
  const list=main.querySelector('#chapter-answer-list'), items=[...list.querySelectorAll('.answer-item')], nav=main.querySelector('.study-nav'), jump=nav.querySelector('[data-chapter-jump]');
+ const toc=main.querySelector('.chapter-toc'), tocLinks=[...toc.querySelectorAll('[data-toc]')];
+ toc.addEventListener('click',event=>{const entry=event.target.closest('[data-toc]');if(entry)goTo(Number(entry.dataset.toc));});
  const fill=details=>{const body=details.querySelector('.full-answer-body');if(body.childElementCount)return;const q=byId.get(details.dataset.answer);const links=sourceLinks(q.sources);body.innerHTML=studyAnswer(q.explanation,4)+(links?contentBlock('source',4,'Tài liệu liên quan',`<div class="actions source-links">${links}</div>`):'');};
  // `toggle` does not bubble; a capturing listener on the list still sees it.
  list.addEventListener('toggle',event=>{if(event.target.matches('details.full-answer')&&event.target.open)fill(event.target);syncToggle();},true);
@@ -233,7 +253,7 @@ async function chapterAnswers(id,generation){
  // Current question = the last one whose top has passed under the top bar.
  let current=0;
  const offset=()=>(document.querySelector('.topbar')?.getBoundingClientRect().height||0)+16;
- function locate(){let at=0;items.forEach((item,i)=>{if(item.getBoundingClientRect().top-offset()<=4)at=i;});current=at;jump.value=String(at);nav.querySelector('[data-chapter-step="-1"]').disabled=at===0;nav.querySelector('[data-chapter-step="1"]').disabled=at===items.length-1;}
+ function locate(){let at=0;items.forEach((item,i)=>{if(item.getBoundingClientRect().top-offset()<=4)at=i;});current=at;jump.value=String(at);nav.querySelector('[data-chapter-step="-1"]').disabled=at===0;nav.querySelector('[data-chapter-step="1"]').disabled=at===items.length-1;tocLinks.forEach((entry,i)=>entry.setAttribute('aria-current',String(i===at)));tocReveal(toc,tocLinks[at]);}
  function goTo(i){const item=items[Math.max(0,Math.min(items.length-1,i))];window.scrollTo(0,window.scrollY+item.getBoundingClientRect().top-offset()+4);item.focus({preventScroll:true});locate();}
  nav.addEventListener('click',event=>{const button=event.target.closest('[data-chapter-step]');if(button&&!button.disabled)goTo(current+Number(button.dataset.chapterStep));});
  jump.addEventListener('change',()=>goTo(Number(jump.value)));

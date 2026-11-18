@@ -221,7 +221,7 @@ function home() {
       ${recentRows ? section('Học gần đây', recentRows) : ''}
     </div>
     <aside class="home-side"><section class="home-section"><h2>Môn học</h2>${subjectCards()}</section>
-      <p class="home-stats">${summary.h.length ? summary.h.length + ' bài đã nộp · đúng ' + summary.accuracy + '% · điểm trung bình ' + summary.average + '/10' : 'Chưa nộp bài nào.'} <a href="#stats">Xem thống kê</a></p></aside>
+      <p class="home-stats">${summary.h.length ? summary.h.length + ' bài đã nộp · đúng ' + summary.accuracy + '% · điểm trung bình ' + scoreText(summary.average) + '/10' : 'Chưa nộp bài nào.'} <a href="#stats">Xem thống kê</a></p></aside>
     </div></div>`;
 }
 function subject(id) {
@@ -235,18 +235,20 @@ function subject(id) {
 }
 function chapterRow(c) {
   const n=chapterCounts(c.id), progress=coverage([c]);
-  return `<article class="card chapter-row"><div class="chapter-row-head"><h2><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a></h2><span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span></div>${chapterActions(c.id,n)}</article>`;
+  return `<article class="card chapter-row"><div class="chapter-row-head"><h2><a href="#chapter/${esc(c.id)}">${esc(c.title)}</a></h2><span class="row-progress">${bar(progress)}<small>${progress}% đã học</small></span></div>${chapterActions(c.id,n,false)}</article>`;
 }
 function chapterCounts(id) {
   const questions=state.questions.filter(q=>q.chapter===id);
   return {quiz:questions.filter(q=>q.kind==='quiz').length, essay:questions.filter(q=>q.kind==='essay').length, docs:state.documents.filter(d=>d.chapter===id).length};
 }
-// Actions grouped by kind (quiz, essay, documents), one clear primary per chapter.
-function chapterActions(id,n=chapterCounts(id)) {
+// Actions grouped by kind (quiz, essay, documents). The chapter page gets one
+// primary action; a list of several chapters (subject page) gets none.
+function chapterActions(id,n=chapterCounts(id),primary=true) {
+  const lead=primary?'primary':'';
   const row=(label,count,buttons,cls='')=>`<div class="action-row ${cls}"><span class="action-label">${label}<small>${count}</small></span><div class="action-buttons">${buttons}</div></div>`;
   const rows=[
-    n.quiz&&row('Trắc nghiệm',n.quiz+' câu',link('quiz/'+id,'Làm bài','primary')+link('quizanswers/'+id,'Xem đáp án')),
-    n.essay&&row('Tự luận',n.essay+' câu',link('essay/'+id,'Học từng câu',n.quiz?'':'primary')+link('essayanswers/'+id,'Đáp án cả chương')),
+    n.quiz&&row('Trắc nghiệm',n.quiz+' câu',link('quiz/'+id,'Làm bài',lead)+link('quizanswers/'+id,'Xem đáp án')),
+    n.essay&&row('Tự luận',n.essay+' câu',link('essay/'+id,'Học từng câu',n.quiz?'':lead)+link('essayanswers/'+id,'Đáp án cả chương')),
     n.docs&&row('Tài liệu',n.docs+' tệp',link('docs/'+id,'Mở tài liệu','link'),'docs-row')
   ].filter(Boolean);
   return `<div class="chapter-actions">${rows.join('')||'<p class="muted">Chương đang chờ bổ sung nội dung.</p>'}</div>`;
@@ -541,7 +543,7 @@ function renderQuestion() {
   const flagged = attempt.flags.includes(question.id);
   const saveText = session.error || (session.saving || session.pending.size ? 'Đang lưu… Bạn có thể tiếp tục làm bài.' : answered ? 'Đã lưu bài làm' : 'Chọn phương án để trả lời');
   main.querySelector('#question-card').innerHTML = `
-    <div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
+    <div class="qa-main"><div class="question-top"><span class="badge">Câu ${attemptIndex + 1}/${items.length}</span>
       ${question.selectionCount > 1 ? `<span class="badge multi-badge">Chọn ${question.selectionCount} đáp án</span>` : ''}
       ${completed ? `<small>${tierLabel(question.tier)}</small>` : `<button type="button" class="icon flag-button" id="flag" aria-pressed="${flagged}" ${submitting ? 'disabled' : ''}>${flagged ? '⚑ Đã đánh dấu' : '⚐ Đánh dấu'}</button>`}
     </div>
@@ -549,9 +551,10 @@ function renderQuestion() {
     ${question.selectionCount > 1 && !revealed ? `<p class="multi-hint">Câu này có ${question.selectionCount} đáp án đúng. Chỉ tính đúng khi chọn đủ và không chọn thừa.</p>` : ''}
     <div class="options" role="group" aria-labelledby="question-title">${optionList(question, attempt.answers[question.id], revealed, completed || submitting || feedback)}</div>
     ${!completed && practice && question.selectionCount > 1 && !feedback ? `<div class="actions practice-check"><button type="button" id="check-answer" ${selected.length !== question.selectionCount ? 'disabled' : ''}>Kiểm tra đáp án</button><small class="muted">Đã chọn ${selected.length}/${question.selectionCount}</small></div>` : ''}
-    ${revealed ? verdict(question, attempt.answers[question.id], completed) + (feedback ? `<p class="lock-note">Lựa chọn đã được ghi và không đổi được.${answerMatches(attempt.answers[question.id], question.correct) ? '' : ' Câu này sẽ vào “Ôn câu sai” sau khi nộp bài.'}</p>` : '') + whyBlock(question) : ''}
     ${!completed ? `<span class="save-status ${session.error ? 'notice' : ''}" role="status">${esc(saveText)}</span>${session.error ? '<button type="button" id="retry-save" class="link">Thử lưu lại</button>' : ''}` : ''}
-    ${question.sources?.length ? `<div class="actions source-links">${sourceLinks(question.sources)}</div>` : ''}`;
+    ${!revealed && question.sources?.length ? `<div class="actions source-links">${sourceLinks(question.sources)}</div>` : ''}</div>
+    ${revealed ? `<div class="qa-aside">${verdict(question, attempt.answers[question.id], completed) + (feedback ? `<p class="lock-note">Lựa chọn đã được ghi và không đổi được.${answerMatches(attempt.answers[question.id], question.correct) ? '' : ' Câu này sẽ vào “Ôn câu sai” sau khi nộp bài.'}</p>` : '') + whyBlock(question)}</div>` : ''}`;
+  main.querySelector('#question-card').classList.toggle('is-revealed', revealed);
   main.querySelectorAll('.tiles [data-index]').forEach(button => {
     const index = Number(button.dataset.index), entry = items[index];
     const chosen = answerIds(attempt.answers[entry.id]).length > 0;
@@ -722,15 +725,27 @@ async function saveAttempt(data, method) {
 }
 
 
+// Documents: the search box always shows, subject/chapter/sort open on demand;
+// compact rows grouped by chapter (or one A–Z list).
+let docSort='chapter';
 function docs() {
   const c=controls('docs');
-  main.innerHTML=`${title('Thư viện tài liệu','Tìm và đọc tài liệu theo môn học và chương.')}<section class="card">${c.html}${field('Tìm tài liệu',input('search',filter.search,'search','placeholder="Tên tài liệu hoặc tên tệp"'))}${field('Sắp xếp',select('doc-sort',opt('title','Tên tài liệu A–Z')+opt('chapter','Theo chương')))}</section><div id="doclist" class="list section"></div>`;
+  const chapter=chapterLookup.get(filter.chapter), sub=state.subjects.find(s=>s.id===filter.subject);
+  const scope=chapter?chapterShort(chapter)+' · '+subjectName(chapter.subject):sub?sub.title:'Tất cả môn học';
+  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${chapter?link('chapter/'+chapter.id,'← '+chapterShort(chapter),'link'):link('home','← Tổng quan','link')}</nav>${title('Thư viện tài liệu','','compact-heading')}<section class="card filter-card"><label class="search-field"><span class="sr-only">Tìm tài liệu</span>${input('search',filter.search,'search','placeholder="Tìm theo tên tài liệu hoặc tên tệp"')}</label><details class="filter-more"><summary>Lọc và sắp xếp<small>${esc(scope)}</small></summary><div class="filter-more-body">${c.html}<div class="filters">${field('Sắp xếp',select('doc-sort',opt('chapter','Theo chương',docSort)+opt('title','Tên tài liệu A–Z',docSort)))}</div></div></details></section><div id="doclist" class="section"></div>`;
+  const order=new Map(state.chapters.map((chapter,i)=>[chapter.id,i]));
+  const row=(d,detail)=>`<div class="list-row"><a class="row-link" href="#doc/${esc(d.id)}"><strong>${esc(docLabel(d))}</strong><small>${detail}</small></a><a class="row-side" href="/api/documents/${esc(d.id)}?download" aria-label="Tải xuống: ${esc(docLabel(d))}">Tải xuống</a></div>`;
   const update=()=>{
     const term=filter.search.toLocaleLowerCase('vi');
-    const docs=state.documents.filter(q=>matches(q)&&[q.title,q.filename].some(s=>s.toLocaleLowerCase('vi').includes(term))).sort((a,b)=>(main.querySelector('[name=doc-sort]').value==='chapter'?chapterName(a.chapter).localeCompare(chapterName(b.chapter),'vi',{numeric:true}):0)||a.title.localeCompare(b.title,'vi',{numeric:true}));
-    main.querySelector('#doclist').innerHTML=docs.map(q=>`<article class="card listitem"><div><h3>${esc(docLabel(q))}</h3><small>${esc(chapterName(q.chapter))} · ${esc(q.filename)}</small></div><div class="actions">${link('doc/'+q.id,'Xem tài liệu','link')}<a class="btn" href="/api/documents/${q.id}?download">Tải xuống</a></div></article>`).join('')||empty('Chưa có tài liệu phù hợp.');
+    const docs=state.documents.filter(q=>matches(q)&&[q.title,q.filename].some(s=>s.toLocaleLowerCase('vi').includes(term))).sort((a,b)=>a.title.localeCompare(b.title,'vi',{numeric:true}));
+    let html;
+    if(docSort==='chapter'){
+      const groups=new Map();for(const d of docs){if(!groups.has(d.chapter))groups.set(d.chapter,[]);groups.get(d.chapter).push(d);}
+      html=[...groups].sort((a,b)=>(order.get(a[0])??1e9)-(order.get(b[0])??1e9)).map(([id,list])=>`<section class="doc-group"><h2>${esc(chapterName(id))}<small>${list.length} tài liệu</small></h2><div class="panel">${list.map(d=>row(d,esc(d.filename))).join('')}</div></section>`).join('');
+    } else html=docs.length?`<div class="panel">${docs.map(d=>row(d,esc(chapterName(d.chapter))+' · '+esc(d.filename))).join('')}</div>`:'';
+    main.querySelector('#doclist').innerHTML=html||empty('Chưa có tài liệu phù hợp.');
   };
-  update();bindFilters();on('[name=doc-sort]','change',update);
+  update();bindFilters();on('[name=doc-sort]','change',(_,el)=>{docSort=el.value;update();});
   on('[name=search]','input',(_,el)=>{filter.search=el.value;update();});
 }
 async function readDocx(path) {

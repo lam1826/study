@@ -121,7 +121,7 @@ async function essayItem(rawId,generation){
   const tabs=[['read','Đáp án'],['memorize','Học từng ý'],['write','Tự viết'],['compare','Đối chiếu']];
   main.innerHTML=`<div class="essay-view">
   <nav class="study-crumbs" aria-label="Vị trí câu hỏi">${link('essay/'+item.chapter,'← Danh sách câu','link')}<span>${esc(chapterName(item.chapter))}${index>=0?' · Câu '+(index+1)+'/'+siblings.length:''}</span>${link('essayanswers/'+item.chapter,'Đáp án cả chương','link')}</nav>
-  <article class="card essay-sheet">
+  <article class="essay-sheet">
     <div class="question-top"><span class="badge">${esc(item.code||'Tự luận')}</span><small>${tierLabel(item.tier)} · <span id="essay-status-label"></span></small></div>
     <h1 class="question-title" id="essay-title" tabindex="-1">${esc(item.prompt)}</h1>
     <div class="study-tabs mode-tabs" role="group" aria-label="Cách học câu này">${tabs.map(([value,label])=>`<button type="button" data-study-mode="${value}">${label}</button>`).join('')}</div>

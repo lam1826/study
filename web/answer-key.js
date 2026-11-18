@@ -47,6 +47,18 @@ function explanationParts(text, keyTexts = []) {
   }
   return {why:why.join('\n').trim(), source:source.join(' ')};
 }
+// Splits one explanation paragraph into its reasoning and a "Lưu ý:" note
+// (from the sentence that starts with "Lưu ý:" to the end of the paragraph)
+// so the note can be shown in its own block. Display only: joining the parts
+// with a space gives the paragraph back, so no text is ever dropped.
+function noteParts(paragraph) {
+  const text = String(paragraph || '').trim();
+  const match = text.match(/(^|[.!?…]\s+)(Lưu ý\s*:)/);
+  if (!match) return [{kind:'text', text}];
+  const start = match.index + match[1].length;
+  const before = text.slice(0, start).trim();
+  return (before ? [{kind:'text', text:before}] : []).concat({kind:'note', text:text.slice(start).trim()});
+}
 // Groups a Markdown model answer by its "###" headings so the reading view can
 // lead with the answer and keep sources quiet. Unknown headings stay "other".
 function answerSections(text) {

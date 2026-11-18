@@ -17,12 +17,15 @@ function richAnswer(text) {
 // Model answer laid out by section: the answer itself first and strongest,
 // explanation and example after it, sources small and quiet.
 // `level` keeps heading order valid: 2 under a page h1, 3 under a card h2.
+// Each section of a model answer becomes a labelled block in its kind's
+// colour: answer → Đáp án, explanation, example, source; unknown headings stay neutral.
+const sectionKinds={main:'answer',explain:'explain',example:'example',source:'source'};
 function studyAnswer(text,level=3) {
-  return answerSections(text).map(section=>`<section class="answer-section answer-${section.kind}">${section.title?`<h${level}>${inlineStudy(section.title)}</h${level}>`:''}${richAnswer(section.body)}</section>`).join('');
+  return answerSections(text).map(section=>contentBlock(sectionKinds[section.kind]||'other',level,section.title?inlineStudy(section.title):'',richAnswer(section.body))).join('');
 }
 function keyPointsBlock(points,level=3) {
   if(!points?.length)return '';
-  return `<section class="key-points" aria-label="Ý chính cần nhớ"><h${level}>Ý chính cần nhớ <small>${points.length} ý</small></h${level}><ol>${points.map((point,i)=>`<li><span class="kp-num" aria-hidden="true">${i+1}</span><span>${inlineStudy(point)}</span></li>`).join('')}</ol></section>`;
+  return contentBlock('answer',level,`Ý chính cần nhớ <small>${points.length} ý</small>`,`<ol class="key-list">${points.map((point,i)=>`<li><span class="kp-num" aria-hidden="true">${i+1}</span><span>${inlineStudy(point)}</span></li>`).join('')}</ol>`);
 }
 // Answer pages are read-only for learners: keep them for the session (and
 // prefetch neighbours) so moving between questions needs no waiting.
@@ -103,7 +106,7 @@ async function essayItem(rawId,generation){
     <div id="essay-editor" hidden><label>Bài làm của bạn<textarea id="essay-draft" rows="12" maxlength="500000" placeholder="Viết câu trả lời của bạn…">${esc(item.draft)}</textarea></label><div class="actions"><button type="button" id="save-essay">Lưu bài làm</button><button type="button" id="go-compare" class="primary">Đối chiếu với đáp án →</button></div></div>
     <div class="essay-status-row"><div class="status-toggles" role="group" aria-label="Đánh dấu câu này"><button type="button" data-status-toggle="mastered" aria-pressed="false">✓ Đã thuộc</button><button type="button" data-status-toggle="review" aria-pressed="false">↻ Cần ôn lại</button></div><p class="save-status" id="essay-save" role="status">Bài làm và trạng thái được tự động lưu.</p><button type="button" id="retry-essay" hidden>Thử lưu lại</button>
       <details class="more-tools"><summary>Thêm thao tác</summary><div class="more-panel"><div class="actions"><button type="button" id="copy-answer">Sao chép đáp án</button><button type="button" id="print-answer">In đáp án</button></div>${field('Trạng thái chi tiết',select('study-state',Object.entries(studyStatuses).map(([v,t])=>opt(v,t,item.status)).join('')))}</div></details></div>
-    ${item.sources.length?`<section class="related-docs"><h2>Tài liệu liên quan</h2><div class="actions">${item.sources.map(sid=>state.documents.find(d=>d.id===sid)).filter(Boolean).map(d=>`<a class="btn link" target="_blank" rel="noopener" href="#doc/${esc(d.id)}">${esc(docLabel(d))}</a>`).join('')}</div></section>`:''}
+    ${item.sources.length?contentBlock('source',2,'Tài liệu liên quan',`<div class="actions source-links">${item.sources.map(sid=>state.documents.find(d=>d.id===sid)).filter(Boolean).map(d=>`<a class="btn link" target="_blank" rel="noopener" href="#doc/${esc(d.id)}">${esc(docLabel(d))}</a>`).join('')}</div>`):''}
   </article>
   <nav class="answer-navigation study-nav" aria-label="Chuyển câu tự luận">${previous?`<a class="btn" data-essay-step="${esc(previous.id)}" data-key-prev href="#essayitem/${esc(previous.id)}"><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></a>`:'<span class="btn" aria-disabled="true"><span class="nav-long">← Câu trước</span><span class="nav-short">← Trước</span></span>'}<span class="question-position">${index+1}/${siblings.length}</span>${next?`<a class="btn primary" data-essay-step="${esc(next.id)}" data-key-next href="#essayitem/${esc(next.id)}"><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></a>`:'<span class="btn" aria-disabled="true"><span class="nav-long">Câu tiếp →</span><span class="nav-short">Tiếp →</span></span>'}</nav></div>`;
   const statusLabel=()=>{if(!location.hash.startsWith('#essayitem/'+id))return;const e=main.querySelector('#essay-save');if(e)e.textContent=session.error||(session.saving||Object.keys(session.pending).length?'Đang lưu…':'Đã lưu vào tài khoản');const retry=main.querySelector('#retry-essay');if(retry)retry.hidden=!session.error;const status=main.querySelector('#essay-status-label');if(status)status.textContent=(item.status==='mastered'?'✓ ':'')+studyStatuses[item.status||'unseen'];main.querySelectorAll('[data-status-toggle]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.statusToggle===item.status)));const select=main.querySelector('[name=study-state]');if(select)select.value=item.status||'unseen';};session.notify=statusLabel;

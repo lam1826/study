@@ -354,17 +354,41 @@ function optionList(question, chosenValue, revealed, disabled) {
     </button>`;
   }).join('');
 }
-// "Vì sao đúng" block shared by practice feedback, results and answer pages.
-function whyBlock(question) {
+// One colour per kind of content, the same on every page, always with a
+// written label: Đáp án (green), Giải thích (blue), Ví dụ (amber),
+// Lưu ý (orange), Nguồn (grey).
+const contentKinds = {answer:'Đáp án', explain:'Giải thích', example:'Ví dụ', note:'Lưu ý', source:'Nguồn'};
+// `title` is trusted HTML (already escaped); it is shown under the label only
+// when it says more than the label itself ("Trả lời trọng tâm", "Vì sao…").
+function contentBlock(kind, level, title, body) {
+  const label = contentKinds[kind] || '';
+  const plainTitle = title ? title.replace(/<[^>]+>/g, '') : '';
+  const extra = plainTitle && !(label && plainKey(plainTitle).startsWith(plainKey(label)));
+  const head = extra && label ? `<p class="cblock-tag">${label}</p><h${level} class="cblock-title">${title}</h${level}>`
+    : `<h${level} class="cblock-tag">${label || title || ''}</h${level}>`;
+  return `<section class="cblock cblock-${label ? kind : 'other'}">${head}${body}</section>`;
+}
+function contentLegend() {
+  return `<p class="content-legend"><span class="legend-label">Màu nội dung:</span>${Object.entries(contentKinds).map(([kind, label]) => `<span class="legend-chip cblock-${kind}">${label}</span>`).join('')}</p>`;
+}
+// Reasoning ("Vì sao … đúng?"), any "Lưu ý:" note and the sources of a quiz
+// question, as separate labelled blocks. Text is only regrouped, never cut.
+function whyBlock(question, level = 3) {
   const keys = lettered(question).filter(option => option.correct);
   const parts = explanationParts(question.explanation, keys.map(option => option.text));
   const letters = joinLetters(keys.map(option => option.letter));
-  const paragraphs = parts.why ? parts.why.split(/\n\s*\n/).map(text => `<p>${esc(text.trim())}</p>`).join('') : '<p>Chưa có giải thích cho câu này.</p>';
-  return `<section class="why" aria-label="Giải thích đáp án">
-    <h3><span class="why-mark" aria-hidden="true">✓</span>Vì sao ${letters ? (keys.length > 1 ? 'các đáp án ' : 'đáp án ') + letters : 'đáp án này'} đúng?</h3>
-    ${paragraphs}
-    ${parts.source ? `<p class="why-source"><strong>Nguồn đối chiếu:</strong> ${esc(parts.source)}</p>` : ''}
-  </section>`;
+  let reasoning = '', notes = '';
+  for (const paragraph of parts.why ? parts.why.split(/\n\s*\n/) : []) {
+    for (const part of noteParts(paragraph)) {
+      if (part.kind === 'note') notes += `<p>${esc(part.text)}</p>`;
+      else reasoning += `<p>${esc(part.text)}</p>`;
+    }
+  }
+  const heading = 'Vì sao ' + (letters ? (keys.length > 1 ? 'các đáp án ' : 'đáp án ') + letters : 'đáp án này') + ' đúng?';
+  const links = sourceLinks(question.sources || []);
+  return contentBlock('explain', level, heading, reasoning || '<p>Chưa có giải thích cho câu này.</p>')
+    + (notes ? contentBlock('note', level, '', notes) : '')
+    + (parts.source || links ? contentBlock('source', level, '', (parts.source ? `<p>${esc(parts.source)}</p>` : '') + (links ? `<div class="actions source-links">${links}</div>` : '')) : '');
 }
 function verdict(question, value, completed) {
   const picked = chosenLetters(question, value), key = joinLetters(keyLetters(question));

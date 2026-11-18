@@ -87,7 +87,7 @@ small { font-size: .8rem; }
 .appearance-panel { position: absolute; top: calc(100% + .65rem); right: 0; z-index: 8; display: flex; align-items: center; gap: .4rem; width: max-content; padding: .7rem; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: var(--shadow); }
 .appearance-panel > span { font-size: .8rem; margin-right: .4rem; }
 #font-size { min-width: 20px; text-align: center; font-size: .85rem; }
-main { max-width: 1400px; margin: auto; padding: 2.2rem clamp(1.25rem, 3.4vw, 3.4rem) 3.5rem; min-width: 0; }
+main { max-width: 87.5rem; margin: auto; padding: 2.2rem clamp(1.25rem, 3.4vw, 3.4rem) 3.5rem; min-width: 0; }
 .heading { margin-bottom: 1.5rem; max-width: 900px; }
 .heading p { margin-bottom: 0; font-size: .93rem; }
 .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
@@ -801,18 +801,17 @@ kbd { display:inline-block; min-width:1.5em; padding:0 .35rem; border:1px solid 
    card is the only outline (no box inside a box). */
 .question-card .cblock, .question-card .verdict { border-color:transparent; }
 /* Essay reading pages (one question, whole chapter): the content fills the
-   space it has, up to 75rem (only very wide screens reach it; then it is
-   centred). Text runs the full width of each block, so the text, the
-   coloured blocks, the question and the buttons share one right edge. */
-.reading-page .reading-main { max-width:75rem; min-width:0; margin-inline:auto; }
+   page frame (beside the question list from 1200 px). Text runs the full
+   width of each block, so the text, the coloured blocks, the question and
+   the buttons share one right edge. */
+.reading-page .reading-main { min-width:0; }
 .reading-page .answer-item { max-width:none; }
-/* From 1200 px the chapter's questions sit in a sticky list against the
-   right edge (aligned with the top bar's tools); the content fills the space
-   to its left. The list ends above the bottom-right corner, where ChatGPT
-   Sites can place its own floating widget. */
+/* From 1200 px the chapter's questions sit in a sticky list at the right of
+   the page frame; the content fills the space to its left. The list ends
+   above the bottom-right corner, where ChatGPT Sites can place its own
+   floating widget. */
 .chapter-toc { display:none; }
 @media (min-width: 1200px) {
-  .reading-page main { max-width:none; }
   .reading-cols { display:grid; grid-template-columns:minmax(0,1fr) clamp(13rem,20vw,20rem); column-gap:2.5rem; align-items:start; }
   .chapter-toc { display:block; position:sticky; top:calc(var(--top-height) + 1.25rem); max-height:calc(100vh - var(--top-height) - 5.5rem); overflow:auto; overscroll-behavior:contain; padding:0 .6rem .9rem .9rem; background:var(--paper); border:1px solid var(--line); border-radius:14px; }
 }
@@ -831,3 +830,14 @@ kbd { display:inline-block; min-width:1.5em; padding:0 .35rem; border:1px solid 
   .toc-link:hover { background:var(--soft); }
 }
 .reading-page .cblock p, .reading-page .answer-content p { max-width:none; }
+
+/* ===== Wide screens (24" and 27" monitors): every page sits in the same
+   centred frame. The frame is sized in rem, so it also grows with the Aa
+   text size, and gets one wider step on very wide screens. ===== */
+@media (min-width: 2200px) {
+  main { max-width:100rem; }
+}
+/* Quiz setup: crumbs, heading and form in one centred column. */
+.has-start-bar main > * { max-width:57.5rem; margin-inline:auto; }
+/* Answer cards use the frame's width, like the toolbar above them. */
+.answer-item.quiz-answer-card, .answer-item.chapter-answer, .answer-item.quiz-answer-card.is-revealed { max-width:none; }

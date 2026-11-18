@@ -57,7 +57,7 @@ function essayList() {
     main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('home','← Tổng quan','link')}</nav>`+title('Học tự luận','Chọn chương để học từng câu hoặc đọc đáp án cả chương.','compact-heading')
       +`<div class="content-filters filter-line"><label class="inline-field">Môn học${select('subject',opt('','Tất cả môn học',filter.subject)+state.subjects.map(s=>opt(s.id,s.title,filter.subject)).join(''))}</label></div>`
       +(chapters.length?`<div class="panel section">${chapters.map(c=>{const qs=chapterEssays(c.id), extra=qs.filter(q=>q.tier==='extra').length, done=qs.filter(q=>essayStatusOf(q.id)==='mastered').length;
-        return `<div class="list-row"><a class="row-link" href="#essay/${esc(c.id)}"><strong>${esc(c.title)}</strong><small>${esc(subjectName(c.subject))} · ${qs.length-extra} câu chính${extra?' · '+extra+' câu bổ sung':''} · ${done}/${qs.length} đã thuộc</small></a><a class="row-side" href="#essayanswers/${esc(c.id)}">Đáp án cả chương</a></div>`;}).join('')}</div>`:empty('Chưa có câu tự luận trong môn này.'));
+        return `<div class="list-row"><a class="row-link" href="#essay/${esc(c.id)}"><strong>${esc(c.title)}</strong><small>${esc(subjectName(c.subject))} · ${qs.length-extra} câu chính${extra?' · '+extra+' câu nâng cao':''} · ${done}/${qs.length} đã thuộc</small></a><a class="row-side" href="#essayanswers/${esc(c.id)}">Đáp án cả chương</a></div>`;}).join('')}</div>`:empty('Chưa có câu tự luận trong môn này.'));
     bindFilters();return;
   }
   const chapter=chapterLookup.get(filter.chapter);
@@ -280,7 +280,7 @@ async function quizAnswers(rawId,generation){
  main.innerHTML=`<nav class="study-crumbs" aria-label="Điều hướng">${link('quiz/'+id,'← Luyện trắc nghiệm','link')}${link('chapter/'+id,'Tổng quan chương','link')}</nav>`+title('Đáp án trắc nghiệm',chapter.title,'compact-heading')+`
  <section class="card answer-toolbar"><div class="toolbar-row"><div class="segmented" role="group" aria-label="Cách xem đáp án"><button type="button" data-quiz-view="single">Từng câu</button><button type="button" data-quiz-view="all">Cả chương</button></div>
  <label class="toggle"><input type="checkbox" id="hide-keys" ${hideKeys?'checked':''}> Che đáp án để tự kiểm tra</label></div>
- ${questions.some(q=>q.tier==='extra')?`<div class="filters">${field('Nhóm câu hỏi',select('quiz-answer-tier',opt('all','Cả hai nhóm',tier)+opt('main','Câu hỏi chính',tier)+opt('extra','Câu hỏi bổ sung',tier)))}</div>`:''}
+ ${questions.some(q=>q.tier==='extra')?`<div class="filters">${field('Nhóm câu hỏi',select('quiz-answer-tier',opt('all','Cả hai nhóm',tier)+opt('main','Câu hỏi chính',tier)+opt('extra','Câu hỏi nâng cao',tier)))}</div>`:''}
  <div class="self-tally" id="self-tally" role="status" hidden></div>${contentLegend()}</section>
  <div id="quiz-answer-list" class="section"></div>`;
  const list=main.querySelector('#quiz-answer-list'), tally=main.querySelector('#self-tally');
@@ -295,7 +295,7 @@ async function quizAnswers(rawId,generation){
    const inner=`<span class="option-letter" aria-hidden="true">${o.letter}</span><span class="option-text"><span class="sr-only">${o.letter}. </span>${esc(o.text)}${status?`<span class="option-status">${status}</span>`:''}</span>`;
    return guessing?`<li class="guess-item"><button type="button" class="option ${state}" data-guess-option="${esc(o.id)}" data-question="${esc(q.id)}" aria-pressed="${picked}">${inner}</button></li>`:`<li class="option ${state}">${inner}</li>`;
   }).join('');
-  return `<article class="answer-item quiz-answer-card ${shown?'is-revealed':''}" id="qa-${esc(q.id)}"><div class="qa-main"><div class="question-top"><span class="badge">Câu ${i+1}/${total}</span>${keys>1?`<span class="badge multi-badge">${keys} đáp án đúng</span>`:''}${questions.some(x=>x.tier==='extra')?`<small>${tierLabel(q.tier)}</small>`:''}</div>
+  return `<article class="answer-item quiz-answer-card ${shown?'is-revealed':''}" id="qa-${esc(q.id)}"><div class="qa-main"><div class="question-top"><span class="badge">Câu ${i+1}/${total}</span>${keys>1?`<span class="badge multi-badge">${keys} đáp án đúng</span>`:''}${q.tier==='extra'?'<span class="badge tier-badge">Nâng cao</span>':''}</div>
   <h2 class="question-title">${esc(q.prompt)}</h2>${guessing&&keys>1?`<p class="multi-hint">Chọn ${keys} phương án; chọn đủ thì tự kiểm tra.</p>`:''}
   <ol class="options study-options" aria-label="Các phương án">${options}</ol>
   ${shown?'':`<div class="reveal-box">${guessing?'<p>Chạm một phương án để tự kiểm tra, hoặc</p>':''}<button type="button" class="primary" data-reveal="${esc(q.id)}">Xem đáp án câu này</button></div>${q.sources.length?`<div class="actions source-links">${sourceLinks(q.sources)}</div>`:''}`}</div>

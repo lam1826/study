@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { loadAddedQuestions } from './added-questions.mjs';
 await mkdir('dist/server', {recursive:true});
 await mkdir('dist/.openai', {recursive:true});
 const [html, css, worker] = await Promise.all(['web/index.html','web/style.css','worker/index.mjs'].map(path => readFile(path,'utf8')));
@@ -21,6 +22,10 @@ const content = JSON.parse(await readFile('content/course.json','utf8'));
 const chapterOverviews=JSON.parse(await readFile('content/chapter-overviews.json','utf8'));
 const essayGuides=JSON.parse(await readFile('content/essay-guides.json','utf8'));
 const explanations = JSON.parse(await readFile('content/explanations.json','utf8'));
+// Questions added after the first import (missing main questions and advanced
+// "extra" questions), imported once under their own revision.
+const added = await loadAddedQuestions();
+const addedQuestions = {...added, questions:added.questions.map(({from, ...question}) => question)};
 const importer = (await readFile('worker/content.mjs','utf8')).replaceAll('export async function','async function');
-await writeFile('dist/server/index.js', 'const assets = ' + JSON.stringify(assets) + ';\nconst courseContent = '+JSON.stringify(content)+';\nconst courseExplanations = '+JSON.stringify(explanations)+';\nconst essayGuides = '+JSON.stringify(essayGuides)+';\nconst chapterOverviews = '+JSON.stringify(chapterOverviews)+';\n'+importer+'\n'+studyWorker+'\n'+worker);
+await writeFile('dist/server/index.js', 'const assets = ' + JSON.stringify(assets) + ';\nconst courseContent = '+JSON.stringify(content)+';\nconst courseExplanations = '+JSON.stringify(explanations)+';\nconst essayGuides = '+JSON.stringify(essayGuides)+';\nconst chapterOverviews = '+JSON.stringify(chapterOverviews)+';\nconst addedQuestions = '+JSON.stringify(addedQuestions)+';\n'+importer+'\n'+studyWorker+'\n'+worker);
 await copyFile('.openai/hosting.json','dist/.openai/hosting.json');

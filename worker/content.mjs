@@ -6,11 +6,12 @@ export async function ensureCourseContent(env) {
   // A new isolate checks every revision in one D1 round trip; each import
   // still re-checks its own marker, so concurrent isolates stay idempotent.
   contentReady = (async () => {
-    const revisions = [courseContent.revision, explanationsRevision, essayGuidesRevision];
-    const done = new Set((await env.DB.prepare('SELECT revision FROM content_imports WHERE revision IN (?,?,?)').bind(...revisions).all()).results.map(row => row.revision));
+    const revisions = [courseContent.revision, explanationsRevision, essayGuidesRevision, addedQuestions.revision];
+    const done = new Set((await env.DB.prepare('SELECT revision FROM content_imports WHERE revision IN (?,?,?,?)').bind(...revisions).all()).results.map(row => row.revision));
     if (!done.has(revisions[0])) await importCourse(env);
     if (!done.has(revisions[1])) await updateExplanations(env);
     if (!done.has(revisions[2])) await updateEssayGuides(env);
+    if (!done.has(revisions[3])) await importAddedQuestions(env);
   })().catch(error => {contentReady = null; throw error;});
   return contentReady;
 }
@@ -23,6 +24,26 @@ async function importCourse(env) {
   const statements = courseContent.questions.map(q=>sql('INSERT INTO questions (id,chapter,kind,tier,prompt,normalized,explanation,options,correct,sources) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(chapter,kind,normalized) DO NOTHING',q.id,q.chapter,q.kind,q.tier,q.prompt,q.normalized,q.explanation,JSON.stringify(q.options),Array.isArray(q.correct)?JSON.stringify(q.correct):q.correct,JSON.stringify(q.sources)));
   for(let start=0;start<statements.length;start+=50) await env.DB.batch(statements.slice(start,start+50));
   await sql('INSERT OR IGNORE INTO content_imports VALUES (?,?)',courseContent.revision,Date.now()).run();
+}
+// Questions added after the first import (content/added-questions.json): main
+// questions from quiz files that were not imported yet and advanced "extra"
+// questions written from the textbooks. Inserted once under their own
+// revision. A question whose prompt already exists in its chapter is left as
+// it is; a chapter that already exists keeps its title; questions for a
+// chapter that could not be created (e.g. the same title under another id)
+// are skipped instead of failing the import.
+async function importAddedQuestions(env) {
+  const sql = (q,...args) => env.DB.prepare(q).bind(...args);
+  const revision = addedQuestions.revision;
+  if (await sql('SELECT revision FROM content_imports WHERE revision=?',revision).first()) return;
+  if (addedQuestions.chapters.length) await env.DB.batch(addedQuestions.chapters.map(c=>sql('INSERT OR IGNORE INTO chapters (id,subject,title) VALUES (?,?,?)',c.id,c.subject,c.title)));
+  const chapters = new Set((await sql('SELECT id FROM chapters').all()).results.map(row=>row.id));
+  // Source document IDs are kept as written: on a new database the files are
+  // imported after the content, and the pages skip IDs they cannot find.
+  const statements = addedQuestions.questions.filter(q=>chapters.has(q.chapter)).map(q=>sql('INSERT INTO questions (id,chapter,kind,tier,prompt,normalized,explanation,options,correct,sources) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(chapter,kind,normalized) DO NOTHING',
+    q.id,q.chapter,q.kind,q.tier,q.prompt,q.normalized,q.explanation,JSON.stringify(q.options),Array.isArray(q.correct)?JSON.stringify(q.correct):q.correct,JSON.stringify(q.sources)));
+  for(let start=0;start<statements.length;start+=50) await env.DB.batch(statements.slice(start,start+50));
+  await sql('INSERT OR IGNORE INTO content_imports VALUES (?,?)',revision,Date.now()).run();
 }
 export async function importSourceDocument(request,env) {
   // No visitor impersonation: a dedicated service secret only authorizes these

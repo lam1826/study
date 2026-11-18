@@ -1,0 +1,3 @@
+[
+  {"tier": "main", "prompt": "Câu chính thử nghiệm của chương mới?", "options": ["Phương án A", "Phương án B", "Phương án C"], "correct": [0, 2], "explanation": "Hai phương án A và C được đánh dấu là đáp án trong tệp đề thử nghiệm của chương mới.\n\nNguồn đối chiếu: tệp thử nghiệm, câu 1.", "sources": [], "from": "fixture"}
+]

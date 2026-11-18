@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node --check worker/index.mjs && node --check worker/study.mjs && node --check worker/content.mjs && node --check web/answer-key.js && node --check web/app.js && node --check web/study.js && node --check scripts/dev.mjs",
-    "test": "node tests/quiz.mjs && node tests/ui-helpers.mjs",
+    "check": "node --check worker/index.mjs && node --check worker/study.mjs && node --check worker/content.mjs && node --check web/answer-key.js && node --check web/app.js && node --check web/study.js && node --check scripts/dev.mjs && node --check scripts/added-questions.mjs",
+    "test": "node tests/quiz.mjs && node tests/ui-helpers.mjs && node tests/added.mjs",
     "dev": "node scripts/build.mjs && node scripts/dev.mjs"
   }
 }

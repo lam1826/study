@@ -164,5 +164,197 @@
       "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
     ],
     "from": "Biên soạn nâng cao từ chapter04.pdf, mục 4.1.1–4.1.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Màn hình chỉ cần tên và điểm của bài nộp, nhưng endpoint REST hiện trả thêm nhiều trường không dùng. GraphQL hỗ trợ giải quyết vấn đề này theo cách nào?",
+    "options": [
+      "Tự xóa những trường không dùng khỏi cơ sở dữ liệu.",
+      "Bắt buộc máy khách nhận toàn bộ entity rồi lọc ở giao diện.",
+      "Cho máy khách chọn các trường cần nhận trong truy vấn theo schema.",
+      "Chuyển mọi truy vấn đọc thành thao tác cập nhật."
+    ],
+    "correct": 2,
+    "explanation": "Lựa chọn trường trong truy vấn giúp hạn chế over-fetching ở phản hồi. Schema và resolver vẫn quyết định dữ liệu được cung cấp; GraphQL không cần xóa cột dữ liệu hay biến truy vấn đọc thành thao tác ghi.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 1–3, mục 4.1.1–4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 1–3, mục 4.1.1–4.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Để dựng một màn hình, máy khách đang phải gọi riêng API sinh viên, bài nộp và bài tập liên quan. Khả năng nào của GraphQL phù hợp để giảm tình trạng under-fetching này?",
+    "options": [
+      "Đổi tên cả ba endpoint REST thành một tên giống nhau.",
+      "Chỉ nén JSON mà không thay đổi cách truy vấn dữ liệu.",
+      "Truy vấn các trường và quan hệ cần thiết trong một cấu trúc truy vấn mà schema hỗ trợ.",
+      "Bỏ mọi quan hệ khỏi schema để truy vấn luôn trả một trường."
+    ],
+    "correct": 2,
+    "explanation": "GraphQL cho phép mô tả dữ liệu cần dùng, gồm các quan hệ đã được schema công bố, trong một truy vấn. Chỉ đổi tên hoặc nén dữ liệu không giải quyết việc phải ghép kết quả của nhiều lượt gọi ở máy khách.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 1–3, mục 4.1.1–4.1.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 1–3, mục 4.1.1–4.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một trường đã xuất hiện trong schema nhưng chưa có logic lấy dữ liệu phù hợp ở phía máy chủ. Thành phần nào cần được xem xét để hiện thực việc trả giá trị trường đó?",
+    "options": [
+      "Resolver gắn với trường hoặc kiểu dữ liệu tương ứng.",
+      "Header Accept của trình duyệt tự tạo toàn bộ logic truy cập dữ liệu.",
+      "Tên tệp giao diện quyết định trực tiếp dữ liệu của mọi trường.",
+      "Schema tự bảo đảm mọi truy vấn cơ sở dữ liệu đã được viết đầy đủ."
+    ],
+    "correct": 0,
+    "explanation": "Schema mô tả hợp đồng kiểu và trường, còn resolver nối yêu cầu tới logic lấy dữ liệu. Khai báo hợp đồng chưa đồng nghĩa mọi cách truy xuất dữ liệu đã được hiện thực; header hay tên tệp giao diện không thay thế resolver.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 2–3, 7–8, mục 4.1.2, 4.2.1–4.2.2.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 2–3, 7–8, mục 4.1.2, 4.2.1–4.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách yêu cầu trường secretScore không có trong schema công khai. Theo mô hình GraphQL chuẩn được giáo trình giới thiệu, cách xử lý phù hợp là gì?",
+    "options": [
+      "Tự suy đoán tên cột gần giống rồi trả dữ liệu đó.",
+      "Cho phép máy khách đọc mọi cột vì đã dùng GraphQL.",
+      "Thêm trường vào cơ sở dữ liệu ngay khi nhận truy vấn.",
+      "Từ chối truy vấn trường không hợp lệ theo schema."
+    ],
+    "correct": 3,
+    "explanation": "Schema giới hạn các kiểu và trường mà máy khách có thể yêu cầu. Khả năng chọn dữ liệu không phải quyền truy cập tùy ý mọi cột; máy chủ cần kiểm tra truy vấn theo hợp đồng đã công bố.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 2–3, 7, mục 4.1.2, 4.2.1.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 2–3, 7, mục 4.1.2, 4.2.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Ứng dụng di động chỉ cần vài trường, còn trang quản trị cần nhiều trường và quan hệ của cùng dữ liệu. Đặc điểm nào khiến GraphQL đáng cân nhắc?",
+    "options": [
+      "GraphQL bảo đảm mọi resolver đều nhanh hơn REST trong mọi trường hợp.",
+      "Các máy khách có thể yêu cầu những hình dạng dữ liệu khác nhau trên cùng schema.",
+      "GraphQL khiến máy chủ không cần thiết kế hợp đồng dữ liệu.",
+      "GraphQL luôn loại bỏ mọi chi phí truy vấn cơ sở dữ liệu."
+    ],
+    "correct": 1,
+    "explanation": "Nhu cầu dữ liệu khác nhau giữa các máy khách là lý do phù hợp để cân nhắc khả năng chọn trường của GraphQL. Hiệu năng vẫn phụ thuộc thiết kế schema, resolver và nguồn dữ liệu; không có bảo đảm tự động nhanh hơn trong mọi trường hợp.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 4–6, mục 4.1.3–4.1.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 4–6, mục 4.1.3–4.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một API có tài nguyên đơn giản, ít dạng màn hình và đang tận dụng cache HTTP theo URI hiệu quả. Đánh giá nào cân bằng nhất trước đề xuất chuyển toàn bộ sang GraphQL?",
+    "options": [
+      "Cân nhắc lợi ích chọn dữ liệu so với độ phức tạp mới; REST vẫn có thể phù hợp với yêu cầu này.",
+      "Chuyển ngay vì GraphQL luôn giữ nguyên mọi cơ chế cache theo URI của REST.",
+      "Chuyển ngay vì REST không thể trả dữ liệu có cấu trúc.",
+      "Loại bỏ cache vì mọi hệ thống phân tán đều phải đọc dữ liệu trực tiếp."
+    ],
+    "correct": 0,
+    "explanation": "Giáo trình so sánh ưu điểm và chi phí của hai hướng tiếp cận, không yêu cầu thay REST trong mọi hệ thống. Khi tài nguyên và nhu cầu đọc đơn giản, lợi ích của GraphQL cần đủ rõ để bù độ phức tạp về schema, resolver và cơ chế cache.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 4–6, mục 4.1.3–4.1.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 4–6, mục 4.1.3–4.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách thường xuyên thực hiện cùng một truy vấn bài nộp nhưng thay đổi mã bài nộp. Cách tổ chức nào tách rõ cấu trúc truy vấn và giá trị đầu vào?",
+    "options": [
+      "Đổi tên field trong schema theo từng mã bài nộp.",
+      "Tạo một endpoint GraphQL mới cho từng giá trị mã.",
+      "Dùng biến truy vấn đã khai báo kiểu và truyền mã bài nộp qua variables.",
+      "Viết mã bài nộp vào tên resolver thay vì truyền tham số."
+    ],
+    "correct": 2,
+    "explanation": "Variables cho phép giữ ổn định cấu trúc truy vấn và thay đổi giá trị đầu vào có kiểu. Giá trị cụ thể không nên trở thành tên field, tên resolver hay một endpoint riêng cho mỗi tài nguyên.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 8–9, mục 4.2.3.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 8–9, mục 4.2.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Schema công bố submissions(studentId: ID). Truy vấn chỉ chọn id và score nhưng truyền studentId = 7. Phân biệt nào đúng giữa đối số và tập trường được chọn?",
+    "options": [
+      "id và score là điều kiện lọc, còn studentId là trường bắt buộc trả về.",
+      "studentId là đầu vào cho việc lấy dữ liệu; id và score là các trường máy khách muốn nhận.",
+      "Mọi đối số đều tự trở thành một cột mới trong kết quả.",
+      "Chọn hai trường buộc resolver phải trả dữ liệu của đúng hai sinh viên."
+    ],
+    "correct": 1,
+    "explanation": "Đối số tham gia xác định dữ liệu cần truy xuất, còn tập trường mô tả hình dạng kết quả. Số trường được chọn không quyết định số bản ghi, và việc truyền đối số không tự yêu cầu trả lại đối số đó như một trường.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 7–9, mục 4.2.1–4.2.3.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 7–9, mục 4.2.1–4.2.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Bài thực hành dùng bộ xử lý truy vấn giản lược bằng biểu thức chính quy. Nhóm muốn dùng nguyên mã đó cho mọi cú pháp GraphQL trong sản phẩm. Nhận định nào đúng?",
+    "options": [
+      "Có endpoint /graphql là đã hỗ trợ đầy đủ mọi cú pháp và quy tắc GraphQL.",
+      "Biểu thức chính quy trong ví dụ tự bảo đảm xác thực mọi truy vấn lồng nhau.",
+      "Chỉ cần đổi cổng chạy là bộ xử lý giản lược trở thành máy chủ GraphQL đầy đủ.",
+      "Ví dụ chỉ minh họa một tập con; cần triển khai hoặc thư viện đầy đủ cho các tính năng GraphQL thực sự yêu cầu."
+    ],
+    "correct": 3,
+    "explanation": "Mục tiêu của ví dụ là làm rõ luồng nhận truy vấn và tạo kết quả, không chứng minh có một bộ máy GraphQL hoàn chỉnh. Khả năng hỗ trợ ngôn ngữ phụ thuộc phần xử lý thực tế, không phụ thuộc tên endpoint hoặc cổng.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 9–12, mục 4.2.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 9–12, mục 4.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách nhận HTTP 200 từ endpoint GraphQL, nhưng body có trường errors. Kết luận nào phù hợp nhất?",
+    "options": [
+      "Bỏ qua errors vì HTTP 200 chứng minh mọi trường đều có kết quả đúng.",
+      "Cần kiểm tra errors và data; HTTP 200 không đủ để khẳng định toàn bộ truy vấn thành công.",
+      "Luôn coi body là HTML lỗi và không thử đọc JSON.",
+      "Đổi mọi lỗi thành dữ liệu rỗng mà không thông báo cho người dùng."
+    ],
+    "correct": 1,
+    "explanation": "Lỗi thực thi GraphQL có thể được mô tả trong body phản hồi dù giao tiếp HTTP thành công. Máy khách cần xét cả data lẫn errors để trình bày đúng kết quả và phần bị lỗi.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 12–13, mục 4.2.5.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 12–13, mục 4.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một response GraphQL chứa dữ liệu sinh viên hợp lệ trong data nhưng có errors ở nhánh điểm số. Giao diện muốn giữ phần dữ liệu còn dùng được. Cách xử lý phù hợp là gì?",
+    "options": [
+      "Tuyên bố tất cả dữ liệu đều đầy đủ vì data khác null.",
+      "Tự gán điểm 10 cho mọi nhánh bị lỗi để kết quả đồng nhất.",
+      "Gửi lại mutation tạo sinh viên dù truy vấn ban đầu chỉ đọc dữ liệu.",
+      "Hiển thị phần data hợp lệ và báo rõ nhánh điểm số bị lỗi theo thông tin errors."
+    ],
+    "correct": 3,
+    "explanation": "GraphQL có thể trả kết quả một phần cùng thông tin lỗi. Giao diện cần phân biệt phần thành công và phần thất bại; tự tạo điểm hoặc phát sinh thao tác ghi không khôi phục đúng dữ liệu của truy vấn đọc.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 12–13, mục 4.2.5.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 12–13, mục 4.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhóm cho rằng cho phép máy khách chọn trường nghĩa là máy khách có thể bỏ qua mọi logic của máy chủ. Lập luận phản biện nào chính xác nhất?",
+    "options": [
+      "Máy khách chỉ chọn trong hợp đồng schema; máy chủ vẫn thực thi resolver và các quy tắc xử lý.",
+      "GraphQL chuyển toàn bộ cơ sở dữ liệu xuống máy khách trước khi lọc.",
+      "Máy khách tự biên dịch và chạy trực tiếp mã resolver trên máy chủ.",
+      "Mỗi lần chọn trường sẽ tự sửa schema của toàn hệ thống."
+    ],
+    "correct": 0,
+    "explanation": "Quyền chọn hình dạng kết quả không đồng nghĩa quyền thay đổi hợp đồng hay logic máy chủ. Schema xác định phạm vi có thể truy vấn và resolver hiện thực việc cung cấp dữ liệu trong phạm vi đó.\n\nNguồn đối chiếu: chapter04.pdf, trang PDF 2–6, mục 4.1.2–4.1.4.",
+    "sources": [
+      "3f318956-9a8c-5926-aed7-3c67fdb9abd5"
+    ],
+    "from": "Biên soạn nâng cao từ chapter04.pdf, trang PDF 2–6, mục 4.1.2–4.1.4."
   }
 ]

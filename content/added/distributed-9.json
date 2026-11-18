@@ -164,5 +164,197 @@
       "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
     ],
     "from": "Biên soạn nâng cao từ chapter09.pdf, mục 9.2.2"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong EduSubmit, API cần nhận bài nhanh còn việc chấm có thể kéo dài. Vị trí nào trong luồng phù hợp để tách xử lý nền?",
+    "options": [
+      "Đưa yêu cầu chấm vào hàng đợi giữa phần điều phối và worker chấm bài.",
+      "Buộc trình duyệt giữ lời gọi đồng bộ cho đến khi mọi worker hoàn tất.",
+      "Chỉ đổi REST thành gRPC nhưng vẫn chờ toàn bộ tác vụ dài trong request.",
+      "Cho trình duyệt tự ghi điểm cuối cùng trước khi worker chạy."
+    ],
+    "correct": 0,
+    "explanation": "Hàng đợi tách thời điểm tiếp nhận và điều phối khỏi thời điểm worker hoàn thành. Đổi giao thức mà vẫn chờ đồng bộ toàn bộ tác vụ không tự tạo khả năng xử lý nền; máy khách cũng không phải bên quyết định điểm cuối cùng.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 2–4, mục 9.1.1–9.1.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 2–4, mục 9.1.1–9.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi worker chấm xong, luồng nào phù hợp để người học nhận thông báo kết quả dựa trên kiến trúc tổng hợp trong giáo trình?",
+    "options": [
+      "Worker chỉ sửa trạng thái cục bộ trong RAM rồi báo mọi kết nối đã có điểm.",
+      "Trình duyệt tự tính điểm ngay sau khi nhận xác nhận tiếp nhận.",
+      "Worker lưu kết quả, phát sự kiện đã chấm; subscriber nhận và đẩy cập nhật qua SignalR.",
+      "Orchestrator gửi kết quả giả trước khi worker xử lý để giảm độ trễ."
+    ],
+    "correct": 2,
+    "explanation": "Luồng tổng hợp phân tách lưu kết quả nghiệp vụ, phát sự kiện và chuyển thông báo tới giao diện. Cần dựa trên kết quả đã xử lý; xác nhận tiếp nhận hoặc thời gian chờ không chứng minh điểm đã được tính và lưu.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 2–3, mục 9.1.1.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 2–3, mục 9.1.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Luồng chấm bài dùng REST, gRPC, queue, pub/sub và SignalR ở các chặng khác nhau. Lý do kiến trúc hợp lý nhất cho sự kết hợp này là gì?",
+    "options": [
+      "Càng nhiều giao thức thì hệ thống tự động càng đúng và càng nhanh.",
+      "Mỗi chặng có nhu cầu khác nhau về phản hồi, thời gian xử lý và số bên nhận.",
+      "Mỗi service bắt buộc dùng một giao thức hoàn toàn khác service còn lại.",
+      "Các giao thức tự loại bỏ mọi lỗi dữ liệu và lỗi mạng khi được dùng chung."
+    ],
+    "correct": 1,
+    "explanation": "Chọn MEP theo vai trò tương tác giúp giải thích vì sao có chặng đồng bộ, chặng xử lý nền và chặng phát sự kiện. Số lượng công nghệ không phải thước đo chất lượng; vẫn phải thiết kế hợp đồng, lỗi và dữ liệu ở từng ranh giới.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 3–4, mục 9.1.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 3–4, mục 9.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong sơ đồ kiến trúc, nhóm ghi “RabbitMQ” như một hộp nhưng không thể hiện queue, luồng gửi và luồng nhận. Thiếu sót này gây khó khăn gì khi đánh giá thiết kế?",
+    "options": [
+      "Chứng minh hệ thống chưa có mã C# ở bất kỳ thành phần nào.",
+      "Chứng minh broker bắt buộc phải chạy trong cùng tiến trình với trình duyệt.",
+      "Chỉ ảnh hưởng màu sắc sơ đồ, không ảnh hưởng cách hiểu kiến trúc.",
+      "Không làm rõ connector và vai trò trao đổi, nên khó biết thành phần nào gửi, nhận và theo MEP nào."
+    ],
+    "correct": 3,
+    "explanation": "Kiến trúc cần thể hiện cả thành phần và mối liên hệ giao tiếp giữa chúng. Chỉ liệt kê công nghệ không cho thấy hướng dữ liệu, cách phối hợp hay trách nhiệm; đây là thiếu thông tin thiết kế chứ không chỉ là vấn đề trình bày.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 4–5, mục 9.1.3.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 4–5, mục 9.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi thêm dịch vụ thống kê kết quả chấm, đội phát triển định sửa worker để gọi trực tiếp thêm một API thống kê. Nếu sự kiện đã chấm hiện có đủ dữ liệu, phương án nào giảm phụ thuộc trực tiếp hơn?",
+    "options": [
+      "Đưa toàn bộ mã thống kê vào tiến trình worker để mọi phần cùng thay đổi.",
+      "Cho dịch vụ thống kê đăng ký sự kiện qua queue riêng và xử lý độc lập.",
+      "Buộc trình duyệt gọi thống kê thay worker trước khi cho xem điểm.",
+      "Cho thống kê cạnh tranh cùng queue công việc chấm dù nó không thực hiện chấm bài."
+    ],
+    "correct": 1,
+    "explanation": "Sự kiện đã chấm là điểm mở rộng phù hợp cho một phản ứng nghiệp vụ mới. Subscriber riêng tránh buộc worker biết thêm endpoint; cạnh tranh trên queue chấm lại làm dịch vụ thống kê nhận sai loại trách nhiệm và có thể lấy mất công việc cần chấm.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 5–7, mục 9.1.4.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 5–7, mục 9.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Số bài nộp chờ tăng, các worker đều bận CPU, còn broker và cơ sở dữ liệu vẫn đủ năng lực. Hướng mở rộng trực tiếp nhất là gì?",
+    "options": [
+      "Chỉ tăng số trình duyệt theo dõi để bài nộp được chấm nhanh hơn.",
+      "Tăng số subscriber gửi thông báo nhưng giữ nguyên năng lực chấm.",
+      "Xóa hàng đợi để các công việc chờ không còn xuất hiện trên biểu đồ.",
+      "Tăng số worker chấm đọc từ hàng đợi chung và tiếp tục theo dõi điểm nghẽn."
+    ],
+    "correct": 3,
+    "explanation": "Giả thiết xác định khâu chấm là điểm nghẽn, nên thêm worker là thay đổi trực tiếp tới năng lực xử lý khâu đó. Mở rộng phần hiển thị hoặc thông báo không làm tăng tốc độ chấm; xóa công việc chờ làm mất việc thay vì xử lý chúng.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 8–9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 8–9, mục 9.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi tăng gấp đôi worker, tốc độ hoàn tất gần như không đổi và thời gian chờ ghi cơ sở dữ liệu tăng. Kết luận nào phù hợp nhất?",
+    "options": [
+      "Điểm nghẽn có thể đã nằm ở cơ sở dữ liệu; cần đo và xử lý khâu đó trước khi tiếp tục tăng worker.",
+      "Thêm worker luôn phải làm thông lượng tăng đúng gấp đôi, nên số đo chắc chắn vô nghĩa.",
+      "Queue không còn tác dụng nên cần bỏ toàn bộ xử lý nền ngay.",
+      "Tăng số kết nối SignalR sẽ trực tiếp giảm mọi thời gian ghi dữ liệu."
+    ],
+    "correct": 0,
+    "explanation": "Mở rộng độc lập chỉ có ích khi thành phần được mở rộng là giới hạn chính. Dấu hiệu chờ ghi tăng gợi ý phụ thuộc dữ liệu đang hạn chế thông lượng; cần quan sát toàn luồng thay vì giả định tăng worker luôn tăng tốc tuyến tính.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 8–9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 8–9, mục 9.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một worker bị dừng nhưng API, broker và các worker khác vẫn hoạt động. Cách đánh giá đúng khả năng tiếp tục phục vụ là gì?",
+    "options": [
+      "Mọi thành phần chắc chắn dừng đồng thời vì một worker bị dừng.",
+      "Mọi bài đã tiếp nhận chắc chắn hoàn tất ngay lập tức mà không cần worker.",
+      "Hệ thống có thể tiếp tục tiếp nhận và xử lý với năng lực giảm; cần theo dõi hàng đợi và công việc được giao lại.",
+      "Không cần quan sát vì hàng đợi bảo đảm dung lượng và thời gian chờ vô hạn."
+    ],
+    "correct": 2,
+    "explanation": "Tách thành phần và dùng hàng đợi giúp giới hạn tác động của một lỗi, nhưng năng lực còn lại có thể thấp hơn tải đến. Việc tích hàng đợi, xử lý lại công việc và phục hồi worker vẫn cần được theo dõi.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 8–9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 8–9, mục 9.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Người học tắt trình duyệt trước khi bài chấm xong và mở lại sau đó. Thiết kế nào giúp hiển thị đúng kết quả hiện tại?",
+    "options": [
+      "Chỉ chờ sự kiện cũ tự phát lại qua kết nối SignalR mới trong mọi trường hợp.",
+      "Yêu cầu worker chấm lại mọi bài mỗi khi người học mở trang.",
+      "Tải kết quả đã lưu qua API khi mở lại, rồi đăng ký nhận các cập nhật tiếp theo.",
+      "Coi bài chưa chấm vì trình duyệt không chứng kiến thông báo hoàn tất."
+    ],
+    "correct": 2,
+    "explanation": "Trạng thái nghiệp vụ được lưu độc lập với việc người học đang mở kết nối. API khôi phục dữ liệu hiện tại, còn SignalR tiếp tục cung cấp thay đổi về sau; thiếu một thông báo ở giao diện không có nghĩa tác vụ chưa hoàn thành.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 8–9, mục 9.2.2.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 8–9, mục 9.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Orchestrator liên tục gọi một dịch vụ phụ thuộc đang lỗi, làm tích nhiều request chờ. Mục đích phù hợp của circuit breaker là gì?",
+    "options": [
+      "Tạm ngừng các lời gọi tới phụ thuộc sau ngưỡng lỗi, rồi kiểm tra khả năng phục hồi theo chính sách.",
+      "Tự viết lại dữ liệu nghiệp vụ sai của dịch vụ phụ thuộc.",
+      "Gửi lại vô hạn mọi lời gọi ngay khi phát hiện lỗi.",
+      "Bảo đảm phụ thuộc không bao giờ có thể bị dừng."
+    ],
+    "correct": 0,
+    "explanation": "Circuit breaker hạn chế tiếp tục dồn lời gọi vào một phụ thuộc đang hỏng, giúp giảm tác động lan truyền. Nó không sửa nghiệp vụ và không bảo đảm dịch vụ luôn sống; cần chính sách mở, thử phục hồi và xử lý khi lời gọi bị chặn.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 5–7, mục 9.1.4.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 5–7, mục 9.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một số công việc có dữ liệu lỗi gây thất bại lặp đi lặp lại, cản trở quan sát các công việc bình thường. Vai trò phù hợp của DLQ trong thiết kế là gì?",
+    "options": [
+      "Tự sửa nội dung sai và bảo đảm mọi công việc thành công ngay.",
+      "Thay thế hoàn toàn cơ sở dữ liệu lưu kết quả chấm.",
+      "Xác nhận mọi công việc là đã chấm mà không cần worker thực hiện.",
+      "Tách công việc lỗi theo chính sách để kiểm tra và xử lý riêng, thay vì quay vòng vô hạn trong luồng chính."
+    ],
+    "correct": 3,
+    "explanation": "DLQ giữ riêng thông điệp không xử lý được theo chính sách, hỗ trợ chẩn đoán hoặc tái xử lý có kiểm soát. Nó không tự sửa dữ liệu và không thay thế kho kết quả nghiệp vụ; vẫn cần quy trình theo dõi các thông điệp bị chuyển vào đó.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 5–7, mục 9.1.4.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 5–7, mục 9.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi bảo vệ kiến trúc hệ thống, sơ đồ nào cung cấp cơ sở đánh giá tốt nhất?",
+    "options": [
+      "Sơ đồ chỉ có logo các công nghệ, không có đường nối.",
+      "Sơ đồ ghi trách nhiệm thành phần, hướng thông điệp, giao thức, chặng đồng bộ/bất đồng bộ và điểm có thể lỗi.",
+      "Sơ đồ chỉ liệt kê tên máy tính cá nhân của các thành viên.",
+      "Sơ đồ nối mọi hộp với mọi hộp mà không giải thích luồng nghiệp vụ."
+    ],
+    "correct": 1,
+    "explanation": "Một sơ đồ kiến trúc có giá trị phải giúp người xem hiểu hệ thống phối hợp ra sao và vì sao chọn cách đó. Thông tin về hướng, ngữ nghĩa trao đổi và lỗi giúp đánh giá thiết kế; danh sách công nghệ hoặc đường nối không có ý nghĩa chưa đủ.\n\nNguồn đối chiếu: chapter09.pdf, trang PDF 8, mục 9.2.1.",
+    "sources": [
+      "b2be60c0-cacf-590c-a8c9-03bc35f9eddd"
+    ],
+    "from": "Biên soạn nâng cao từ chapter09.pdf, trang PDF 8, mục 9.2.1."
   }
 ]

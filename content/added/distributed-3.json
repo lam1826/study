@@ -164,5 +164,197 @@
       "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
     ],
     "from": "Biên soạn nâng cao từ chapter03.pdf, mục 3.2.5"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Có 1.000 máy khách, mỗi máy gửi một request kiểm tra trạng thái mỗi 2 giây dù trạng thái hiếm khi đổi. Bỏ qua thời gian truyền, tải polling trung bình và hướng cải thiện phù hợp là gì?",
+    "options": [
+      "Khoảng 500 request/giây; cân nhắc kênh đẩy cập nhật khi trạng thái đổi.",
+      "Khoảng 2.000 request/giây; chỉ tăng kích thước JSON để giảm tải.",
+      "Khoảng 500 request/phút; chỉ cần bỏ endpoint đọc trạng thái.",
+      "Khoảng 2 request/giây; không phụ thuộc số máy khách."
+    ],
+    "correct": 0,
+    "explanation": "Mỗi máy tạo 1/2 request mỗi giây, nên tổng là 1.000/2 = 500 request/giây. Khi thay đổi thưa, push giảm các lượt hỏi không có dữ liệu mới; vẫn nên giữ API đọc trạng thái cho tải ban đầu và đồng bộ lại.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 1–3, mục 3.1.1–3.1.2.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 1–3, mục 3.1.1–3.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trang quản lý cần vừa tải danh sách bài nộp khi mở trang vừa nhận cập nhật trạng thái về sau. Cách phối hợp phù hợp nhất là gì?",
+    "options": [
+      "Chỉ mở SignalR rồi giả định mọi bài nộp cũ đều tự xuất hiện.",
+      "Chỉ gọi REST một lần và coi dữ liệu sẽ luôn mới.",
+      "Dùng REST lấy trạng thái ban đầu và SignalR nhận các cập nhật sau đó.",
+      "Tạo lại toàn bộ bài nộp mỗi khi có thông báo SignalR."
+    ],
+    "correct": 2,
+    "explanation": "REST phù hợp để lấy ảnh chụp trạng thái, còn SignalR bổ sung kênh cập nhật chủ động. Kênh kết nối không tự thay thế truy vấn dữ liệu đã tồn tại, và việc nhận thông báo không có nghĩa phải tạo lại tài nguyên.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 2, 9, mục 3.1.1, 3.2.5.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 2, 9, mục 3.1.1, 3.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một ứng dụng cần gửi thông điệp qua lại liên tục trên cùng kết nối giữa máy khách và máy chủ. Đặc điểm nào khiến WebSocket phù hợp với nhu cầu này?",
+    "options": [
+      "WebSocket buộc mỗi thông điệp phải tạo một kết nối HTTP hoàn toàn mới.",
+      "WebSocket chỉ cho máy chủ gửi, máy khách không thể gửi thông điệp.",
+      "WebSocket hỗ trợ giao tiếp hai chiều trên kết nối duy trì.",
+      "WebSocket chỉ truyền được một phản hồi rồi phải kết thúc kết nối."
+    ],
+    "correct": 2,
+    "explanation": "Kết nối WebSocket cho phép cả hai phía gửi dữ liệu, phù hợp giao tiếp hai chiều liên tục. SSE chủ yếu phục vụ chiều máy chủ đến máy khách; mô hình một phản hồi rồi kết thúc không mô tả đặc điểm nổi bật của WebSocket.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 2–3, mục 3.1.2.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 2–3, mục 3.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Đâu là mô tả đúng khác biệt giữa long polling và polling định kỳ?",
+    "options": [
+      "Long polling có thể giữ request chờ dữ liệu; sau khi nhận response, máy khách tạo request chờ tiếp.",
+      "Long polling gửi vô hạn request đồng thời mà không chờ response.",
+      "Long polling không dùng request từ máy khách ở bất kỳ bước nào.",
+      "Long polling luôn cung cấp một kết nối hai chiều giống WebSocket."
+    ],
+    "correct": 0,
+    "explanation": "Long polling kéo dài thời gian chờ của một request khi chưa có dữ liệu, thay vì liên tục hỏi theo chu kỳ ngắn. Nó vẫn dựa trên các lượt HTTP và không đồng nghĩa với kết nối WebSocket hai chiều.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 3, mục 3.1.2.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 3, mục 3.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Ứng dụng đã gọi AddSignalR nhưng máy khách không kết nối được tới /hubs/status vì chưa có endpoint hub tại đường dẫn đó. Bước cấu hình còn thiếu là gì?",
+    "options": [
+      "Đăng ký thêm một DTO trùng tên đường dẫn trong DI.",
+      "Đổi mọi phương thức của hub thành phương thức static.",
+      "Bỏ URL hub khỏi máy khách để thư viện tự đoán đường dẫn.",
+      "Ánh xạ hub tại đúng đường dẫn bằng MapHub với kiểu hub tương ứng."
+    ],
+    "correct": 3,
+    "explanation": "AddSignalR đăng ký các dịch vụ cần thiết, còn MapHub công bố endpoint tại đường dẫn cụ thể. Hai nhiệm vụ bổ sung cho nhau; máy khách phải sử dụng đúng URL đã ánh xạ.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 4, mục 3.2.1.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 4, mục 3.2.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ gửi SendAsync(\"StatusChanged\", payload), nhưng máy khách chỉ đăng ký On<T>(\"ReceiveStatus\", ...). Kết nối vẫn mở mà giao diện không cập nhật. Cần kiểm tra điều gì trước?",
+    "options": [
+      "Tên lớp DTO bắt buộc phải trùng với tên phương thức StartAsync.",
+      "Tên thông điệp ở SendAsync và tên đăng ký handler phải thống nhất.",
+      "Mọi lỗi tên thông điệp đều phải khiến máy chủ không biên dịch được.",
+      "SignalR chỉ nhận thông điệp nếu URL hub chứa tên người dùng."
+    ],
+    "correct": 1,
+    "explanation": "Tên thông điệp dạng chuỗi là hợp đồng giữa phía gửi và handler phía nhận. Hai tên khác nhau có thể làm handler mong muốn không được gọi dù kết nối vẫn hoạt động; trình biên dịch không tự đối chiếu mọi chuỗi giữa hai ứng dụng.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 6–7, mục 3.2.2–3.2.3.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 6–7, mục 3.2.2–3.2.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ có thể gửi thông báo ngay khi kết nối được thiết lập. Trình tự khởi tạo máy khách nào giúp sẵn sàng xử lý thông điệp sớm?",
+    "options": [
+      "Tạo HubConnection, đăng ký handler nhận, rồi gọi StartAsync.",
+      "Gọi StartAsync, chờ vài thông điệp bị bỏ qua, rồi mới đăng ký handler.",
+      "Đăng ký handler sau khi đóng HubConnection.",
+      "Gọi SendAsync trước khi tạo đối tượng HubConnection."
+    ],
+    "correct": 0,
+    "explanation": "Đăng ký handler trước khi mở kết nối giúp máy khách đã sẵn sàng khi thông điệp đến. Đăng ký muộn tạo khoảng thời gian không có hàm xử lý phù hợp; đóng kết nối hay gửi trước khi tạo kết nối đều không đáp ứng yêu cầu.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 6–7, mục 3.2.3.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 6–7, mục 3.2.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một lớp học có nhiều người theo dõi; máy chủ chỉ muốn đẩy thông báo của lớp đó đến các kết nối đã được thêm vào nhóm tương ứng. Cách gửi nào phù hợp?",
+    "options": [
+      "Gửi tới Clients.All rồi coi mọi người đều thuộc lớp đó.",
+      "Gửi tới Clients.Caller để tất cả người theo dõi đều nhận.",
+      "Gửi tới Clients.Group với tên nhóm của lớp.",
+      "Gửi tới một connection ID ngẫu nhiên để đại diện cho cả nhóm."
+    ],
+    "correct": 2,
+    "explanation": "Group gom các kết nối đã được thêm vào cùng một nhóm và cho phép gửi có chủ đích. All mở rộng ra mọi kết nối, Caller chỉ là bên đang gọi, còn một connection ID chỉ nhắm một kết nối.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 8, mục 3.2.4.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 8, mục 3.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một phương thức hub cần trả thông báo riêng cho kết nối vừa gọi nó, không gửi cho các kết nối khác. Đối tượng nhận nào phù hợp nhất?",
+    "options": [
+      "Clients.All.",
+      "Clients.Caller.",
+      "Clients.Group với tên của mọi lớp học.",
+      "Mọi kết nối có cùng địa chỉ IP mạng nội bộ."
+    ],
+    "correct": 1,
+    "explanation": "Caller chỉ kết nối đang gọi phương thức hub. All và nhóm nhiều kết nối có phạm vi rộng hơn; địa chỉ IP cũng không phải khái niệm chọn bên gọi của API hub trong tình huống này.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 8, mục 3.2.4.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 8, mục 3.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách mất kết nối 30 giây rồi kết nối lại. Trong khoảng đó, trạng thái bài nộp đã thay đổi. Cách khôi phục giao diện đáng tin cậy nhất là gì?",
+    "options": [
+      "Giữ nguyên trạng thái cũ vì nối lại bảo đảm phát lại mọi thông điệp đã bỏ lỡ.",
+      "Tự chuyển mọi bài nộp sang hoàn tất mà không đọc trạng thái máy chủ.",
+      "Xóa dữ liệu trên máy chủ để giao diện và máy chủ cùng trống.",
+      "Gọi REST API lấy trạng thái mới nhất sau khi nối lại, rồi tiếp tục nhận SignalR."
+    ],
+    "correct": 3,
+    "explanation": "Khôi phục kết nối không tự bảo đảm máy khách nhận lại toàn bộ thông điệp đã bỏ lỡ. Đồng bộ lại từ API lấy trạng thái hiện tại, sau đó kênh thời gian thực tiếp tục cập nhật; không cần suy đoán kết quả hoặc xóa dữ liệu.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 9, mục 3.2.5.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 9, mục 3.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi HubConnection phát sự kiện Reconnecting, giao diện nên hiểu và biểu diễn trạng thái nào?",
+    "options": [
+      "Mọi thao tác nghiệp vụ đã thất bại vĩnh viễn và phải xóa khỏi máy chủ.",
+      "Kết nối đang gián đoạn và thư viện đang thử nối lại; dữ liệu hiển thị có thể chưa cập nhật.",
+      "Kết nối đã khôi phục hoàn toàn và mọi thông điệp thiếu đã được phát lại.",
+      "Máy chủ đã chấm xong tất cả bài nộp của người dùng."
+    ],
+    "correct": 1,
+    "explanation": "Reconnecting mô tả vòng đời kết nối, không phải kết quả nghiệp vụ hay xác nhận đồng bộ dữ liệu. Giao diện nên thông báo đang nối lại và thực hiện đồng bộ trạng thái khi kết nối được khôi phục.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 8–9, mục 3.2.5.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 8–9, mục 3.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một báo cáo chỉ cần xem số liệu khi người dùng bấm “Tải lại”, không có yêu cầu cập nhật tức thời. Lựa chọn giao tiếp nào hợp lý nhất với nhu cầu hiện tại?",
+    "options": [
+      "Bắt buộc mở SignalR vì mọi ứng dụng phân tán đều cần kết nối liên tục.",
+      "Bắt buộc dùng WebSocket để đọc bất kỳ dữ liệu JSON nào.",
+      "Bắt buộc bỏ REST vì HTTP không hỗ trợ lấy báo cáo.",
+      "Dùng request/response để tải báo cáo khi cần, chưa cần thêm kênh thời gian thực."
+    ],
+    "correct": 3,
+    "explanation": "Công nghệ nên đi theo nhu cầu tương tác. Khi người dùng chủ động tải dữ liệu và không yêu cầu cập nhật tức thời, request/response đáp ứng được; việc thêm kênh thời gian thực chỉ vì ứng dụng phân tán không có cơ sở từ yêu cầu này.\n\nNguồn đối chiếu: chapter03.pdf, trang PDF 2–3, mục 3.1.1–3.1.2.",
+    "sources": [
+      "c8283d8f-e6aa-5eb5-8ed0-bd3b2c70c14c"
+    ],
+    "from": "Biên soạn nâng cao từ chapter03.pdf, trang PDF 2–3, mục 3.1.1–3.1.2."
   }
 ]

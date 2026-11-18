@@ -1,0 +1,334 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "R1 đã có ba tuyến trong bảng định tuyến: 172.20.0.0/16 qua 10.0.0.2, 172.20.8.0/24 qua 10.0.1.2 và 0.0.0.0/0 qua 10.0.2.2. Gói tin tới 172.20.8.50 sẽ được gửi đến next-hop nào?",
+    "options": [
+      "10.0.1.2",
+      "10.0.0.2",
+      "10.0.2.2",
+      "Cả ba next-hop luân phiên"
+    ],
+    "correct": 0,
+    "explanation": "Địa chỉ đích khớp cả ba tuyến, nhưng /24 là tiền tố dài nhất nên tuyến qua 10.0.1.2 được dùng. Tuyến /16 ít cụ thể hơn; tuyến mặc định chỉ được chọn khi không có tuyến cụ thể phù hợp. Ba tuyến khác tiền tố này không được chia tải luân phiên.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 2–3, mục 7.1.1.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong bảng định tuyến của R1 có C 192.168.30.0/24 và L 192.168.30.1/32 trên G0/0. Một gói tin có IP đích 192.168.30.1 được hiểu đúng nhất như thế nào?",
+    "options": [
+      "Gói phải được gửi tới một máy bất kỳ trong mạng /24",
+      "Gói gửi tới chính địa chỉ IP của cổng R1",
+      "Gói chỉ dùng được tuyến mặc định vì /32 không phải mạng",
+      "Gói phải được phát quảng bá tới mọi cổng"
+    ],
+    "correct": 1,
+    "explanation": "Tuyến L /32 biểu diễn chính địa chỉ IP của giao diện Router, nên đích này thuộc về R1. Tuyến C biểu diễn toàn mạng kết nối trực tiếp. Không cần tuyến mặc định và không biến gói có đích cục bộ thành quảng bá.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 2, mục 7.1.1.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "G0/1 của R1 đang up/up với IP 192.168.40.1/24. Sau khi quản trị viên nhập shutdown trên G0/1, thay đổi nào được dự kiến trong bảng định tuyến?",
+    "options": [
+      "Chỉ tuyến L biến mất, tuyến C vẫn giữ nguyên",
+      "Tuyến C tự chuyển thành tuyến S",
+      "Tuyến C 192.168.40.0/24 và L 192.168.40.1/32 biến mất",
+      "R1 tự học một tuyến OSPF thay thế"
+    ],
+    "correct": 2,
+    "explanation": "Tuyến kết nối trực tiếp phụ thuộc vào giao diện đang hoạt động. Khi G0/1 bị tắt, cả tuyến C của subnet và tuyến L của địa chỉ giao diện đều không còn hoạt động trong bảng. Router không tự chuyển tuyến kết nối thành tuyến tĩnh hoặc tự kích hoạt OSPF.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 2, 16, mục 7.1.1 và 7.3.1.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 chỉ có các tuyến kết nối trực tiếp 192.168.10.0/24 và 10.0.0.0/30; Gateway of last resort is not set. Khi nhận gói tới 198.51.100.25, R1 sẽ làm gì?",
+    "options": [
+      "Chuyển tới mọi cổng Ethernet để tìm đích",
+      "Gửi tới địa chỉ MAC nguồn của gói",
+      "Chọn tuyến 10.0.0.0/30 vì đó là mạng nhỏ hơn",
+      "Loại bỏ gói vì không có tuyến khớp và không có tuyến mặc định"
+    ],
+    "correct": 3,
+    "explanation": "Không tuyến nào trong bảng chứa 198.51.100.25 và cũng không có tuyến mặc định để sử dụng. Router vì thế loại bỏ gói; cơ chế định tuyến không flood gói như switch xử lý unknown unicast và cũng không chọn mạng không khớp chỉ vì mạng đó nhỏ hơn.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 1–2, 5, mục 7.1.1 và 7.1.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "LAN A 192.168.10.0/24 nối R1; LAN B 192.168.20.0/24 nối R2. Liên kết R1–R2 dùng 10.0.0.1/30 và 10.0.0.2/30. R1 đã có tuyến tới LAN B qua 10.0.0.2; R2 chỉ có các tuyến kết nối trực tiếp. Hai PC đặt gateway đúng, không có ACL. Cần thêm lệnh nào trên R2 để có đường trả lời về LAN A?",
+    "options": [
+      "ip route 192.168.10.0 255.255.255.0 10.0.0.1",
+      "ip route 192.168.20.0 255.255.255.0 10.0.0.1",
+      "ip route 192.168.10.0 255.255.255.0 10.0.0.2",
+      "ip route 10.0.0.0 255.255.255.252 192.168.10.1"
+    ],
+    "correct": 0,
+    "explanation": "R2 cần tuyến tới mạng nguồn LAN A với next-hop là R1, tức 10.0.0.1. LAN B và mạng liên kết đã kết nối trực tiếp với R2; 10.0.0.2 là chính R2, không phải Router kế tiếp. Định tuyến chỉ cấu hình một chiều không bảo đảm ping thành công.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 5–6, mục 7.1.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 nối EDGE bằng 10.0.0.1/30–10.0.0.2/30 và có default route qua EDGE. Máy chủ 203.0.113.10 nằm sau EDGE, gateway đúng. R1 ping máy chủ với nguồn 10.0.0.1 thành công; PC 192.168.10.10 sau R1 ping thất bại. EDGE không có tuyến tới 192.168.10.0/24. Cách giải thích phù hợp nhất là gì?",
+    "options": [
+      "Máy chủ không thể trả lời bất kỳ gói ICMP nào",
+      "EDGE biết đường về 10.0.0.1 nhưng thiếu đường về mạng của PC",
+      "R1 chưa có tuyến mặc định",
+      "PC và máy chủ phải được đổi sang cùng một VLAN"
+    ],
+    "correct": 1,
+    "explanation": "Nguồn của hai phép ping khác nhau. EDGE có mạng 10.0.0.0/30 kết nối trực tiếp nên trả lời được R1, nhưng chưa có đường trả lời về 192.168.10.0/24. Cần bổ sung tuyến chiều về; thành công từ Router không chứng minh mọi LAN phía sau đã có kết nối hai chiều.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 18, mục 7.3.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC-A có IP 192.168.10.20/24, cùng VLAN với gateway 192.168.10.1. PC-A ping gateway và máy cùng VLAN được, nhưng không liên lạc với VLAN 20; trường default gateway trên PC-A đang để trống. Thay đổi nào trực tiếp xử lý lỗi này?",
+    "options": [
+      "Đổi IP PC-A thành địa chỉ broadcast của VLAN 10",
+      "Tăng tốc độ cổng switch từ 100 Mb/s lên 1 Gb/s",
+      "Đặt default gateway của PC-A là 192.168.10.1",
+      "Đặt default gateway của PC-A là một PC trong VLAN 20"
+    ],
+    "correct": 2,
+    "explanation": "Đích khác subnet phải được gửi qua một gateway thuộc subnet của PC. 192.168.10.1 đáp ứng yêu cầu này. Liên lạc nội bộ vẫn hoạt động khi thiếu gateway; tăng băng thông không tạo đường ra, còn địa chỉ broadcast hoặc gateway ở VLAN khác đều không phù hợp.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 10–11, mục 7.2.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC-A 192.168.10.20/24 gửi tới PC-B 192.168.20.30/24 qua R1; gateway của PC-A là 192.168.10.1. Không có NAT. Ở chặng PC-A → R1, cặp địa chỉ đích nào nằm trong frame/gói tin?",
+    "options": [
+      "MAC đích của PC-B; IP đích 192.168.10.1",
+      "MAC đích của PC-A; IP đích 192.168.20.30",
+      "MAC broadcast; IP đích 192.168.10.255",
+      "MAC đích của gateway; IP đích 192.168.20.30"
+    ],
+    "correct": 3,
+    "explanation": "PC-A dùng MAC của gateway để chuyển frame trong VLAN 10, nhưng IP đích vẫn là PC-B ở đầu cuối. MAC của PC-B chỉ được dùng ở chặng cuối thuộc VLAN 20. ARP request có thể là broadcast trước đó, còn frame dữ liệu sau khi phân giải ARP không vì thế trở thành broadcast.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 10–11, mục 7.2.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 nhận gói từ PC-A thuộc VLAN 10 để chuyển tới PC-B thuộc VLAN 20. G0/1 của R1 là cổng đi ra VLAN 20; không có NAT. Trong frame mới R1 gửi cho PC-B, MAC nguồn là gì?",
+    "options": [
+      "MAC của G0/1 trên R1",
+      "MAC của PC-A",
+      "MAC của cổng R1 nhận gói từ VLAN 10",
+      "MAC broadcast FF:FF:FF:FF:FF:FF"
+    ],
+    "correct": 0,
+    "explanation": "Router loại bỏ header Ethernet cũ và tạo frame cho chặng mới. MAC nguồn là MAC cổng đi ra G0/1, MAC đích là PC-B. IP nguồn vẫn là PC-A khi không có NAT; việc giữ IP nguồn không đồng nghĩa giữ MAC nguồn qua Router.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 11, mục 7.2.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một văn phòng có hai VLAN được nối trực tiếp vào hai cổng R1. Cả hai cổng đã đặt IP đúng và up/up; các PC dùng gateway đúng. Để riêng hai VLAN này định tuyến qua R1, nhận định nào chính xác?",
+    "options": [
+      "Phải chạy RIP trước khi Router có thể chuyển gói",
+      "Các tuyến kết nối trực tiếp đã cung cấp đường tới hai subnet",
+      "Phải đặt một tuyến mặc định cho từng VLAN trên R1",
+      "Phải cấu hình VTP để Router học địa chỉ IP của PC"
+    ],
+    "correct": 1,
+    "explanation": "R1 tự có tuyến C cho mỗi mạng trực tiếp và có thể định tuyến giữa chúng khi các cấu hình còn lại đúng. Định tuyến động hay tuyến mặc định chỉ cần cho các nhu cầu khác, không bắt buộc để biết hai subnet đã trực tiếp kết nối. VTP quản lý VLAN, không cung cấp tuyến IP cho Router.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 2, 16–17, mục 7.1.1 và 7.3.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "RIP học hai đường tới cùng một mạng: đường A đi qua 2 hop bằng các liên kết chậm, đường B đi qua 3 hop bằng các liên kết nhanh hơn. Nếu chỉ xét metric RIP và cả hai đường đều hợp lệ, đường nào được ưu tiên?",
+    "options": [
+      "Đường B vì RIP luôn ưu tiên tổng băng thông cao hơn",
+      "Hai đường luôn được chia tải dù khác hop-count",
+      "Đường A vì RIP dùng số hop làm metric",
+      "Không đường nào vì RIP chỉ chấp nhận 1 hop"
+    ],
+    "correct": 2,
+    "explanation": "RIP dùng hop-count, nên 2 hop tốt hơn 3 hop dù các liên kết của đường B nhanh hơn. Băng thông không phải metric mà RIP dùng trong so sánh này. Giới hạn của RIP là tối đa 15 hop có thể đạt tới, không phải chỉ 1 hop.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 8–9, mục 7.1.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một mạng doanh nghiệp cần giao thức định tuyến nội bộ chuẩn mở, sử dụng cơ sở dữ liệu trạng thái liên kết và thuật toán Dijkstra. Lựa chọn nào phù hợp với các yêu cầu này?",
+    "options": [
+      "RIP vì dùng số hop làm metric",
+      "Định tuyến tĩnh vì không trao đổi cập nhật",
+      "EIGRP vì dùng thuật toán DUAL",
+      "OSPF"
+    ],
+    "correct": 3,
+    "explanation": "OSPF là giao thức link-state chuẩn mở, xây dựng LSDB và chạy Dijkstra. RIP là distance vector dùng hop-count; EIGRP dùng DUAL; định tuyến tĩnh dựa cấu hình thủ công nên không hình thành LSDB bằng trao đổi trạng thái liên kết.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 8–9, mục 7.1.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 học cùng mạng 172.16.8.0/24 qua OSPF với AD 110 và EIGRP internal với AD 90; cả hai đường đều hợp lệ, không có tuyến khác cạnh tranh. Nguồn tuyến nào được ưu tiên để đưa vào bảng định tuyến?",
+    "options": [
+      "EIGRP internal vì AD 90 nhỏ hơn 110",
+      "OSPF vì 110 lớn hơn 90",
+      "Cả hai luôn được chọn vì cùng mặt nạ",
+      "Nguồn có tên giao thức đứng trước theo bảng chữ cái"
+    ],
+    "correct": 0,
+    "explanation": "Khi cùng một tiền tố được học từ các nguồn khác nhau, AD thấp hơn biểu thị nguồn được ưu tiên. Với các giá trị đã cho, EIGRP internal thắng. Metric của hai giao thức không được so trực tiếp với nhau như cùng một thang đo; tên giao thức không quyết định ưu tiên.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 2, 9, mục 7.1.1 và 7.1.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 đã có default route qua EDGE 10.0.0.2. EDGE có tuyến về VLAN 10 và 20 qua R1 10.0.0.1. Văn phòng thêm VLAN 30 mạng 192.168.30.0/24 nối trực tiếp R1, cổng và PC đều cấu hình đúng. Trên EDGE cần thêm gì để máy chủ sau EDGE trả lời được VLAN mới?",
+    "options": [
+      "Xóa hai tuyến cũ để EDGE tự học mọi VLAN",
+      "ip route 192.168.30.0 255.255.255.0 10.0.0.1",
+      "Đổi default gateway của mọi PC thành 10.0.0.2",
+      "ip route 192.168.30.0 255.255.255.0 10.0.0.2"
+    ],
+    "correct": 1,
+    "explanation": "EDGE cần biết mạng mới nằm sau R1 nên next-hop là 10.0.0.1. Default route đã có trên R1 vẫn đảm nhiệm chiều đi ra. Địa chỉ 10.0.0.2 là chính EDGE, còn PC VLAN 30 phải dùng gateway trong subnet VLAN 30, không dùng trực tiếp địa chỉ WAN của EDGE.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 18, mục 7.3.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một Router dành riêng G0/0 cho VLAN 10 và G0/1 cho VLAN 20, không dùng subinterface. Hai cổng Router lần lượt nối Fa0/1 và Fa0/2 của cùng switch. Cấu hình nào đúng cho hai cổng switch?",
+    "options": [
+      "Cả hai cùng là access VLAN 1",
+      "Cả hai là trunk và Router tự suy ra VLAN",
+      "Fa0/1 access VLAN 10; Fa0/2 access VLAN 20",
+      "Fa0/1 access VLAN 20; Fa0/2 access VLAN 10 bất kể IP Router"
+    ],
+    "correct": 2,
+    "explanation": "Trong mô hình mỗi VLAN một cổng vật lý, cổng switch hướng tới Router là access của VLAN tương ứng. Trunk và subinterface thuộc mô hình Router-on-a-Stick khác; đảo VLAN hoặc để cả hai trong VLAN 1 làm sai ánh xạ giữa VLAN và gateway.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 11, 16–17, mục 7.2.3 và 7.3.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Ba VLAN đều dùng các subinterface trên G0/0 của R1 để liên lạc với nhau. Nếu đường trunk duy nhất giữa switch và G0/0 bị đứt, trong khi các cổng PC vẫn hoạt động, tác động trực tiếp nào xảy ra?",
+    "options": [
+      "Chỉ VLAN có số hiệu lớn nhất mất gateway",
+      "Switch lớp 2 tự tiếp quản toàn bộ định tuyến",
+      "Mỗi PC sẽ tự tìm một Router khác bằng VTP",
+      "Cả ba VLAN mất đường qua R1 để định tuyến giữa các VLAN"
+    ],
+    "correct": 3,
+    "explanation": "Các subinterface cùng phụ thuộc một cổng vật lý và một đường trunk. Khi đường này mất, cả ba VLAN đều mất kết nối tới các gateway trên R1. Liên lạc lớp 2 bên trong từng VLAN có thể vẫn còn, nhưng switch lớp 2 không tự trở thành Router dự phòng.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 12–13, mục 7.2.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 có G0/0 192.168.50.1/24 đang up/up. Hai nhận xét nào đúng về các tuyến C và L liên quan đến cổng này? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Tuyến C mô tả mạng 192.168.50.0/24 kết nối trực tiếp",
+      "Tuyến L mô tả mọi mạng Internet chưa biết",
+      "Tuyến L dùng /32 để biểu diễn địa chỉ 192.168.50.1 của chính Router",
+      "Tuyến C chỉ xuất hiện sau khi bật RIP"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "Tuyến C được sinh cho subnet kết nối trực tiếp, còn tuyến L /32 biểu diễn địa chỉ giao diện cục bộ. Các tuyến này không cần RIP. Vai trò bao phủ đích không có tuyến cụ thể thuộc về default route 0.0.0.0/0, không phải tuyến L.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 2, mục 7.1.1.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 quản lý LAN 192.168.10.0/24 và nối EDGE bằng 10.0.0.1/30–10.0.0.2/30. Máy chủ 203.0.113.10/24 nối trực tiếp EDGE và dùng EDGE làm gateway. PC trong LAN dùng R1 làm default gateway. Các giao diện đều hoạt động, không có NAT/ACL. Hai cấu hình nào tạo đủ đường đi và về giữa LAN và máy chủ? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Trên R1: ip route 0.0.0.0 0.0.0.0 10.0.0.1",
+      "Trên R1: ip route 0.0.0.0 0.0.0.0 10.0.0.2",
+      "Trên EDGE: ip route 192.168.10.0 255.255.255.0 10.0.0.2",
+      "Trên EDGE: ip route 192.168.10.0 255.255.255.0 10.0.0.1"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "R1 gửi các đích bên ngoài tới địa chỉ của EDGE là 10.0.0.2; EDGE gửi gói trả lời về LAN qua R1 là 10.0.0.1. Hai lựa chọn còn lại dùng chính địa chỉ Router đang cấu hình làm next-hop nên không tạo đường đi mong muốn.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 7, 18, mục 7.1.2 và 7.3.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một gói IPv4 còn TTL lớn hơn 1 đi từ VLAN 10 sang VLAN 20 qua một Router, không có NAT. Hai thay đổi/đặc điểm nào đúng khi Router chuyển tiếp gói? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Header Ethernet được thay bằng header phù hợp với chặng ra",
+      "IP nguồn luôn bị đổi thành IP cổng ra của Router",
+      "MAC nguồn của PC được giữ nguyên trong mọi frame sau Router",
+      "TTL của gói IP giảm đi 1"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "Router bỏ header lớp 2 cũ, tra tuyến rồi đóng gói frame mới cho chặng ra và giảm TTL. Khi không có NAT, IP nguồn và đích vẫn xác định hai đầu liên lạc. MAC không được giữ xuyên Router vì chỉ có ý nghĩa trên từng chặng lớp 2.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 11, mục 7.2.2.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Doanh nghiệp có nhiều VLAN và lưu lượng nội bộ lớn, đang cân nhắc thay Router-on-a-Stick bằng switch lớp 3. Hai nhận xét nào giải thích lợi ích của lựa chọn này theo bài giảng? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Mọi PC có thể bỏ cấu hình default gateway",
+      "Định tuyến giữa VLAN có thể diễn ra ngay bên trong switch lớp 3",
+      "Giảm việc dồn lưu lượng nội bộ qua một đường trunk duy nhất tới Router",
+      "Một SVI duy nhất tự làm gateway cho mọi subnet mà không cần IP riêng"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Switch lớp 3 dùng các SVI của từng VLAN làm gateway và xử lý định tuyến nội bộ bằng phần cứng, tránh dồn toàn bộ lưu lượng qua một liên kết Router-on-a-Stick. PC vẫn cần gateway phù hợp, và mỗi VLAN/subnet cần ánh xạ gateway đúng.\n\nNguồn đối chiếu: chapter07(1).pdf, trang PDF 12–13, mục 7.2.3.",
+    "sources": [
+      "7c24c40d-5f6b-5580-81fb-b48fe3ba81b1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 7"
+  }
+]

@@ -1,0 +1,334 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "R1 có subinterface G0/0.7 với encapsulation dot1Q 30 và IP 192.168.30.1/24. Switch gửi VLAN 30 đúng trên trunk. Nhận xét nào đúng về cấu hình này?",
+    "options": [
+      "Cổng phụ phục vụ VLAN 30 dù chỉ số cổng phụ là 7",
+      "Cổng phụ chỉ có thể phục vụ VLAN 7",
+      "Phải đổi IP thành 192.168.7.1 vì số cổng phụ quyết định subnet",
+      "Cổng phụ sẽ nhận đồng thời mọi VLAN từ 7 đến 30"
+    ],
+    "correct": 0,
+    "explanation": "Chỉ số sau dấu chấm có ý nghĩa cục bộ; encapsulation dot1Q 30 mới quyết định VLAN được ánh xạ. Đặt chỉ số bằng VLAN ID chỉ là quy ước để dễ quản lý. Cổng phụ này không tự đại diện cho một dải VLAN hoặc ép subnet theo tên cổng.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 3–4, mục 8.1.2 và 8.1.3.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC VLAN 20 không ping được gateway 192.168.20.1, còn VLAN 10 vẫn hoạt động. Trunk đã cho phép VLAN 10,20, cổng PC thuộc VLAN 20. Trên R1, G0/0.20 được cấu hình encapsulation dot1Q 200 với IP 192.168.20.1/24. Lỗi cần sửa là gì?",
+    "options": [
+      "Đổi chỉ số cổng phụ từ .20 thành .200",
+      "Sửa encapsulation dot1Q thành 20 và kiểm tra lại IP cổng phụ",
+      "Đổi tất cả máy VLAN 20 sang IP 192.168.10.0/24",
+      "Tắt VLAN 10 để Router chỉ còn một cổng phụ"
+    ],
+    "correct": 1,
+    "explanation": "Switch gắn thẻ VLAN 20 nhưng cổng phụ đang chờ VLAN 200 nên không tiếp nhận lưu lượng đúng VLAN. Cần sửa VLAN ID trong encapsulation và xác nhận lại địa chỉ IP. Chỉ đổi tên cổng phụ hoặc phá bỏ VLAN đang chạy không xử lý nguyên nhân.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 8, 17, mục 8.2.2 và 8.4.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Các subinterface G0/0.10, G0/0.20 và G0/0.30 đều down. show ip interface brief cho biết G0/0 administratively down. Lệnh nào cần thực hiện trước tiên?",
+    "options": [
+      "no shutdown trên từng cổng PC",
+      "Xóa toàn bộ các subinterface rồi tạo lại",
+      "no shutdown trên interface GigabitEthernet0/0",
+      "ip routing trên switch lớp 2"
+    ],
+    "correct": 2,
+    "explanation": "Các cổng phụ phụ thuộc trạng thái của cổng vật lý chứa chúng. Administratively down cho biết G0/0 bị tắt bằng cấu hình; bật G0/0 là bước xử lý trực tiếp. Tạo lại subinterface hoặc tác động cổng PC không khắc phục cổng cha đang shutdown.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 4, 8, mục 8.2.1 và 8.2.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 đã cấu hình đúng gateway cho VLAN 10,20,30. Trunk switch–Router đang hoạt động nhưng allowed VLAN list chỉ có 10,20. PC VLAN 30 không ping được gateway, các VLAN khác bình thường. Cần thay đổi gì để VLAN 30 hoạt động mà vẫn giữ VLAN 10,20?",
+    "options": [
+      "Đổi cổng trunk thành access VLAN 30",
+      "Xóa VLAN 10 và 20 khỏi switch",
+      "Thay allowed VLAN list bằng danh sách chỉ chứa VLAN 30",
+      "Bổ sung VLAN 30 vào allowed VLAN list hiện có của trunk"
+    ],
+    "correct": 3,
+    "explanation": "VLAN cần định tuyến phải được phép trên trunk. Bổ sung VLAN 30 vào danh sách hiện có cho phép vận chuyển cả ba VLAN; thay danh sách bằng chỉ VLAN 30 sẽ làm mất vận chuyển VLAN 10,20. Đổi sang access hoặc xóa VLAN đang hoạt động không giải quyết đúng yêu cầu.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 6, mục 8.2.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi tạo subinterface mới G0/0.40, quản trị viên nhập ip address trước nhưng IOS từ chối do chưa khai báo VLAN encapsulation. Thứ tự nào phù hợp với quy trình trong bài giảng?",
+    "options": [
+      "encapsulation dot1Q 40 rồi ip address 192.168.40.1 255.255.255.0",
+      "ip default-gateway 192.168.40.1 rồi shutdown",
+      "switchport access vlan 40 rồi ip routing",
+      "vtp domain 40 rồi ip address 192.168.40.1 255.255.255.0"
+    ],
+    "correct": 0,
+    "explanation": "Cổng phụ cần được gắn với VLAN bằng encapsulation dot1Q trước khi đặt IP gateway. Lệnh switchport thuộc cấu hình cổng switch lớp 2; VTP không thay thế đóng gói 802.1Q trên Router. ip default-gateway cũng không tạo ánh xạ VLAN cho subinterface.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 4–5, mục 8.2.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trên CORE, interface vlan 40 đã có IP và no shutdown. Tuy nhiên show vlan brief không có VLAN 40. Vì sao SVI chưa hoạt động đúng?",
+    "options": [
+      "SVI chỉ hoạt động nếu chỉ số VLAN nhỏ hơn 10",
+      "Tạo SVI chưa đủ; VLAN 40 còn phải tồn tại trong cơ sở dữ liệu VLAN",
+      "Cần dùng cùng địa chỉ IP cho tất cả SVI",
+      "Cần xóa lệnh no shutdown để SVI tự thương lượng"
+    ],
+    "correct": 1,
+    "explanation": "Bài giảng phân biệt việc tạo giao diện SVI với việc tạo VLAN. VLAN tương ứng phải tồn tại, SVI không shutdown và phải có cổng hoạt động mang VLAN đó. Số VLAN 40 không phải nguyên nhân; dùng IP trùng hoặc shutdown không giải quyết điều kiện đang thiếu.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 8–9, 20–21, mục 8.3.1 và 8.4.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "VLAN 50 đã tồn tại trên CORE và SVI VLAN 50 đã no shutdown. Tất cả cổng access VLAN 50 đều mất liên kết, các trunk không mang VLAN 50. Điều kiện nào đang thiếu để SVI hoạt động?",
+    "options": [
+      "Một VTP server nằm ngoài VLAN 50",
+      "Một tuyến mặc định tới 0.0.0.0/0",
+      "Ít nhất một cổng hoạt động mang VLAN 50",
+      "Một địa chỉ IP giống SVI VLAN 1"
+    ],
+    "correct": 2,
+    "explanation": "SVI cần có ít nhất một cổng access đang hoạt động trong VLAN hoặc một trunk hoạt động mang VLAN đó. Tồn tại VLAN và no shutdown là cần nhưng chưa đủ. Tuyến mặc định hay IP của VLAN khác không thay thế kết nối lớp 2 của VLAN 50.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 8–9, mục 8.3.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "CORE là switch lớp 3, đã có SVI VLAN 10 và 20 up/up, PC đặt IP/gateway đúng và không có ACL. Mỗi PC ping được SVI cùng VLAN nhưng không ping được PC VLAN khác. Cấu hình toàn cục chưa có ip routing. Bổ sung nào giải quyết đúng nguyên nhân đã nêu?",
+    "options": [
+      "spanning-tree portfast trên mọi cổng trunk",
+      "vtp mode server",
+      "ip default-gateway trỏ tới một PC",
+      "ip routing"
+    ],
+    "correct": 3,
+    "explanation": "SVI có IP giúp switch nhận gói tới chính nó, nhưng chuyển tiếp IPv4 giữa các subnet cần bật ip routing trên switch lớp 3. ip default-gateway phục vụ hướng ra của thiết bị không định tuyến; VTP và PortFast không bật chức năng định tuyến giữa các VLAN.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 9, 20, mục 8.3.1 và 8.4.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "CORE cần dùng Gi1/0/24 làm liên kết lớp 3 có IP trực tiếp tới Router biên, không mang trunk VLAN. Lệnh nào chuyển cổng sang vai trò phù hợp trước khi đặt IP?",
+    "options": [
+      "no switchport",
+      "switchport mode trunk",
+      "switchport access vlan 24",
+      "encapsulation dot1Q 24"
+    ],
+    "correct": 0,
+    "explanation": "no switchport chuyển cổng vật lý của switch lớp 3 thành routed port để gán IP trực tiếp. Cổng này không thuộc VLAN và không mang trunk. Hai lệnh switchport còn lại giữ cổng ở lớp 2; encapsulation dot1Q dùng cho subinterface Router trong mô hình khác.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 9–10, mục 8.3.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một switch lớp 2 có IP quản lý 192.168.10.254/24, được PC cùng VLAN quản trị bình thường. PC ở VLAN 20 không nhận được phản hồi dù Router định tuyến đúng và không có ACL. Switch chưa đặt ip default-gateway. Cấu hình nào phù hợp nếu gateway VLAN 10 là 192.168.10.1?",
+    "options": [
+      "Đổi VLAN của mọi cổng sang 20",
+      "ip default-gateway 192.168.10.1",
+      "ip default-gateway 192.168.20.10 là địa chỉ PC quản trị",
+      "Xóa SVI để switch không cần trả lời"
+    ],
+    "correct": 1,
+    "explanation": "Switch lớp 2 cần default gateway để gửi phản hồi quản trị tới subnet khác; gateway phải thuộc subnet quản lý 192.168.10.0/24. Việc Router đã có tuyến không tự cấu hình đường ra của chính switch. Đổi VLAN hàng loạt hoặc xóa SVI không phải cách sửa.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 15–16, mục 8.4.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trên liên kết SW1–CORE, SW1 cấu hình switchport mode trunk và gửi DTP. CORE để dynamic auto; show interfaces trunk của CORE báo trunking nhưng show running-config không có switchport mode trunk. Cách giải thích nào đúng?",
+    "options": [
+      "Kết quả hai lệnh chứng minh CORE bị lỗi phần cứng",
+      "CORE đang định tuyến bằng routed port",
+      "CORE đã thương lượng trunk bằng DTP dù cấu hình quản trị vẫn là dynamic auto",
+      "Mọi cổng dynamic auto luôn là trunk dù đầu kia ở chế độ nào"
+    ],
+    "correct": 2,
+    "explanation": "Administrative Mode và Operational Mode có thể khác nhau. dynamic auto chấp nhận lời mời DTP từ SW1 để hoạt động trunk, còn cấu hình mặc định có thể không được in trong running-config. Hai đầu cùng auto không tự tạo trunk; routed port là loại cổng khác.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 18–19, mục 8.4.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai switch mới nối trực tiếp với nhau, cả hai đầu đều dynamic auto và không có cấu hình trunk tĩnh. Vì sao VLAN 10 không đi qua liên kết như mong muốn?",
+    "options": [
+      "VLAN 10 chỉ được dùng trên routed port",
+      "DTP tự chọn VLAN có số nhỏ nhất và loại các VLAN khác",
+      "Cần đổi native VLAN thành 10 để DTP tự gửi lời mời",
+      "Không đầu nào chủ động đề nghị trunk; cần cấu hình trunk phù hợp"
+    ],
+    "correct": 3,
+    "explanation": "dynamic auto là chế độ thụ động, nên auto–auto không hình thành trunk bằng DTP. Cấu hình trunk tường minh ở hai đầu làm liên kết mang nhiều VLAN mà không phụ thuộc lời mời. Đổi native VLAN không thay đổi tính thụ động của chế độ thương lượng.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 19–20, mục 8.4.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Theo mô hình thực hành, native VLAN 1 được R1 phục vụ bằng IP trên cổng vật lý G0/1; VLAN 2 và 3 dùng subinterface có thẻ. Nếu cổng switch nối R1 bị đổi thành access VLAN 1, hiện tượng nào có thể xảy ra?",
+    "options": [
+      "PC VLAN 1 vẫn ping gateway được, còn VLAN 2 và 3 mất đường tới gateway qua liên kết này",
+      "Mọi VLAN vẫn hoạt động vì IP Router không đổi",
+      "Chỉ VLAN 3 hoạt động vì có số hiệu lớn nhất",
+      "VLAN 2 và 3 tự chuyển frame thành VLAN 1 và giữ nguyên định tuyến"
+    ],
+    "correct": 0,
+    "explanation": "Cổng access VLAN 1 vẫn gửi frame không gắn thẻ mà cổng vật lý R1 tiếp nhận cho VLAN 1. Nó không còn vận chuyển VLAN 2,3 có thẻ như trunk. Vì thế lỗi thiếu trunk không nhất thiết làm native VLAN mất liên lạc trong mô hình cụ thể này.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 15–17, mục 8.4.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi cấu hình trunk trên Catalyst 3650 chỉ hỗ trợ 802.1Q, lệnh switchport trunk encapsulation dot1q bị báo không hợp lệ. Nếu thiết bị và cổng đều bình thường, cách xử lý phù hợp là gì?",
+    "options": [
+      "Đổi sang ISL vì 3650 không hỗ trợ 802.1Q",
+      "Dùng switchport mode trunk; thiết bị này không cần chọn kiểu encapsulation",
+      "Bỏ trunk và gộp mọi VLAN về VLAN 1",
+      "Chuyển cổng thành routed port để giả lập trunk"
+    ],
+    "correct": 1,
+    "explanation": "Trên mẫu switch chỉ có 802.1Q, không có nhu cầu lựa chọn giữa ISL và 802.1Q nên lệnh chọn encapsulation không được hỗ trợ. Cấu hình trunk vẫn thực hiện bằng switchport mode trunk. Routed port không thay thế trunk mang nhiều VLAN.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 4, 11, 14, mục 8.2.1, 8.3.2 và 8.4.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "SW2 có tuyến tĩnh 172.16.0.0/22 qua R1 để tới các VLAN dùng 172.16.1.0/24, 172.16.2.0/24 và 172.16.3.0/24. Khi thêm VLAN mạng 172.16.4.0/24 sau R1, nhận định nào đúng?",
+    "options": [
+      "Tuyến /22 tự bao phủ mọi subnet bắt đầu bằng 172.16",
+      "172.16.4.0/24 trùng với 172.16.3.0/24",
+      "Mạng mới nằm ngoài /22 hiện tại; cần bổ sung tuyến phù hợp",
+      "Chỉ cần đổi tên VLAN, không liên quan bảng định tuyến"
+    ],
+    "correct": 2,
+    "explanation": "172.16.0.0/22 bao phủ từ 172.16.0.0 đến 172.16.3.255, nên không chứa 172.16.4.0/24. Có thể thêm một tuyến riêng tới mạng mới qua R1; không nên mở rộng tổng hợp thiếu cân nhắc vì có thể bao trùm cả mạng khác. Tên VLAN không thay đổi phạm vi tiền tố.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 24–25, mục 8.4.3.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một mạng Router-on-a-Stick đang phục vụ VLAN 10 và 20. Cần thêm VLAN 40 với subnet riêng, dùng cùng đường trunk hiện tại. Phương án triển khai đầy đủ nhất là gì?",
+    "options": [
+      "Chỉ đổi tên một subinterface cũ thành .40",
+      "Chỉ thêm tuyến mặc định trên PC VLAN 10",
+      "Chỉ tạo VLAN 40 trên switch, mọi phần còn lại tự có",
+      "Tạo VLAN/gán cổng PC, cho phép VLAN 40 trên trunk, tạo subinterface dot1Q 40 có IP gateway và đặt gateway cho PC"
+    ],
+    "correct": 3,
+    "explanation": "Thêm VLAN cần đồng thời đúng lớp 2 và lớp 3: VLAN/cổng access, vận chuyển trunk, ánh xạ dot1Q–subinterface–IP và gateway máy trạm. Chỉ tạo tên hoặc đổi một cấu hình cũ không bảo đảm đủ đường dữ liệu và có thể làm hỏng VLAN đang dùng.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 3–6, 17, mục 8.1.3, 8.2.1 và 8.4.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "VLAN 30 không đi tới gateway Router-on-a-Stick. Cần kiểm tra cổng switch thực sự trunking/cho phép VLAN 30 và VLAN ID trên subinterface Router. Hai lệnh nào trực tiếp cung cấp hai nhóm bằng chứng này? (Chọn 2 đáp án đúng)",
+    "options": [
+      "show interfaces trunk trên switch",
+      "show clock trên Router",
+      "show running-config trên Router",
+      "show version trên PC"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "explanation": "show interfaces trunk cho biết trạng thái trunk và các VLAN được phép; running-config của Router cho phép đối chiếu encapsulation dot1Q và IP subinterface. Thời gian hệ thống hay phiên bản không trực tiếp kiểm tra hai cấu hình đang nghi ngờ.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 6, 8, mục 8.2.2.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "SVI VLAN 60 đã được no shutdown và có IP hợp lệ trên switch lớp 3. Hai điều kiện nào còn cần kiểm tra để SVI có thể up/up theo bài giảng? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Switch bắt buộc phải chạy OSPF",
+      "VLAN 60 tồn tại trong cơ sở dữ liệu VLAN",
+      "Phải có đúng 60 cổng access",
+      "Có ít nhất một cổng đang hoạt động mang VLAN 60"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "explanation": "VLAN phải tồn tại và có cổng hoạt động trong VLAN để SVI có kết nối lớp 2 tương ứng. Các điều kiện này độc lập với việc chạy OSPF. Số hiệu VLAN không đặt yêu cầu về số lượng cổng access.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 8–9, mục 8.3.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "R1 có các VLAN 172.16.1.0/24–172.16.3.0/24; SW2 có VLAN 172.17.1.0/24. R1 và SW2 nối bằng 192.168.1.1/24–192.168.1.2/24, các gateway đúng. Hai lệnh nào cung cấp chiều đi từ khối R1 tới SW2 và chiều trả lời về các VLAN R1? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Trên R1: ip route 0.0.0.0 0.0.0.0 192.168.1.2",
+      "Trên R1: ip route 0.0.0.0 0.0.0.0 192.168.1.1",
+      "Trên SW2: ip route 172.16.0.0 255.255.252.0 192.168.1.2",
+      "Trên SW2: ip route 172.16.0.0 255.255.252.0 192.168.1.1"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "R1 có một lối ra là SW2 nên dùng default route tới .2. SW2 cần đường về dải /22 chứa các subnet của R1, qua .1. Hai lựa chọn sai dùng chính IP của thiết bị đang cấu hình làm next-hop, không tạo đường tới thiết bị bên kia.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 24, mục 8.4.3.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  },
+  {
+    "tier": "extra",
+    "prompt": "CORE vừa chuyển một cổng vật lý thành routed port bằng no switchport để nối Router biên. Hai nhận xét nào đúng về cổng sau chuyển đổi? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Cổng vẫn cần encapsulation dot1Q cho mọi gói đi ra",
+      "Có thể đặt địa chỉ IP trực tiếp trên cổng",
+      "Cổng không còn là access/trunk thuộc một VLAN",
+      "Cổng trở thành SVI và mất liên hệ với cổng vật lý"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Routed port là cổng vật lý lớp 3, có thể gán IP trực tiếp và không thuộc VLAN hay mang trunk. Nó không phải SVI logic đại diện cho cả VLAN. Đóng gói dot1Q cho subinterface Router không phải bước bắt buộc của routed port trong mô hình này.\n\nNguồn đối chiếu: chapter08(1).pdf, trang PDF 9–10, mục 8.3.1.",
+    "sources": [
+      "99be7111-06b6-5bb0-af0d-7eb5a30b90cd"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 8"
+  }
+]

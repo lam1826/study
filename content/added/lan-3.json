@@ -1,0 +1,334 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Switch có 6 PC: A, B, C ở VLAN 10; D, E, F ở VLAN 20. Mọi cổng access forwarding, không có định tuyến. Khi A phát ARP Request, PC nào nhận bản sao qua switch?",
+    "options": [
+      "Chỉ D vì D ở VLAN khác",
+      "Không PC nào vì ARP không hoạt động khi có VLAN",
+      "B và C",
+      "B, C, D, E và F"
+    ],
+    "correct": 2,
+    "explanation": "Broadcast từ A bị giới hạn trong VLAN 10 nên switch gửi tới các cổng B và C, không gửi ngược cổng A và không sang VLAN 20. VLAN không ngăn ARP nội bộ; nó giới hạn miền quảng bá.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 5–7, mục 3.1.2–3.1.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai PC cắm vào cùng switch, một ở VLAN 10 và một ở VLAN 20; cả hai đều đặt IP trong 192.168.1.0/24. Không có định tuyến hay cơ chế nối cầu giữa VLAN. Vì sao vẫn không liên lạc trực tiếp?",
+    "options": [
+      "Cùng subnet luôn liên lạc được, nên chắc chắn switch hỏng",
+      "Đổi tên hai VLAN giống nhau sẽ nối hai miền lớp 2",
+      "Chỉ cần xóa default gateway là các VLAN tự gộp lại",
+      "ARP không vượt ranh giới VLAN dù địa chỉ IP được đặt cùng subnet"
+    ],
+    "correct": 3,
+    "explanation": "VLAN xác định miền lớp 2 độc lập với cách gán IP. Hai máy nghĩ đích cùng subnet và cần ARP trực tiếp, nhưng ARP bị tách bởi VLAN. Tên VLAN và việc xóa gateway không nối hai miền; thiết kế nên ánh xạ mỗi VLAN sang một subnet riêng.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 4–6, 11–12, mục 3.1.1–3.1.2 và 3.2.2.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhân viên chuyển PC từ cổng access VLAN 10 sang cổng access VLAN 20 trên switch chỉ dùng VLAN tĩnh theo cổng. VLAN của lưu lượng PC sau khi chuyển được xác định thế nào?",
+    "options": [
+      "Theo VLAN 20 đã gán cho cổng mới",
+      "Luôn giữ VLAN 10 vì MAC của PC không đổi",
+      "Theo tên đăng nhập Windows dù không có hệ thống xác thực động",
+      "Theo octet cuối của IP mà PC đang giữ"
+    ],
+    "correct": 0,
+    "explanation": "Với VLAN tĩnh, thiết bị kết nối vào cổng nào sẽ thuộc VLAN được cấu hình cho cổng đó. Giữ MAC hoặc IP không tự chuyển cổng mới về VLAN cũ. Nếu PC giữ IP của subnet cũ, cần điều chỉnh quy hoạch/cấu hình phù hợp; gán theo danh tính là cơ chế khác ngoài giả thiết.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 8–9, mục 3.1.5.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cơ quan cần giới hạn phạm vi broadcast và sự cố lớp 2 trong từng tầng; tài nguyên dùng chung được truy cập qua lớp 3. Cách tổ chức VLAN nào phù hợp nhất với mục tiêu này?",
+    "options": [
+      "Chia VLAN chỉ theo chữ số cuối của địa chỉ MAC",
+      "VLAN theo địa lý, giới hạn theo tầng hoặc khối truy nhập",
+      "Một VLAN đầu cuối kéo dài qua tất cả tòa nhà",
+      "Một VLAN chung toàn cơ quan vì dễ đặt tên"
+    ],
+    "correct": 1,
+    "explanation": "VLAN theo địa lý giữ miền lớp 2 trong khu vực/khối truy nhập, giúp giới hạn broadcast và khoanh vùng sự cố. VLAN đầu cuối kéo dài có thể đáp ứng yêu cầu di chuyển chức năng, nhưng mở rộng miền lỗi và không khớp mục tiêu đã nêu. MAC cuối không phải căn cứ thiết kế theo nhu cầu.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 9–11, mục 3.2.1.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một VLAN cần 30 địa chỉ cho thiết bị đầu cuối và thêm 1 địa chỉ cho gateway, không có dự phòng khác. Với subnet IPv4 thông thường, prefix tiết kiệm nhất nhưng đủ địa chỉ là gì?",
+    "options": [
+      "/28",
+      "/25",
+      "/26",
+      "/27"
+    ],
+    "correct": 2,
+    "explanation": "Tổng nhu cầu là 31 địa chỉ host. /27 chỉ có 32 − 2 = 30 host nên thiếu; /26 có 64 − 2 = 62 host và là khối nhỏ nhất đủ. /25 cũng đủ nhưng lãng phí hơn, còn /28 chỉ có 14 host. Đề đã tính riêng gateway để tránh bỏ sót địa chỉ.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 12–14, mục 3.2.2–3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong khối 192.168.40.0/24, VLAN A đã dùng 192.168.40.0/26. Muốn cấp tiếp một subnet /27 liền kề, không chồng lấn, network đúng là địa chỉ nào?",
+    "options": [
+      "192.168.40.32/27",
+      "192.168.40.63/27",
+      "192.168.40.70/27",
+      "192.168.40.64/27"
+    ],
+    "correct": 3,
+    "explanation": "Subnet /26 đầu chiếm .0–.63; subnet /27 tiếp theo phải bắt đầu đúng biên 32 tại .64 và chiếm .64–.95. .32/27 nằm trong khối đã cấp; .63 và .70 không phải network đúng biên /27.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 12–14, mục 3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "VLAN 30 được cấp 192.168.40.96/28. Phương án nào ghi đúng dải host khả dụng và broadcast?",
+    "options": [
+      "Host .97–.110, broadcast .111",
+      "Host .96–.111, broadcast .112",
+      "Host .97–.126, broadcast .127",
+      "Host .98–.111, broadcast .112"
+    ],
+    "correct": 0,
+    "explanation": "/28 có 16 địa chỉ; bắt đầu .96 nên kết thúc .111. .96 là network và .111 là broadcast, còn .97–.110 dùng cho host. Dải đến .126 là quy mô /27 và các phương án đưa network/broadcast vào host đều sai.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 12–14, mục 3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một kế hoạch cấp VLAN A là 192.168.40.0/26, VLAN B là 192.168.40.32/27. Cả hai network đều đúng biên. Vấn đề nào vẫn tồn tại?",
+    "options": [
+      "Mọi subnet thuộc cùng /24 đều bắt buộc chồng lấn",
+      "Toàn bộ subnet của VLAN B nằm trong dải địa chỉ đã cấp cho VLAN A",
+      "Hai subnet chắc chắn độc lập vì prefix khác nhau",
+      "/27 có nhiều host hơn /26 nên không thể chứa trong /26"
+    ],
+    "correct": 1,
+    "explanation": "A chiếm .0–.63 và B chiếm .32–.63, nên hai phạm vi giao nhau dù mỗi network đứng riêng đều đúng biên. Khác prefix không chứng minh không chồng lấn; cần kiểm tra cả sức chứa, biên, bao chứa và giao nhau.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 13–14, mục 3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cho địa chỉ 192.168.40.70/27. Nếu cần ghi địa chỉ mạng của subnet chứa host này vào bảng quy hoạch, giá trị đúng là gì?",
+    "options": [
+      "192.168.40.0/27",
+      "192.168.40.96/27",
+      "192.168.40.64/27",
+      "192.168.40.70/27"
+    ],
+    "correct": 2,
+    "explanation": "Bước nhảy /27 là 32, nên .70 thuộc khối .64–.95. Network là .64, broadcast .95; .70 là host chứ không phải địa chỉ mạng. .0/27 và .96/27 là các khối khác.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 13, mục 3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "VLAN 10 hiện có tên DAO_TAO. Quản trị viên chỉ đổi tên thành KE_TOAN, giữ nguyên VLAN ID và mọi cấu hình cổng. Điều gì xảy ra với việc phân nhóm lớp 2?",
+    "options": [
+      "Mọi cổng tự chuyển sang VLAN mới có ID do tên quyết định",
+      "IP của các PC tự đổi theo tên VLAN",
+      "VLAN 10 bị xóa rồi mọi cổng về VLAN 1",
+      "Các cổng vẫn thuộc VLAN 10; đổi tên không đổi VLAN ID"
+    ],
+    "correct": 3,
+    "explanation": "Tên VLAN là nhãn mô tả để quản trị; switch xử lý theo VLAN ID. Đổi tên không tự đổi ID, gán lại cổng hay cấp lại IP. Cần cập nhật hồ sơ cho nhất quán, nhưng phân nhóm lớp 2 vẫn dựa trên ID 10.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 15, 17, mục 3.3.1–3.3.2.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "show vlan brief báo VLAN 10 active và liệt kê Gi1/0/1, nhưng PC tại cổng đó không liên lạc. Kết luận nào là chắc chắn từ riêng output này?",
+    "options": [
+      "VLAN 10 tồn tại và Gi1/0/1 được liệt kê là cổng access thành viên",
+      "Cáp và NIC chắc chắn đang hoạt động bình thường",
+      "IP, mask và tường lửa PC chắc chắn đúng",
+      "Mọi máy VLAN 10 chắc chắn ping được nhau"
+    ],
+    "correct": 0,
+    "explanation": "Output xác nhận thông tin VLAN và thành viên, chưa chứng minh trạng thái vật lý, IP/mask hoặc tường lửa. Cần thêm show interfaces status, thông tin switchport, bảng MAC và phép kiểm thử. Trạng thái active của VLAN không đồng nghĩa kết nối đầu cuối đã tốt.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 15, 17, mục 3.3.1–3.3.2.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Bảng thiết kế yêu cầu Gi1/0/2 là access VLAN 10. Kết quả kiểm tra cho thấy cổng connected nhưng Access Mode VLAN là 20. Cách sửa trực tiếp phù hợp là gì?",
+    "options": [
+      "Đổi IP PC sang bất kỳ địa chỉ nào trong VLAN 10 mà giữ gán cổng sai",
+      "Gán lại switchport access vlan 10 trên đúng Gi1/0/2 rồi kiểm tra",
+      "Thay dây vì connected chứng minh VLAN chắc chắn đúng",
+      "Đổi tên VLAN 20 thành VLAN_10 mà không đổi ID"
+    ],
+    "correct": 1,
+    "explanation": "connected chỉ xác nhận liên kết Ethernet; Access Mode VLAN 20 là bằng chứng cổng thuộc sai miền. Cần sửa gán VLAN tại đúng cổng và kiểm tra lại. Đổi tên VLAN hoặc chỉ đổi IP không thay đổi miền lớp 2 của cổng.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 15–17, 19, mục 3.3.1–3.3.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "VLAN 20 bị xóa bằng no vlan 20 trong khi Gi1/0/3 vẫn giữ switchport access vlan 20. Hậu quả nào phù hợp với bài giảng?",
+    "options": [
+      "Cổng tự trở thành router port và định tuyến được",
+      "Cổng tự tạo VLAN 20 lại ngay khi nhận khung đầu tiên",
+      "Cổng có thể còn tham chiếu VLAN 20 nhưng không chuyển lưu lượng cho VLAN đã xóa",
+      "Cổng luôn tự chuyển thành access VLAN 1"
+    ],
+    "correct": 2,
+    "explanation": "Xóa VLAN không tự động gán cổng thành viên về VLAN 1. Cấu hình tham chiếu có thể còn nhưng VLAN không tồn tại để chuyển tiếp. Cần chuyển cổng sang VLAN hợp lệ hoặc tạo lại VLAN theo kế hoạch, không suy luận rằng khung đầu tiên sẽ tự sửa cấu hình.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 18, mục 3.3.2.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai PC cùng VLAN, switch đã học cả hai MAC đúng cổng và liên kết connected, nhưng ping vẫn thất bại. Bước khoanh vùng hợp lý tiếp theo là gì?",
+    "options": [
+      "Lập tức xóa toàn bộ vlan.dat rồi reload",
+      "Gán hai PC sang hai VLAN khác nhau để bỏ giới hạn broadcast",
+      "Kết luận switch không thể chuyển khung khi đã học MAC",
+      "Kiểm tra IP, subnet mask và tường lửa trên hai PC"
+    ],
+    "correct": 3,
+    "explanation": "Bằng chứng đã ủng hộ đường lớp 2 nhưng chưa xác nhận cấu hình IP và chính sách trên host. Kiểm tra IP/mask/tường lửa là bước phù hợp trước khi thay đổi khác. Xóa cơ sở VLAN gây tác động rộng và chuyển sang hai VLAN khác nhau không khắc phục liên lạc trực tiếp.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 19–20, mục 3.3.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "VLAN 40 dự kiến cần tổng cộng 12 địa chỉ host hiện tại và thêm 4 địa chỉ host khi mở rộng, đã tính gateway trong tổng. Prefix nào tạo subnet có ít địa chỉ nhất nhưng vẫn đủ cho cả giai đoạn?",
+    "options": [
+      "/27",
+      "/28",
+      "/29",
+      "/26"
+    ],
+    "correct": 0,
+    "explanation": "Nhu cầu dự kiến là 16 host. /28 chỉ có 14 host nên đủ hiện tại nhưng thiếu khi mở rộng; /27 có 30 host và là khối nhỏ nhất đủ. /26 cũng đủ nhưng lớn hơn cần thiết, /29 chỉ có 6 host. Quy hoạch phải tính cả tăng trưởng.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 13–14, mục 3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một cấu hình VLAN đã đúng trên running-config và kiểm thử đạt. Bước nào xác nhận thay đổi sẽ được dùng sau lần boot tiếp theo, theo quy trình bài giảng?",
+    "options": [
+      "Chỉ ping gateway; ping thành công luôn đồng nghĩa đã lưu",
+      "Lưu running-config vào startup-config rồi đối chiếu cấu hình đã lưu",
+      "Chỉ đổi tên VLAN một lần nữa để hệ thống tự lưu",
+      "Chỉ xóa bảng MAC động để ghi cấu hình vào flash"
+    ],
+    "correct": 1,
+    "explanation": "Sau kiểm thử cần copy running-config startup-config và kiểm tra bản lưu. Ping xác nhận kết nối chứ không chứng minh độ bền cấu hình. Đổi tên VLAN hoặc xóa MAC không thay thế việc lưu; thông tin VLAN còn tùy nền tảng nên cũng phải hiểu cơ chế lưu cụ thể.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 17–18, mục 3.3.2.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một kỹ thuật viên đề xuất dùng VLAN để phân nhóm camera và người dùng. Những nhận định nào đúng về lợi ích và giới hạn? (Chọn 2 đáp án đúng)",
+    "options": [
+      "VLAN tự mã hóa mọi khung camera trên dây",
+      "Chỉ tạo VLAN là tự sửa được cáp lỗi và uplink thiếu băng thông",
+      "VLAN giúp giới hạn phạm vi broadcast theo nhóm",
+      "Chính sách định tuyến giữa VLAN vẫn cần được kiểm soát để hạn chế truy cập"
+    ],
+    "correct": [
+      2,
+      3
+    ],
+    "explanation": "VLAN tách miền lớp 2 và hỗ trợ áp dụng chính sách tại ranh giới lớp 3, nhưng không tự mã hóa hay thay thế kiểm soát truy cập. Các lỗi vật lý và thiếu năng lực liên kết cần được xử lý riêng; không thể gán mọi lợi ích bảo mật/hiệu năng cho việc tạo VLAN.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 4–5, 8, mục 3.1.1–3.1.2 và 3.1.4.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cấp hai VLAN trong mạng mẹ 192.168.40.0/24: A dùng 192.168.40.0/26 và B dùng 192.168.40.64/27. Những kết luận nào đúng? (Chọn 2 đáp án đúng)",
+    "options": [
+      "A có 62 host khả dụng, B có 30 host khả dụng",
+      "Broadcast của A là 192.168.40.64",
+      "B có thể dùng 192.168.40.95 làm địa chỉ một PC",
+      "Hai subnet không chồng lấn và đều nằm trong mạng mẹ"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "explanation": "A chiếm .0–.63, B chiếm .64–.95 nên không giao nhau và nằm trong /24. Sức chứa lần lượt là 64−2=62 và 32−2=30 host. .63 mới là broadcast A; .95 là broadcast B nên không cấp cho PC.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 12–14, mục 3.2.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "Quản trị viên cần xóa riêng VLAN 30 đang có một số cổng thành viên. Những bước nào phù hợp với quy trình có kiểm soát? (Chọn 2 đáp án đúng)",
+    "options": [
+      "Xác định cổng và thiết bị bị ảnh hưởng trước khi xóa",
+      "Chuyển cổng sang VLAN hợp lệ hoặc shutdown có chủ đích rồi dùng no vlan 30",
+      "Xóa flash:vlan.dat để chỉ tác động đúng VLAN 30",
+      "Mặc định tin rằng mọi cổng sẽ tự về VLAN 1 sau khi xóa"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Phải xác định phạm vi và xử lý cổng thành viên trước khi dùng no vlan 30, rồi kiểm tra và lưu khi đúng. Xóa vlan.dat tác động cơ sở dữ liệu VLAN rộng hơn, không phải thao tác xóa một VLAN. Các cổng không được bảo đảm tự chuyển về VLAN 1.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 18, mục 3.3.2.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  },
+  {
+    "tier": "extra",
+    "prompt": "PC-A phát khung từ cổng access VLAN 10, trong khi cùng địa chỉ MAC đích chỉ có bản ghi ở VLAN 20. Không có chức năng định tuyến. (Chọn 2 đáp án đúng)",
+    "options": [
+      "Chỉ cần MAC đích giống nhau thì mọi VLAN dùng chung một không gian tra cứu",
+      "Switch phải tra MAC đích trong ngữ cảnh VLAN 10",
+      "Nếu đích chưa biết trong VLAN 10, khung được flood tới cổng đủ điều kiện của VLAN 10",
+      "Bản ghi MAC ở VLAN 20 cho phép chuyển trực tiếp khung sang VLAN 20"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "explanation": "Bảng MAC được tra theo cặp ngữ cảnh VLAN và địa chỉ; bản ghi trong VLAN 20 không phải đích lớp 2 hợp lệ cho khung VLAN 10. Khi đích chưa biết ở VLAN 10, unknown unicast chỉ flood trong VLAN đó, không xuyên sang VLAN 20.\n\nNguồn đối chiếu: chapter03(1).pdf, trang PDF 6–7, mục 3.1.3.",
+    "sources": [
+      "473c417f-ad2e-57d4-9a28-e424846a7bc1"
+    ],
+    "from": "Biên soạn nâng cao từ giáo trình Bài 3"
+  }
+]

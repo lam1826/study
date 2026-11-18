@@ -1,0 +1,194 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Dịch vụ gửi thư và dịch vụ thống kê đều phải nhận mọi sự kiện order.created. Cách tổ chức queue nào phù hợp?",
+    "options": [
+      "Cả hai cạnh tranh đọc một queue duy nhất rồi coi mỗi bên đều đã nhận mọi sự kiện.",
+      "Chỉ tạo queue cho gửi thư và bỏ đăng ký của thống kê.",
+      "Dùng một queue nhưng xóa thông điệp trước khi hai dịch vụ đọc.",
+      "Mỗi dịch vụ có queue riêng, cùng bind tới exchange với chủ đề cần nhận."
+    ],
+    "correct": 3,
+    "explanation": "Queue riêng tạo luồng nhận độc lập cho từng subscriber, để một sự kiện có thể được sao chép tới cả hai. Dùng chung một queue khiến các consumer chia việc, không đáp ứng yêu cầu cả hai cùng xử lý mọi sự kiện.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 1–3, mục 7.1.1.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 1–3, mục 7.1.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Thông điệp nào thể hiện rõ một sự kiện đã xảy ra, thay vì yêu cầu một thành phần thực hiện hành động?",
+    "options": [
+      "PayOrder: hãy thanh toán đơn hàng.",
+      "OrderPaid: đơn hàng đã được thanh toán.",
+      "SendInvoice: hãy gửi hóa đơn.",
+      "RecalculateTotal: hãy tính lại tổng tiền."
+    ],
+    "correct": 1,
+    "explanation": "Event thông báo một sự thật đã xảy ra và để các bên quan tâm tự phản ứng. Các tên mang ý yêu cầu thực hiện như PayOrder, SendInvoice và RecalculateTotal mô tả command hơn là kết quả đã xảy ra.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 3, mục 7.1.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 3, mục 7.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hệ thống đã phát order.created với đủ dữ liệu cần thiết. Muốn bổ sung dịch vụ phân tích đơn hàng, thay đổi nào tận dụng được tính mở rộng của pub/sub?",
+    "options": [
+      "Thêm subscriber cùng queue và binding phù hợp, không cần thêm lời gọi trực tiếp từ publisher tới dịch vụ mới.",
+      "Sửa publisher để biết địa chỉ mọi bản sao của dịch vụ phân tích.",
+      "Buộc các subscriber cũ chuyển hết nghiệp vụ sang publisher.",
+      "Gỡ exchange và thay bằng một chuỗi gọi trực tiếp tới mọi dịch vụ."
+    ],
+    "correct": 0,
+    "explanation": "Khi hợp đồng sự kiện đã đủ, subscriber mới có thể đăng ký luồng sự kiện mà không buộc publisher biết nó. Đây là lợi ích giảm phụ thuộc trực tiếp; vẫn phải cấu hình đăng ký và thực hiện logic của subscriber mới.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 4–5, mục 7.1.3.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 4–5, mục 7.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau khi chuyển từ gọi trực tiếp sang pub/sub, nhóm nói rằng các dịch vụ “không còn phụ thuộc gì vào nhau”. Nhận định nào chính xác hơn?",
+    "options": [
+      "Mỗi dịch vụ có thể đổi mọi trường sự kiện tùy ý mà không ảnh hưởng ai.",
+      "Không cần broker hoạt động vì subscriber tự đọc bộ nhớ publisher.",
+      "Giảm phụ thuộc trực tiếp về bên nhận, nhưng vẫn cần thống nhất hợp đồng sự kiện và vận hành broker.",
+      "Không cần biết kiểu sự kiện hoặc phiên bản trước khi xử lý."
+    ],
+    "correct": 2,
+    "explanation": "Liên kết lỏng không có nghĩa không còn hợp đồng hoặc hạ tầng chung. Subscriber vẫn phải hiểu sự kiện và hệ thống vẫn cần cơ chế chuyển thông điệp; thay đổi phá vỡ hợp đồng có thể ảnh hưởng các bên nhận.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 5–6, mục 7.1.4.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 5–6, mục 7.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai thông điệp có cùng EventType và cùng nội dung nhưng có thể là hai lần phát sinh nghiệp vụ khác nhau. Trường nào phù hợp để nhận diện một sự kiện cụ thể khi kiểm tra giao trùng?",
+    "options": [
+      "Chỉ EventType, vì mọi sự kiện cùng loại đều là một sự kiện.",
+      "EventId được cấp cho từng sự kiện và giữ nguyên khi sự kiện đó được giao lại.",
+      "Chỉ Version, vì mọi sự kiện cùng phiên bản đều trùng nhau.",
+      "Một ID ngẫu nhiên mới do subscriber tạo cho mỗi lần nhận."
+    ],
+    "correct": 1,
+    "explanation": "EventId phân biệt từng sự kiện; EventType phân loại và Version mô tả phiên bản hợp đồng. Nếu đổi ID mỗi lần nhận hoặc dùng chung ID theo loại, subscriber không thể phân biệt đúng giao lại với sự kiện mới.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 7–8, mục 7.2.1.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 7–8, mục 7.2.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Queue bind topic exchange bằng mẫu order.*. Trong các routing key sau, khóa nào khớp mẫu?",
+    "options": [
+      "order",
+      "order.created.v2",
+      "user.order.paid",
+      "order.paid"
+    ],
+    "correct": 3,
+    "explanation": "Dấu * khớp đúng một từ trong routing key phân cách bằng dấu chấm. Vì vậy order.paid có đúng một cấp sau order; order không có cấp sau, còn hai lựa chọn khác có cấu trúc nhiều cấp hoặc tiền tố khác.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 8–9, mục 7.2.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 8–9, mục 7.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Subscriber muốn nhận cả order, order.created và order.created.v2. Mẫu binding nào phù hợp nhất?",
+    "options": [
+      "order.*",
+      "order.#",
+      "*.order",
+      "order.created.*"
+    ],
+    "correct": 1,
+    "explanation": "Dấu # khớp không hoặc nhiều từ sau tiền tố, nên order.# bao phủ cả ba khóa. order.* chỉ khớp đúng một cấp sau order; các mẫu còn lại yêu cầu cấu trúc hẹp hơn hoặc thứ tự khác.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 8–9, mục 7.2.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 8–9, mục 7.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Queue A bind order.*, queue B bind order.#. Publisher gửi một sự kiện với routing key order.created.v2. Queue nào có binding khớp?",
+    "options": [
+      "Chỉ queue A.",
+      "Cả A và B đều không khớp.",
+      "Cả A và B đều khớp vì * và # có cùng ý nghĩa.",
+      "Chỉ queue B."
+    ],
+    "correct": 3,
+    "explanation": "Sau order còn hai từ created và v2. Mẫu * chỉ nhận một từ nên A không khớp; # nhận nhiều từ nên B khớp. Việc chọn queue dựa vào mẫu binding, không chỉ dựa vào cùng tiền tố order.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 8–9, mục 7.2.2.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 8–9, mục 7.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Publisher muốn thêm trường Priority mà subscriber cũ vẫn hoạt động. Với điều kiện subscriber cũ bỏ qua trường lạ, thay đổi nào ít phá vỡ hợp đồng hơn?",
+    "options": [
+      "Thêm trường có giá trị mặc định phù hợp, giữ nguyên ý nghĩa các trường hiện có.",
+      "Đổi kiểu EventId từ chuỗi sang đối tượng và giữ nguyên mọi giả định của bên nhận.",
+      "Xóa trường Message đang được subscriber cũ bắt buộc sử dụng.",
+      "Đổi ý nghĩa Version thành số tiền nhưng giữ nguyên tên trường."
+    ],
+    "correct": 0,
+    "explanation": "Thay đổi bổ sung có mặc định phù hợp có thể duy trì tương thích nếu bên nhận chịu được trường lạ. Xóa trường cần thiết, đổi kiểu hoặc đổi nghĩa trường hiện có dễ phá vỡ subscriber dù tên sự kiện không thay đổi.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 12, mục 7.2.5.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 12, mục 7.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong giai đoạn chuyển đổi hợp đồng, subscriber cũ chỉ đọc v1, subscriber mới đọc v2. Thiết kế định tuyến nào phân tách rõ hai phiên bản?",
+    "options": [
+      "Dùng một khóa duy nhất rồi bỏ toàn bộ thông tin phiên bản khỏi body.",
+      "Buộc subscriber cũ tự hiểu v2 dù chưa được cập nhật.",
+      "Dùng routing key order.created.v1 và order.created.v2, mỗi subscriber bind phiên bản phù hợp.",
+      "Đổi tên queue theo thời gian nhưng giữ binding nhận mọi phiên bản không phân biệt."
+    ],
+    "correct": 2,
+    "explanation": "Đưa phiên bản vào routing key cho phép dùng binding để chọn hợp đồng tương ứng trong giai đoạn chuyển tiếp. Việc đổi tên queue đơn thuần hoặc xóa thông tin phiên bản không giải quyết khác biệt cấu trúc mà các subscriber hiểu.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 12, mục 7.2.5.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 12, mục 7.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Subscriber lưu EventId đã xử lý trong ConcurrentDictionary. Sau khi tiến trình khởi động lại, cùng sự kiện được giao lại và bị xử lý thêm lần nữa. Cải tiến nào giải quyết trực tiếp giới hạn này?",
+    "options": [
+      "Tăng số phần tử tối đa của dictionary nhưng vẫn chỉ lưu trong RAM tiến trình.",
+      "Tạo EventId mới cho sự kiện được giao lại để tránh so sánh.",
+      "Lưu trạng thái chống trùng ở kho bên ngoài với thời hạn phù hợp, kết hợp xử lý nghiệp vụ idempotent.",
+      "Bỏ ack vì không ack sẽ ngăn mọi lần giao lại."
+    ],
+    "correct": 2,
+    "explanation": "Bộ nhớ tiến trình mất khi khởi động lại nên danh sách đã xử lý không còn. Kho bên ngoài giúp giữ thông tin qua vòng đời tiến trình, nhưng vẫn cần phối hợp với nghiệp vụ để không coi một công việc chưa hoàn tất là đã xử lý xong.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 12, mục 7.2.5.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 12, mục 7.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sự kiện bài đã chấm được phát trên broker nội bộ, còn trình duyệt cần nhận cập nhật. Cách nối hai kênh phù hợp nhất là gì?",
+    "options": [
+      "Một subscriber nhận sự kiện, rồi dùng SignalR đẩy tới nhóm người dùng cần nhận.",
+      "Cho mọi trình duyệt trực tiếp dùng chung tài khoản quản trị broker.",
+      "Phát sự kiện của một người dùng đến Clients.All trong mọi trường hợp.",
+      "Bỏ broker và để trình duyệt tự giả định kết quả chấm sau một khoảng chờ."
+    ],
+    "correct": 0,
+    "explanation": "Subscriber đóng vai trò cầu nối từ luồng sự kiện nội bộ sang kênh thời gian thực cho máy khách. Việc chọn đúng nhóm giữ phạm vi nhận phù hợp; mở quyền broker rộng hoặc suy đoán kết quả không đáp ứng đúng vai trò của luồng này.\n\nNguồn đối chiếu: chapter07.pdf, trang PDF 13, mục 7.2.6.",
+    "sources": [
+      "a6b8ac9a-f0c0-54d8-97c5-f639077e0203"
+    ],
+    "from": "Biên soạn nâng cao từ chapter07.pdf, trang PDF 13, mục 7.2.6."
+  }
+]

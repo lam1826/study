@@ -203,7 +203,7 @@ for(let round=0;round<20;round++) for(const chapter of ['distributed-1','distrib
     shuffledItems++;
   }
 }
-assert.equal(shuffledItems,20*(15+15+30));
+assert.equal(shuffledItems,20*bank.filter(q=>q.kind==='quiz'&&['distributed-1','distributed-2','history-1'].includes(q.chapter)).length);
 console.log('PASS: '+shuffledItems+' shuffled attempt items keep option text, IDs and (multi-)answer keys together.');
 
 // Creating an attempt returns it (no second request); an exam still hides keys.

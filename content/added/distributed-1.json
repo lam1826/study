@@ -1,0 +1,194 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Một API và một worker chạy trong hai tiến trình trên cùng máy, trao đổi qua thông điệp. Theo ranh giới thành phần của giáo trình, nhận định nào phù hợp nhất?",
+    "options": [
+      "Chỉ là hệ đơn khối vì chưa có hai máy vật lý.",
+      "Vẫn có tính phân tán vì hai thành phần độc lập giao tiếp qua ranh giới tiến trình.",
+      "Chỉ trở thành phân tán khi hai thành phần dùng hai ngôn ngữ khác nhau.",
+      "Chỉ là hệ phân tán nếu cả hai cùng truy cập một cơ sở dữ liệu."
+    ],
+    "correct": 1,
+    "explanation": "Ranh giới tiến trình và cách các thành phần giao tiếp mới là yếu tố cần xem xét; cùng máy vật lý không làm mất ranh giới đó. Khác ngôn ngữ hay dùng chung cơ sở dữ liệu không phải điều kiện bắt buộc để nhận diện hệ phân tán.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 1–3, mục 1.1.1.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 1–3, mục 1.1.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Dịch vụ nhận bài vẫn phản hồi được, nhưng dịch vụ chấm bài bị dừng. Hiện tượng này minh họa đặc điểm nào khi tách hệ thống thành các thành phần độc lập?",
+    "options": [
+      "Lỗi biên dịch: mọi thành phần phải được biên dịch lại.",
+      "Lỗi toàn hệ thống: các tiến trình chắc chắn dừng đồng thời.",
+      "Lỗi định dạng: thông điệp giữa các thành phần chắc chắn sai cú pháp.",
+      "Lỗi từng phần: một thành phần ngừng hoạt động trong khi thành phần khác vẫn chạy."
+    ],
+    "correct": 3,
+    "explanation": "Hệ phân tán có thể gặp lỗi từng phần vì các thành phần có vòng đời riêng. API còn chạy không chứng minh dịch vụ chấm bài còn hoạt động; tình huống cũng không cung cấp bằng chứng về lỗi biên dịch hoặc định dạng.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 2–3, mục 1.1.1.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 2–3, mục 1.1.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Ứng dụng web gọi dịch vụ A; trong khi xử lý, A gọi tiếp dịch vụ B để lấy dữ liệu. Vai trò của A trong hai lượt tương tác là gì?",
+    "options": [
+      "A là máy chủ đối với ứng dụng web và là máy khách khi gọi B.",
+      "A luôn là máy chủ vì được triển khai dưới dạng dịch vụ.",
+      "A luôn là máy khách vì có gọi dịch vụ B.",
+      "A chuyển thành broker vì đứng giữa hai thành phần."
+    ],
+    "correct": 0,
+    "explanation": "Vai trò máy khách và máy chủ được xác định theo từng tương tác: bên khởi tạo yêu cầu là máy khách, bên phục vụ yêu cầu là máy chủ. Việc A xử lý rồi gọi tiếp B không tự biến A thành môi giới thông điệp.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 3, mục 1.1.2.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 3, mục 1.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Tác vụ tạo báo cáo mất vài phút; người dùng chỉ cần biết yêu cầu đã được tiếp nhận và có thể xem kết quả sau. Mô hình trao đổi nào phù hợp nhất cho phần xử lý báo cáo?",
+    "options": [
+      "Giữ mọi kết nối HTTP mở cho đến khi tạo xong toàn bộ báo cáo.",
+      "Phát báo cáo cho mọi máy khách ngay khi nhận yêu cầu, trước khi xử lý.",
+      "Đưa công việc vào hàng đợi để worker xử lý, trả xác nhận tiếp nhận trước.",
+      "Buộc máy khách gọi lại liên tục thao tác tạo mới cho đến khi có kết quả."
+    ],
+    "correct": 2,
+    "explanation": "Hàng đợi tách thời điểm tiếp nhận khỏi thời điểm hoàn thành, phù hợp với tác vụ dài. Giữ kết nối chờ làm hai bên phụ thuộc thời gian; gọi lại thao tác tạo mới có thể tạo thêm công việc; phát kết quả trước khi xử lý không đáp ứng yêu cầu.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 4–6, mục 1.1.3.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 4–6, mục 1.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một sự kiện tạo đơn phải được cả dịch vụ gửi thư và dịch vụ thống kê xử lý độc lập. Thiết kế trao đổi nào thể hiện đúng yêu cầu này?",
+    "options": [
+      "Một hàng đợi công việc dùng chung, hai dịch vụ cạnh tranh lấy từng thông điệp.",
+      "Chỉ trả sự kiện trong phản hồi HTTP cho người đặt đơn.",
+      "Publish/subscribe, để mỗi bên quan tâm nhận sự kiện qua luồng đăng ký riêng.",
+      "Gửi sự kiện cho một dịch vụ bất kỳ rồi coi cả hai đã nhận."
+    ],
+    "correct": 2,
+    "explanation": "Pub/sub phù hợp khi cùng một sự kiện cần đến nhiều bên quan tâm. Hai consumer cạnh tranh trên cùng hàng đợi chủ yếu chia việc; một phản hồi cho người đặt đơn cũng không tự chuyển sự kiện tới cả hai dịch vụ.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 5–6, mục 1.1.3.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 5–6, mục 1.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trang theo dõi cần nhận ngay thông báo khi trạng thái bài nộp thay đổi, trong khi các lần thay đổi diễn ra không đều. MEP nào phù hợp cho kênh cập nhật này?",
+    "options": [
+      "Đẩy thông điệp từ máy chủ khi có thay đổi (server push).",
+      "Yêu cầu máy khách tạo lại bài nộp sau mỗi chu kỳ.",
+      "Chỉ trả trạng thái trong phản hồi của lần mở trang đầu tiên.",
+      "Dùng một hàng đợi để các trình duyệt tranh nhau nhận thông báo chung."
+    ],
+    "correct": 0,
+    "explanation": "Server push cho phép máy chủ chủ động gửi cập nhật khi sự kiện xảy ra. Phản hồi ban đầu không bao phủ thay đổi về sau; việc tạo lại bài nộp và cạnh tranh nhận thông báo đều không thể hiện nhu cầu theo dõi trạng thái của từng người.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 4–6, mục 1.1.3.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 4–6, mục 1.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhóm chọn công nghệ trước, sau đó mới phát hiện tác vụ cần nhiều bên nhận độc lập và không cần phản hồi tức thời. Cách điều chỉnh hợp lý nhất là gì?",
+    "options": [
+      "Giữ nguyên request/response vì mọi công nghệ đều có cùng ngữ nghĩa trao đổi.",
+      "Tăng số máy chủ để tự biến một phản hồi thành nhiều bản sao sự kiện.",
+      "Chuyển toàn bộ dữ liệu sang JSON để loại bỏ nhu cầu chọn MEP.",
+      "Xác định lại MEP theo nhu cầu nhận thông điệp, rồi chọn công nghệ hỗ trợ MEP đó."
+    ],
+    "correct": 3,
+    "explanation": "MEP mô tả cách các bên tương tác, còn công nghệ là cách hiện thực hóa. Số lượng máy chủ và định dạng dữ liệu không tự thay đổi ngữ nghĩa từ một yêu cầu–phản hồi sang phát sự kiện cho nhiều bên.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 4–7, mục 1.1.3–1.1.4.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 4–7, mục 1.1.3–1.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một solution có hai project Web API nhưng khi chạy chỉ xuất hiện một tiến trình dịch vụ. Kết luận nào là đúng?",
+    "options": [
+      "Solution chỉ cho phép một project có mã endpoint.",
+      "Có hai project chưa đồng nghĩa cả hai dịch vụ đã được khởi chạy.",
+      "Cứ thêm project thì hệ điều hành tự khởi chạy một tiến trình tương ứng.",
+      "Hai project trong cùng solution bắt buộc dùng chung một tiến trình."
+    ],
+    "correct": 1,
+    "explanation": "Project là đơn vị tổ chức và xây dựng mã, còn tiến trình là thực thể đang chạy. Muốn quan sát hai dịch vụ độc lập phải thực sự khởi chạy chúng với cấu hình phù hợp; số project không chứng minh số tiến trình hiện có.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 9–10, mục 1.2.1–1.2.2.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 9–10, mục 1.2.1–1.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "API đã khởi động thành công tại cổng 5101, nhưng máy khách đang gửi tới cổng 5102 và không kết nối được. Bước kiểm tra đầu tiên phù hợp nhất là gì?",
+    "options": [
+      "Đối chiếu địa chỉ lắng nghe của API với địa chỉ đích mà máy khách sử dụng.",
+      "Đổi mọi endpoint GET thành POST trước khi kiểm tra địa chỉ.",
+      "Bỏ bộ chuyển đổi JSON để máy khách tự tìm đúng cổng.",
+      "Thêm bản ghi dữ liệu mẫu để kết nối tự được thiết lập."
+    ],
+    "correct": 0,
+    "explanation": "Trước khi xét route hay dữ liệu, máy khách phải đến đúng địa chỉ và cổng của tiến trình phục vụ. Đổi HTTP method, định dạng JSON hoặc dữ liệu không sửa được địa chỉ đích đang sai.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 10–12, mục 1.2.2–1.2.4.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 10–12, mục 1.2.2–1.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một ứng dụng khai báo GET /jobs/{id} và POST /jobs/{id}. Máy khách gửi GET /jobs/7. Yếu tố nào phân biệt hai endpoint có cùng mẫu đường dẫn?",
+    "options": [
+      "Giá trị id bằng 7 nên luôn chọn endpoint POST.",
+      "Endpoint được viết sau trong tệp luôn xử lý yêu cầu.",
+      "HTTP method của yêu cầu, kết hợp với mẫu route.",
+      "Tên biến C# trong handler quyết định chọn GET hay POST."
+    ],
+    "correct": 2,
+    "explanation": "Ánh xạ endpoint dựa trên cả phương thức HTTP và route, nên yêu cầu GET khớp nhánh GET khi các điều kiện khác phù hợp. Giá trị tham số, thứ tự viết hay tên biến không thay thế tiêu chí phương thức.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 10–12, mục 1.2.3–1.2.4.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 10–12, mục 1.2.3–1.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Handler nhận dữ liệu tạo tài nguyên và đã tạo thành công một mã mới. Vì sao nên trả Results.Created kèm URI tài nguyên thay vì chỉ trả chuỗi “OK”?",
+    "options": [
+      "Để máy khách tự động đăng ký nhận mọi sự kiện của máy chủ.",
+      "Để phản hồi thể hiện việc tạo mới và cung cấp vị trí truy cập tài nguyên vừa tạo.",
+      "Để bảo đảm tài nguyên được nhân bản sang mọi dịch vụ khác.",
+      "Để bỏ hoàn toàn bước ánh xạ tham số đầu vào của handler."
+    ],
+    "correct": 1,
+    "explanation": "Results.Created biểu đạt ngữ nghĩa tạo tài nguyên và vị trí của nó trong phản hồi HTTP. Nó không thiết lập pub/sub, không bảo đảm nhân bản giữa dịch vụ và không thay thế model binding đầu vào.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 12, mục 1.2.4.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 12, mục 1.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "API trả đúng kết quả khi gọi trực tiếp bằng công cụ thử HTTP, nhưng ứng dụng máy khách vẫn báo lỗi. Cách khoanh vùng nào có cơ sở nhất?",
+    "options": [
+      "Kết luận ngay mọi route của máy chủ đều sai vì máy khách báo lỗi.",
+      "Thay toàn bộ MEP trước khi xem request và response.",
+      "Chỉ chạy lại trình biên dịch máy chủ, không cần kiểm tra giao tiếp.",
+      "So sánh request thực tế của máy khách với request đã thử thành công, rồi kiểm tra cách đọc response."
+    ],
+    "correct": 3,
+    "explanation": "Kết quả thử độc lập tạo một mốc đối chiếu cho địa chỉ, phương thức, header và dữ liệu. Sai khác ở request hoặc cách xử lý response của máy khách là các điểm cần kiểm tra; chưa đủ bằng chứng để thay kiến trúc hay kết luận mọi route đều hỏng.\n\nNguồn đối chiếu: chapter01.pdf, trang PDF 13, mục 1.2.5.",
+    "sources": [
+      "888a4e20-f705-5655-84d2-77f9f54f00a8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter01.pdf, trang PDF 13, mục 1.2.5."
+  }
+]

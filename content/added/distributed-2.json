@@ -1,0 +1,194 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi một body JSON và mong nhận JSON. Cặp header nào diễn tả đúng hai yêu cầu này?",
+    "options": [
+      "Accept mô tả body gửi đi; Content-Type chỉ mô tả dạng phản hồi mong muốn.",
+      "Chỉ đặt Location: application/json để diễn tả cả hai.",
+      "Đặt HTTP method thành JSON thay cho cả Content-Type và Accept.",
+      "Content-Type: application/json cho body gửi đi; Accept: application/json cho dạng phản hồi mong muốn."
+    ],
+    "correct": 3,
+    "explanation": "Content-Type mô tả kiểu dữ liệu của nội dung thông điệp, còn Accept diễn đạt kiểu phản hồi máy khách chấp nhận. Location dùng chỉ vị trí tài nguyên, và JSON là định dạng dữ liệu chứ không phải HTTP method.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 1–3, mục 2.1.1.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 1–3, mục 2.1.1."
+  },
+  {
+    "tier": "extra",
+    "prompt": "API cần truy cập sản phẩm số 42 và tìm các sản phẩm thuộc nhóm “book”. Cặp URI nào phân biệt hợp lý định danh tài nguyên và điều kiện lọc?",
+    "options": [
+      "/products/42 và /products?category=book.",
+      "/products?create=42 và /products/book/delete.",
+      "/getProduct42 và /products/42 với body chỉ chứa “book”.",
+      "/products#42 và /products#category=book để máy chủ đọc fragment."
+    ],
+    "correct": 0,
+    "explanation": "Định danh một tài nguyên thường nằm trong path; điều kiện tìm kiếm trên tập tài nguyên phù hợp với query string. Cách đặt này thể hiện rõ đối tượng và bộ lọc, không trộn thao tác vào URI hoặc dựa vào fragment phía trình duyệt.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 4–5, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 4–5, mục 2.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một API chỉ xử lý được request thứ hai nếu vẫn nhớ request thứ nhất của máy khách trong phiên làm việc. Cách sửa nào phù hợp với nguyên tắc stateless của REST?",
+    "options": [
+      "Xóa cơ sở dữ liệu nghiệp vụ vì stateless cấm lưu tài nguyên.",
+      "Buộc mọi request của một người dùng đi vào đúng một tiến trình.",
+      "Đưa thông tin cần cho việc xử lý vào từng request, thay vì phụ thuộc ngữ cảnh phiên trước đó.",
+      "Giữ ngữ cảnh phiên trong RAM lâu hơn để request sau ít thất bại."
+    ],
+    "correct": 2,
+    "explanation": "Stateless yêu cầu mỗi request có đủ ngữ cảnh để máy chủ hiểu và xử lý nó. Điều này không cấm lưu dữ liệu tài nguyên; việc bám một tiến trình hoặc kéo dài phiên chỉ duy trì sự phụ thuộc mà tình huống đang cần loại bỏ.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 4, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 4, mục 2.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách muốn thay thế toàn bộ biểu diễn hiện tại của sản phẩm có URI đã biết. Theo cách dùng HTTP method trong giáo trình, phương thức nào phù hợp nhất?",
+    "options": [
+      "GET tới URI sản phẩm với body chứa dữ liệu mới.",
+      "DELETE tới danh sách sản phẩm, kèm dữ liệu thay thế.",
+      "PUT tới URI của sản phẩm đó.",
+      "POST tới một URI truy vấn chỉ để đọc sản phẩm."
+    ],
+    "correct": 2,
+    "explanation": "PUT được dùng cho việc cập nhật thay thế tài nguyên tại URI xác định. GET phục vụ đọc và DELETE phục vụ xóa; dùng POST vào một điểm truy vấn chỉ đọc không biểu đạt rõ thao tác thay thế được yêu cầu.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 5, mục 2.1.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 5, mục 2.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Entity sản phẩm có Id, Name, Price và IsApproved. Người mua chỉ được gửi Name và Price khi tạo yêu cầu. Thiết kế đầu vào nào hạn chế việc gửi thêm trường ngoài quyền kiểm soát?",
+    "options": [
+      "Dùng DTO đầu vào chỉ gồm Name và Price, rồi ánh xạ các trường được phép sang entity.",
+      "Nhận trực tiếp entity và tin rằng giao diện sẽ không gửi IsApproved.",
+      "Đưa IsApproved vào query string để mọi máy khách đều đặt được.",
+      "Yêu cầu máy khách tự tạo Id và tự quyết định IsApproved."
+    ],
+    "correct": 0,
+    "explanation": "DTO tạo ranh giới rõ giữa hợp đồng API và cấu trúc lưu trữ, giới hạn dữ liệu máy khách được cung cấp. Chỉ ẩn trường trên giao diện hoặc đổi nơi truyền trường không ngăn máy khách tùy ý gửi dữ liệu.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 6, mục 2.1.4.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 6, mục 2.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Endpoint có route /products/{id:int}. Máy khách gọi /products/abc. Trước khi xét nghiệp vụ cập nhật sản phẩm, nguyên nhân trực tiếp khiến route này không khớp là gì?",
+    "options": [
+      "Sản phẩm abc chắc chắn đã bị xóa trong cơ sở dữ liệu.",
+      "Header Accept tự động chuyển route này sang một URL khác.",
+      "Máy chủ chắc chắn chưa đăng ký cơ chế tuần tự hóa JSON.",
+      "Giá trị “abc” không thỏa ràng buộc kiểu số nguyên của đoạn id."
+    ],
+    "correct": 3,
+    "explanation": "Ràng buộc :int tham gia chọn route, nên chuỗi “abc” không phù hợp mẫu đã khai báo. Không thể suy ra dữ liệu sản phẩm bị xóa hay JSON chưa được đăng ký chỉ từ việc route không khớp.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 8–10, mục 2.2.1–2.2.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 8–10, mục 2.2.1–2.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Với endpoint PUT /products/{id:int}?notify=true nhận thêm một DTO JSON, cách phân vai dữ liệu nào rõ ràng nhất?",
+    "options": [
+      "id luôn lấy từ body, notify lấy từ route, còn DTO lấy từ header Accept.",
+      "id lấy từ route, notify từ query, các giá trị sản phẩm mới từ body.",
+      "Cả ba đều phải nằm trong một chuỗi route duy nhất.",
+      "notify quyết định định danh sản phẩm, còn id chỉ là tùy chọn hiển thị."
+    ],
+    "correct": 1,
+    "explanation": "Route xác định sản phẩm đang tác động, query mang tùy chọn, còn body chứa dữ liệu có cấu trúc cho cập nhật. Nhận diện đúng các nguồn đầu vào giúp handler và hợp đồng API thống nhất, tránh gán nhầm vai trò cho từng giá trị.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 10, mục 2.2.2.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 10, mục 2.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Body JSON đọc được nhưng Price là số âm trong khi quy tắc yêu cầu Price > 0. Phản hồi nào phù hợp nhất?",
+    "options": [
+      "400 Bad Request với thông tin lỗi kiểm tra dữ liệu đầu vào.",
+      "404 Not Found vì mọi dữ liệu không hợp lệ đều được xem là tài nguyên không tồn tại.",
+      "201 Created rồi để máy khách tự phát hiện giá không hợp lệ.",
+      "500 Internal Server Error cho một lỗi đầu vào đã dự kiến được."
+    ],
+    "correct": 0,
+    "explanation": "Đọc được JSON không đồng nghĩa dữ liệu hợp lệ theo nghiệp vụ. Với quy tắc đầu vào đã biết, cần từ chối bằng lỗi phía máy khách và mô tả nguyên nhân; 404 dùng cho tài nguyên không tìm thấy, còn 201 biểu đạt đã tạo thành công.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 10–11, mục 2.2.3–2.2.4.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 10–11, mục 2.2.3–2.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Sau POST /products, máy chủ đã tạo sản phẩm có Id = 8. Cặp trạng thái và thông tin phản hồi nào giúp máy khách tiếp tục truy cập tài nguyên rõ ràng nhất?",
+    "options": [
+      "204 No Content, kèm thông báo “chưa biết có tạo được hay không”.",
+      "404 Not Found, kèm Id = 8 trong body.",
+      "201 Created, kèm Location trỏ tới /products/8.",
+      "400 Bad Request, kèm Location trỏ tới danh sách sản phẩm."
+    ],
+    "correct": 2,
+    "explanation": "201 Created cho biết việc tạo tài nguyên thành công và Location chỉ nơi truy cập tài nguyên mới. Các lựa chọn còn lại diễn tả không có nội dung hoặc lỗi, không phù hợp với kết quả tạo thành công đã xác định.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 3, 11, mục 2.1.1, 2.2.4.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 3, 11, mục 2.1.1, 2.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách luôn giải tuần tự mọi response thành ProductDto, nhưng máy chủ trả 400 với ApiError khi dữ liệu sai. Cách xử lý nào phù hợp?",
+    "options": [
+      "Bỏ trạng thái HTTP và ép mọi ApiError thành một sản phẩm có giá bằng 0.",
+      "Kiểm tra trạng thái HTTP và đọc body theo hợp đồng thành công hoặc hợp đồng lỗi tương ứng.",
+      "Chỉ đổi tên ApiError thành ProductDto ở phía máy chủ.",
+      "Gửi lại cùng dữ liệu không hợp lệ cho đến khi giải tuần tự thành công."
+    ],
+    "correct": 1,
+    "explanation": "Response lỗi có cấu trúc và ngữ nghĩa khác dữ liệu sản phẩm. Máy khách cần phân nhánh theo trạng thái rồi đọc đúng kiểu; ép kiểu hoặc gửi lại đầu vào sai không giải quyết nguyên nhân lỗi.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 11–12, mục 2.2.4–2.2.5.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 11–12, mục 2.2.4–2.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một vòng lặp tải danh sách sản phẩm tạo mới rồi hủy HttpClient ở mỗi lượt gọi. Thay đổi nào phù hợp với cách quản lý máy khách HTTP trong giáo trình?",
+    "options": [
+      "Tạo thêm nhiều HttpClient trong cùng một lượt để giảm nhu cầu quản lý kết nối.",
+      "Đổi GET thành POST để loại bỏ vấn đề vòng đời HttpClient.",
+      "Giữ nguyên vòng lặp nhưng bỏ đọc response để kết nối luôn rảnh.",
+      "Tái sử dụng HttpClient phù hợp hoặc dùng cơ chế quản lý HttpClient, thay vì tạo mới cho từng request."
+    ],
+    "correct": 3,
+    "explanation": "HttpClient gắn với tài nguyên kết nối nên cần quản lý vòng đời, không tùy tiện tạo và hủy theo từng request. Đổi phương thức HTTP hoặc bỏ đọc kết quả không thay thế việc quản lý kết nối đúng cách.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 7, 12, mục 2.1.5, 2.2.5.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 7, 12, mục 2.1.5, 2.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Giao diện đã chặn tên sản phẩm rỗng, nhưng một chương trình khác gọi API trực tiếp với Name rỗng. API nên xử lý thế nào?",
+    "options": [
+      "Chấp nhận vì kiểm tra trên giao diện đã thay thế hoàn toàn kiểm tra máy chủ.",
+      "Vẫn kiểm tra DTO ở phía máy chủ và trả lỗi đầu vào theo hợp đồng API.",
+      "Bỏ DTO và để mọi trường được ghi thẳng vào entity.",
+      "Trả thành công nhưng tự xóa tài nguyên ngay sau đó, không báo lý do."
+    ],
+    "correct": 1,
+    "explanation": "API phục vụ nhiều loại máy khách, nên không thể dựa hoàn toàn vào kiểm tra của một giao diện. Kiểm tra ở máy chủ bảo vệ quy tắc đầu vào; phản hồi lỗi rõ ràng giúp mọi máy khách sửa yêu cầu đúng cách.\n\nNguồn đối chiếu: chapter02.pdf, trang PDF 6, 10–12, mục 2.1.4, 2.2.3–2.2.5.",
+    "sources": [
+      "36ed3bc1-cc65-5ccd-8d86-36129d15c8aa"
+    ],
+    "from": "Biên soạn nâng cao từ chapter02.pdf, trang PDF 6, 10–12, mục 2.1.4, 2.2.3–2.2.5."
+  }
+]

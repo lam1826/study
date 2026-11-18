@@ -1,0 +1,194 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Lượng yêu cầu chấm bài tăng mạnh trong vài phút rồi giảm. Vai trò phù hợp nhất của hàng đợi giữa API và worker là gì?",
+    "options": [
+      "Đệm công việc để worker xử lý theo năng lực, giảm phụ thuộc thời điểm giữa tiếp nhận và xử lý.",
+      "Tự tăng vô hạn năng lực CPU của từng worker.",
+      "Bảo đảm mọi công việc hoàn tất ngay khi API nhận request.",
+      "Loại bỏ hoàn toàn nhu cầu theo dõi số công việc đang chờ."
+    ],
+    "correct": 0,
+    "explanation": "Hàng đợi hấp thụ chênh lệch tạm thời giữa tốc độ gửi và tốc độ xử lý. Nó không tạo năng lực xử lý vô hạn; công việc có thể tích lại nên vẫn cần theo dõi và điều chỉnh số worker hoặc tài nguyên.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 1–3, mục 6.1.1–6.1.2.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 1–3, mục 6.1.1–6.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "API trả 202 Accepted ngay sau khi tiếp nhận một công việc để xử lý nền. Máy khách nên hiểu trạng thái này như thế nào?",
+    "options": [
+      "Công việc đã thành công và kết quả cuối cùng chắc chắn sẵn sàng.",
+      "Máy chủ đã từ chối đầu vào vì sai định dạng.",
+      "Worker đã bị dừng nên máy khách phải tạo vô hạn yêu cầu mới.",
+      "Yêu cầu đã được tiếp nhận để xử lý, chưa khẳng định công việc đã hoàn tất."
+    ],
+    "correct": 3,
+    "explanation": "202 biểu đạt tiếp nhận cho quá trình xử lý có thể diễn ra sau đó. Máy khách cần cơ chế theo dõi kết quả; không nên đồng nhất xác nhận tiếp nhận với hoàn thành nghiệp vụ.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 3–4, mục 6.1.3.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 3–4, mục 6.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Ba worker đọc chung một hàng đợi chấm bài. Mục tiêu chính của cấu hình này là gì?",
+    "options": [
+      "Mỗi bài nộp luôn phải được cả ba worker chấm độc lập.",
+      "Chia tải xử lý giữa các worker; vẫn phải dự phòng việc một công việc bị giao lại khi có lỗi.",
+      "Bảo đảm công việc tuyệt đối không thể bị xử lý lặp trong mọi sự cố.",
+      "Biến ba worker thành ba subscriber có hàng đợi riêng mà không cần cấu hình."
+    ],
+    "correct": 1,
+    "explanation": "Các consumer của cùng hàng đợi cạnh tranh nhận công việc để chia tải. Nếu xử lý xong nhưng ack chưa tới broker, thông điệp có thể được giao lại; chia tải không tự cung cấp bảo đảm xử lý đúng một lần.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 3–4, 10, mục 6.1.3, 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 3–4, 10, mục 6.1.3, 6.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một exchange cần chuyển thông điệp đến những queue có binding key khớp chính xác routing key “grading.high”. Loại exchange nào phù hợp nhất?",
+    "options": [
+      "Direct exchange.",
+      "Fanout exchange bỏ qua routing key.",
+      "Topic exchange bắt buộc khớp mọi chủ đề.",
+      "Headers exchange chỉ kiểm tra độ dài body."
+    ],
+    "correct": 0,
+    "explanation": "Direct exchange định tuyến theo sự khớp chính xác của routing key và binding key. Fanout phát tới các queue đã bind mà không dựa vào routing key; topic hỗ trợ mẫu, còn headers định tuyến theo thuộc tính header.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 5, mục 6.1.4.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 5, mục 6.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy chủ cần gửi cùng một thông báo đến tất cả queue đã bind với exchange, không xét routing key. Loại exchange phù hợp nhất là gì?",
+    "options": [
+      "Direct exchange với một khóa không trùng binding nào.",
+      "Headers exchange nhưng không khai báo tiêu chí header.",
+      "Fanout exchange.",
+      "Default exchange chỉ dùng tên một queue đích."
+    ],
+    "correct": 2,
+    "explanation": "Fanout thể hiện nhu cầu phát thông điệp tới mọi queue đã bind. Direct và default exchange định tuyến theo khóa, nên không tự mang nghĩa phát tới tất cả các queue đã đăng ký.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 5, mục 6.1.4.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 5, mục 6.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Producer và consumer cùng khai báo một queue tên jobs khi khởi động. Khi nào việc khai báo lại phù hợp với tính idempotent được giáo trình mô tả?",
+    "options": [
+      "Khi mỗi bên tự đặt thuộc tính durable khác nhau cho cùng tên queue.",
+      "Khi tên queue và các thuộc tính khai báo tương thích, thống nhất với queue đã tồn tại.",
+      "Khi consumer xóa queue trước mỗi lần producer gửi.",
+      "Khi producer đổi tên queue ngẫu nhiên sau từng thông điệp."
+    ],
+    "correct": 1,
+    "explanation": "Khai báo lại giúp các thành phần bảo đảm tài nguyên tồn tại khi cấu hình nhất quán. Cùng tên nhưng thuộc tính mâu thuẫn không phải thao tác khai báo tương đương; xóa hoặc đổi tên liên tục làm thay đổi tài nguyên thay vì bảo đảm nó.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 7, mục 6.2.2.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 7, mục 6.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Producer gửi JSON mã hóa UTF-8, nhưng consumer đọc body theo cấu trúc dữ liệu khác. Nút thắt cần giải quyết trước khi sửa nghiệp vụ là gì?",
+    "options": [
+      "Tăng số consumer để mỗi consumer đoán một định dạng khác nhau.",
+      "Bật autoAck để dữ liệu sai cấu trúc tự trở nên hợp lệ.",
+      "Đổi tên queue nhưng giữ nguyên cách đọc body đang sai.",
+      "Thống nhất hợp đồng thông điệp và quy trình mã hóa, giải mã giữa hai phía."
+    ],
+    "correct": 3,
+    "explanation": "Thông điệp chỉ có ý nghĩa khi hai bên thống nhất cấu trúc và cách chuyển giữa đối tượng và byte. Chia tải, ack hoặc đổi tên queue không sửa được sự bất đồng về hợp đồng dữ liệu.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 7–9, mục 6.2.3–6.2.4.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 7–9, mục 6.2.3–6.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Worker gửi ack ngay khi nhận thông điệp rồi bị dừng trước lúc ghi kết quả. Rủi ro trực tiếp của thứ tự này là gì?",
+    "options": [
+      "Ack tự ghi thay kết quả nghiệp vụ vào cơ sở dữ liệu.",
+      "Broker đã coi thông điệp được xử lý nên công việc chưa hoàn tất có thể không được giao lại.",
+      "Broker chắc chắn biết công việc chưa hoàn tất và luôn phát lại.",
+      "Mọi consumer khác tự thực hiện bù công việc dù không có thiết kế tương ứng."
+    ],
+    "correct": 1,
+    "explanation": "Ack xác nhận với broker rằng consumer đã xử lý xong trách nhiệm của thông điệp. Nếu ack quá sớm, lỗi sau đó có thể làm mất cơ hội giao lại; vì vậy cần xác nhận sau khi hoàn tất bước xử lý yêu cầu.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 9–10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 9–10, mục 6.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Worker đã ghi điểm vào cơ sở dữ liệu nhưng mất kết nối trước khi broker nhận ack. Thông điệp được giao lại. Biện pháp nghiệp vụ nào cần thiết?",
+    "options": [
+      "Giả định lần giao lại luôn là một bài nộp mới dù mã công việc không đổi.",
+      "Bỏ mọi định danh công việc để các lần xử lý không thể so sánh.",
+      "Tin rằng manual ack tự bảo đảm exactly-once cho cả cơ sở dữ liệu.",
+      "Xử lý idempotent hoặc nhận diện công việc đã hoàn tất để tránh áp dụng tác dụng phụ thêm lần nữa."
+    ],
+    "correct": 3,
+    "explanation": "Khoảng hở giữa hoàn tất nghiệp vụ và ack có thể dẫn tới giao lại. Manual ack hỗ trợ độ tin cậy giao nhận nhưng không tự phối hợp giao tác với dữ liệu nghiệp vụ; ứng dụng cần chịu được việc nhận trùng.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 10, mục 6.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Consumer nhận thông điệp sai hợp đồng mà gửi lại nguyên nội dung cũng không thể xử lý được. Cách nack phù hợp để tránh vòng lặp vô ích là gì?",
+    "options": [
+      "Nack với requeue=false; thông điệp đi tới DLX nếu đã cấu hình, nếu không có thể bị loại bỏ.",
+      "Nack với requeue=true vô hạn vì mọi lỗi hợp đồng đều tự hết theo thời gian.",
+      "Ack trước rồi gọi lại nghiệp vụ với dữ liệu sai mãi mãi.",
+      "Giữ thông điệp chưa ack vĩnh viễn và không ghi nhận lỗi."
+    ],
+    "correct": 0,
+    "explanation": "Lỗi không thể sửa bằng việc thử lại cùng nội dung không nên bị requeue liên tục. requeue=false loại thông điệp khỏi vòng xử lý hiện tại; cần cấu hình DLX nếu muốn giữ lại để phân tích, không được mặc định rằng DLX luôn tồn tại.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 9–10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 9–10, mục 6.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cơ sở dữ liệu tạm thời mất kết nối nên worker chưa ghi được kết quả. Nội dung thông điệp hợp lệ. Trong các lựa chọn sau, cách xử lý nào phù hợp với phân biệt lỗi tạm thời?",
+    "options": [
+      "Ack thành công ngay vì body thông điệp đọc được.",
+      "Loại bỏ vĩnh viễn mọi thông điệp hợp lệ khi cơ sở dữ liệu gián đoạn ngắn.",
+      "Chưa ack thành công; có thể nack và requeue theo chính sách thử lại có kiểm soát.",
+      "Ghi một kết quả giả để tránh phải xử lý lại."
+    ],
+    "correct": 2,
+    "explanation": "Lỗi kết nối tạm thời khác lỗi nội dung không hợp lệ: công việc có thể thành công khi phụ thuộc hồi phục. Chỉ đọc được body chưa đủ để ack công việc đã hoàn tất; retry cần được kiểm soát để không tạo vòng lặp dồn dập.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 9–10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 9–10, mục 6.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trên cùng channel, delivery tag 10 còn đang xử lý, tag 11 đã xong. Nếu ack tag 11 với multiple=true, rủi ro nào xuất hiện?",
+    "options": [
+      "Chỉ tag 11 được ack vì multiple không ảnh hưởng các tag trước.",
+      "Broker tự chờ nghiệp vụ của tag 10 hoàn thành mới đọc lệnh ack.",
+      "Các thông điệp chưa ack có tag đến 11, gồm tag 10, cũng có thể được xác nhận dù chưa xử lý xong.",
+      "Tag 11 bị chuyển thành một queue mới để tách khỏi tag 10."
+    ],
+    "correct": 2,
+    "explanation": "multiple=true xác nhận một dải delivery tag trên channel, không chỉ riêng thông điệp đã hoàn tất. Khi xử lý đồng thời và hoàn tất không theo thứ tự, ack từng thông điệp với multiple=false tránh xác nhận sớm công việc khác.\n\nNguồn đối chiếu: chapter06.pdf, trang PDF 9–10, mục 6.2.5.",
+    "sources": [
+      "e5c4792e-8709-5675-94d2-75cafaf4bbb8"
+    ],
+    "from": "Biên soạn nâng cao từ chapter06.pdf, trang PDF 9–10, mục 6.2.5."
+  }
+]

@@ -1,0 +1,194 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Lời gọi gRPC trông giống gọi phương thức C#, nhưng máy chủ ở tiến trình khác. Kết luận nào cần giữ khi thiết kế xử lý lỗi?",
+    "options": [
+      "Stub khiến lời gọi từ xa không thể gặp lỗi mạng.",
+      "Gọi được phương thức có kiểu nghĩa là máy chủ chắc chắn đang chạy.",
+      "Vẫn phải tính đến độ trễ mạng, lỗi kết nối và giới hạn thời gian của lời gọi từ xa.",
+      "Mọi exception từ xa đều trở thành lỗi biên dịch phía máy khách."
+    ],
+    "correct": 2,
+    "explanation": "Stub che bớt chi tiết đóng gói và truyền thông, nhưng không loại bỏ ranh giới mạng. Kiểm tra kiểu hỗ trợ hợp đồng lập trình; khả năng kết nối và thời gian đáp ứng vẫn là vấn đề lúc chạy.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 2–3, 8, mục 5.1.2, 5.2.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 2–3, 8, mục 5.1.2, 5.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi một yêu cầu và nhận đúng một kết quả tính toán. Dạng RPC nào phù hợp nhất?",
+    "options": [
+      "Unary RPC.",
+      "Server streaming RPC.",
+      "Client streaming RPC.",
+      "Bidirectional streaming RPC."
+    ],
+    "correct": 0,
+    "explanation": "Unary có một thông điệp yêu cầu và một thông điệp phản hồi. Ba dạng streaming dành cho trường hợp một hoặc cả hai phía gửi chuỗi thông điệp, chưa cần thiết với yêu cầu một–một này.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 3–4, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 3–4, mục 5.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi một yêu cầu theo dõi tác vụ, sau đó máy chủ trả nhiều thông điệp tiến độ theo thời gian trên cùng RPC. Dạng giao tiếp nào phù hợp?",
+    "options": [
+      "Unary RPC.",
+      "Client streaming RPC.",
+      "Một chuỗi POST tạo tác vụ mới.",
+      "Server streaming RPC."
+    ],
+    "correct": 3,
+    "explanation": "Server streaming nhận một yêu cầu rồi cho máy chủ gửi một luồng phản hồi. Client streaming đảo phía gửi nhiều thông điệp, còn unary không mô tả chuỗi cập nhật tiến độ trong một RPC.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 3–4, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 3–4, mục 5.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi nhiều mẫu đo; khi kết thúc luồng, máy chủ trả một kết quả tổng hợp duy nhất. Dạng RPC nào phù hợp?",
+    "options": [
+      "Server streaming RPC.",
+      "Client streaming RPC.",
+      "Unary RPC với một response cho từng mẫu đo.",
+      "Bidirectional streaming bắt buộc hai phía gửi xen kẽ từng cặp."
+    ],
+    "correct": 1,
+    "explanation": "Client streaming cho máy khách gửi một chuỗi thông điệp và nhận một phản hồi tổng hợp. Server streaming có chiều nhiều thông điệp ngược lại; bidirectional cho hai luồng độc lập và không bắt buộc nhịp gửi từng cặp.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 3–4, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 3–4, mục 5.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong một phiên cộng tác, hai phía đều cần gửi nhiều cập nhật khi có dữ liệu, không phải chờ từng cặp yêu cầu–phản hồi. Dạng RPC nào phù hợp nhất?",
+    "options": [
+      "Bidirectional streaming RPC.",
+      "Unary RPC với đúng một request và một response.",
+      "Client streaming nhưng cấm máy chủ gửi dữ liệu cho đến cuối phiên.",
+      "Server streaming nhưng máy khách không được gửi cập nhật tiếp theo."
+    ],
+    "correct": 0,
+    "explanation": "Bidirectional streaming cung cấp luồng thông điệp ở cả hai chiều trong cùng RPC. Hai phía có thể gửi độc lập theo logic ứng dụng; các dạng một chiều hoặc unary không mô tả đầy đủ nhu cầu này.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 3–4, mục 5.1.2.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 3–4, mục 5.1.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm muốn đổi tên trường trong mã nhưng vẫn giữ hợp đồng truyền Protobuf tương thích. Vì sao phải đặc biệt thận trọng với số hiệu trường trong tệp .proto?",
+    "options": [
+      "Số hiệu chỉ là số dòng, có thể đổi tùy ý mà không ảnh hưởng thông điệp.",
+      "Số hiệu luôn được suy ra từ tên biến C# nên không thuộc hợp đồng.",
+      "Số hiệu trường là định danh dùng trong biểu diễn truyền Protobuf, không chỉ là thứ tự trình bày.",
+      "Đổi số hiệu khiến mọi thông điệp tự chuyển thành JSON."
+    ],
+    "correct": 2,
+    "explanation": "Protobuf sử dụng số hiệu để nhận diện trường trong dữ liệu mã hóa. Thay đổi số tùy tiện có thể làm hai phía hiểu khác nhau; tên hiển thị trong mã và số hiệu truyền thông không có cùng vai trò.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 4–5, mục 5.1.3.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 4–5, mục 5.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hai đội dùng cùng .proto có trường amount kiểu số, nhưng một đội hiểu đơn vị là đồng, đội kia hiểu là nghìn đồng. Vì sao sinh stub thành công vẫn chưa đủ?",
+    "options": [
+      "Protobuf tự chuyển mọi đơn vị tiền tệ dựa trên tên trường.",
+      ".proto xác định cấu trúc và kiểu, còn ý nghĩa nghiệp vụ như đơn vị cần được thống nhất và mô tả rõ.",
+      "Sinh stub bảo đảm hai đội có cùng mọi quy tắc nghiệp vụ.",
+      "Chỉ cần dùng HTTP/2 thì sai khác về đơn vị tự biến mất."
+    ],
+    "correct": 1,
+    "explanation": "Hợp đồng cú pháp không tự giải quyết khác biệt ngữ nghĩa. Cùng kiểu số vẫn có thể mang hai đơn vị khác nhau, nên cần tài liệu hoặc quy ước nghiệp vụ rõ ràng ngoài việc sinh mã thành công.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 4–5, mục 5.1.3.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 4–5, mục 5.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hệ thống đã có REST cho ứng dụng web nhưng muốn gRPC giữa hai dịch vụ nội bộ có hợp đồng kiểu rõ ràng. Lựa chọn kiến trúc nào hợp lý?",
+    "options": [
+      "Bắt buộc loại bỏ REST khỏi toàn bộ hệ thống trước khi thêm gRPC.",
+      "Chỉ được chọn một công nghệ truyền thông cho mọi ranh giới dịch vụ.",
+      "Dùng gRPC đồng nghĩa không cần định nghĩa hợp đồng giữa các dịch vụ.",
+      "Giữ REST ở giao tiếp phù hợp với máy khách và dùng gRPC ở giao tiếp nội bộ cần nó."
+    ],
+    "correct": 3,
+    "explanation": "Các ranh giới tương tác có nhu cầu khác nhau nên có thể kết hợp công nghệ. gRPC không buộc thay mọi API REST và vẫn dựa vào hợp đồng dịch vụ, thường được định nghĩa bằng .proto.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 5–6, mục 5.1.4.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 5–6, mục 5.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Mã service gRPC đã được sinh từ .proto nhưng lời gọi chưa chạy được vì chưa có logic xử lý phép tính. Việc nào còn phải thực hiện ở máy chủ?",
+    "options": [
+      "Chỉ đổi tên tệp .proto; mã sinh tự biết mọi công thức nghiệp vụ.",
+      "Hiện thực phương thức dịch vụ và đăng ký, ánh xạ dịch vụ để nhận lời gọi.",
+      "Chỉ sửa mã máy khách để bỏ qua hoàn toàn response.",
+      "Chuyển tất cả message thành biến toàn cục trong trình duyệt."
+    ],
+    "correct": 1,
+    "explanation": "Mã sinh cung cấp khung hợp đồng và thành phần hỗ trợ giao tiếp, không tự viết nghiệp vụ. Máy chủ phải hiện thực dịch vụ và đưa nó vào cấu hình chạy để các lời gọi đến được xử lý.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 8–10, mục 5.2.2–5.2.3.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 8–10, mục 5.2.2–5.2.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một máy khách gọi cùng dịch vụ gRPC nhiều lần nhưng tạo channel mới cho từng phép tính nhỏ. Hướng tổ chức nào phù hợp hơn?",
+    "options": [
+      "Tạo thêm hai channel dự phòng cho mỗi lời gọi dù không có nhu cầu.",
+      "Thay message .proto bằng chuỗi tùy ý để channel không còn cần thiết.",
+      "Dùng mỗi cổng mạng cho đúng một phép tính rồi ngừng dịch vụ.",
+      "Tái sử dụng channel tới dịch vụ, tận dụng quản lý kết nối và khả năng multiplex của HTTP/2."
+    ],
+    "correct": 3,
+    "explanation": "Channel quản lý đường giao tiếp tới dịch vụ và có thể phục vụ nhiều lời gọi. Tạo mới liên tục làm tăng chi phí quản lý kết nối; đổi hợp đồng dữ liệu hoặc cổng không phải cách tối ưu vòng đời channel.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 10–11, mục 5.2.4.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 10–11, mục 5.2.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Dịch vụ trả InvalidArgument vì số chia bằng 0. Máy khách nên làm gì thay vì gửi lại nguyên yêu cầu theo vòng lặp?",
+    "options": [
+      "Báo lỗi đầu vào và yêu cầu sửa dữ liệu trước khi gọi lại.",
+      "Retry vô hạn vì mọi mã lỗi gRPC đều là lỗi mạng tạm thời.",
+      "Tăng deadline để phép chia cho 0 trở thành hợp lệ.",
+      "Bỏ kiểm tra trạng thái và hiển thị một kết quả ngẫu nhiên."
+    ],
+    "correct": 0,
+    "explanation": "InvalidArgument thể hiện yêu cầu không hợp lệ, nên gửi lại cùng dữ liệu không sửa được nguyên nhân. Deadline và retry phục vụ vấn đề thời gian hoặc lỗi tạm thời, không làm phép tính sai đầu vào trở nên đúng.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 12–13, mục 5.2.5.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 12–13, mục 5.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách đặt deadline 2 giây nhưng tác vụ máy chủ có thể kéo dài 20 giây. Khi lời gọi hết hạn, cách phối hợp phù hợp là gì?",
+    "options": [
+      "Máy khách coi kết quả là thành công vì deadline chỉ là gợi ý hiển thị.",
+      "Máy chủ luôn tiếp tục mọi công việc vô hạn bất kể tín hiệu hủy.",
+      "Máy khách xử lý DeadlineExceeded; máy chủ quan sát tín hiệu hủy để dừng công việc khi thích hợp.",
+      "Đổi DeadlineExceeded thành InvalidArgument dù dữ liệu không sai."
+    ],
+    "correct": 2,
+    "explanation": "Deadline giới hạn thời gian chờ của lời gọi và khác lỗi đối số. Phía máy chủ nên kiểm tra tín hiệu hủy trong tác vụ dài để tránh làm việc không còn cần thiết; hết hạn không phải một phản hồi thành công.\n\nNguồn đối chiếu: chapter05.pdf, trang PDF 12–13, mục 5.2.5.",
+    "sources": [
+      "3fe8dc17-1f33-50e4-85d1-45d77a5c82a7"
+    ],
+    "from": "Biên soạn nâng cao từ chapter05.pdf, trang PDF 12–13, mục 5.2.5."
+  }
+]

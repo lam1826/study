@@ -1,0 +1,194 @@
+[
+  {
+    "tier": "extra",
+    "prompt": "Nhóm cần chạy ba bản sao của cùng dịch vụ từ một bản đóng gói bất biến. Phân biệt nào giữa image và container là đúng?",
+    "options": [
+      "Mỗi image chỉ cho phép tồn tại một container trong mọi thời điểm.",
+      "Image là bản đóng gói dùng để tạo các container; ba container có thể chạy từ cùng một image.",
+      "Container là mã nguồn chưa được đóng gói, image là tiến trình đang chạy.",
+      "Ba container từ một image bắt buộc dùng chung một bộ nhớ tiến trình."
+    ],
+    "correct": 1,
+    "explanation": "Image chứa ứng dụng và môi trường cần thiết để tạo container. Các container là các thể hiện chạy riêng; dùng cùng image không có nghĩa dùng chung một tiến trình hoặc toàn bộ bộ nhớ của nhau.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 3–4, mục 8.1.3.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 3–4, mục 8.1.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Dịch vụ vẫn trả response đúng định dạng nhưng tính tổng 2 + 3 thành 8. Theo phân loại lỗi trong giáo trình, đây gần nhất với loại nào?",
+    "options": [
+      "Lỗi giá trị phản hồi (value failure).",
+      "Crash failure: tiến trình đã dừng hoàn toàn.",
+      "Receive-omission failure: máy chủ không nhận được request.",
+      "Send-omission failure: máy chủ không gửi được response."
+    ],
+    "correct": 0,
+    "explanation": "Thông điệp đã được nhận và phản hồi đã tới máy khách, nhưng giá trị kết quả sai. Đây là lỗi về nội dung phản hồi, khác việc tiến trình dừng hoặc bỏ sót ở bước nhận, gửi thông điệp.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 5, mục 8.1.4.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 5, mục 8.1.4."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách timeout sau khi gửi yêu cầu tạo bài nộp. Máy chủ có thể đã lưu bài nhưng response bị mất. Kết luận nào thận trọng và đúng nhất?",
+    "options": [
+      "Timeout chứng minh máy chủ chưa từng nhận request.",
+      "Timeout chứng minh máy chủ đã rollback toàn bộ thay đổi.",
+      "Chưa thể kết luận nghiệp vụ chưa xảy ra; cần xác minh trạng thái hoặc gửi lại bằng cơ chế chống trùng.",
+      "Timeout luôn đồng nghĩa dữ liệu đầu vào không hợp lệ."
+    ],
+    "correct": 2,
+    "explanation": "Timeout chỉ cho biết máy khách chưa nhận phản hồi trong thời hạn. Nếu máy chủ đã xử lý nhưng phản hồi thất lạc, gửi lại không kiểm soát có thể lặp tác dụng phụ; cần tách tình trạng giao tiếp khỏi trạng thái nghiệp vụ.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 5–7, mục 8.1.4–8.1.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 5–7, mục 8.1.4–8.1.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Hàng nghìn máy khách cùng gặp lỗi tạm thời và retry đúng mỗi giây, khiến dịch vụ vừa hồi phục lại quá tải. Chiến lược nào phù hợp hơn?",
+    "options": [
+      "Cho tất cả máy khách retry ngay lập tức vô hạn để tăng cơ hội thành công.",
+      "Giới hạn số lần thử, tăng thời gian chờ theo backoff và thêm jitter.",
+      "Đồng bộ đồng hồ để mọi máy khách retry cùng một thời điểm.",
+      "Tăng kích thước request mỗi lần retry để giảm số lần gọi."
+    ],
+    "correct": 1,
+    "explanation": "Backoff giảm tần suất thử lại khi lỗi kéo dài, còn jitter phân tán thời điểm gửi giữa các máy khách. Giới hạn số lần hoặc thời gian thử tránh giữ tải vô hạn; retry đồng loạt làm tăng nguy cơ dồn tải trở lại.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 6, mục 8.1.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 6, mục 8.1.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Máy khách gửi lại POST tạo bài nộp sau timeout. Cách sử dụng Idempotency Key nào phù hợp để máy chủ nhận diện cùng một yêu cầu nghiệp vụ?",
+    "options": [
+      "Tạo khóa hoàn toàn mới cho mỗi lần retry của cùng yêu cầu.",
+      "Dùng một khóa chung vĩnh viễn cho mọi bài nộp của mọi người.",
+      "Chỉ đặt khóa ở giao diện, không gửi và không lưu dấu vết ở máy chủ.",
+      "Giữ cùng khóa cho các lần thử lại của yêu cầu đó; máy chủ kiểm tra khóa trước khi áp dụng tác dụng phụ."
+    ],
+    "correct": 3,
+    "explanation": "Khóa cần ổn định qua các lần gửi lại của cùng yêu cầu và phân biệt được các yêu cầu nghiệp vụ khác nhau. Khóa mới mỗi lần làm mất khả năng nhận diện retry; một khóa dùng cho mọi việc lại gộp nhầm các yêu cầu độc lập.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 7, mục 8.1.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 7, mục 8.1.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Một nhóm bật retry cho thao tác trừ tiền và tuyên bố đã đạt exactly-once. Đánh giá nào đúng?",
+    "options": [
+      "Retry luôn tự bảo đảm mỗi thao tác chỉ chạy đúng một lần dù mất response.",
+      "Retry đơn thuần có thể lặp tác dụng phụ; cần cơ chế ứng dụng như chống trùng và quản lý giao tác phù hợp.",
+      "Chỉ tăng timeout là đủ chứng minh exactly-once trong mọi sự cố.",
+      "Dùng TCP khiến ứng dụng không còn phải quan tâm trạng thái giao tác."
+    ],
+    "correct": 1,
+    "explanation": "Truyền thông đáng tin cậy hơn không tự đồng bộ việc ghi nghiệp vụ với nhận phản hồi. Khi kết quả chưa rõ, retry có thể thực hiện lại thao tác; tính đúng đắn cần thiết kế ở tầng ứng dụng, không chỉ thay chính sách mạng.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 7, mục 8.1.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 7, mục 8.1.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Cùng một image cần chạy ở môi trường phát triển và triển khai với địa chỉ backend khác nhau. Cách cấu hình nào phù hợp?",
+    "options": [
+      "Sửa mã nguồn địa chỉ backend rồi biên dịch riêng cho từng lần chạy.",
+      "Ghi cứng địa chỉ máy cá nhân trong mọi container.",
+      "Đưa địa chỉ backend vào tên phương thức xử lý nghiệp vụ.",
+      "Đọc cấu hình qua hệ thống cấu hình của ứng dụng và đặt giá trị theo môi trường, chẳng hạn biến môi trường."
+    ],
+    "correct": 3,
+    "explanation": "Tách cấu hình khỏi mã cho phép tái sử dụng bản đóng gói ở nhiều môi trường. Trong cách cấu hình của giáo trình, biến môi trường có thể ghi đè giá trị từ tệp cấu hình, giúp thay địa chỉ mà không sửa nghiệp vụ.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 8, mục 8.2.1–8.2.2.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 8, mục 8.2.1–8.2.2."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Dockerfile dùng một stage SDK để build và một stage runtime để chạy. Lợi ích chính của việc tách hai stage là gì?",
+    "options": [
+      "Image chạy cuối chỉ chứa những thành phần cần để chạy ứng dụng, không cần mang toàn bộ công cụ build.",
+      "Mọi lần chạy container đều phải biên dịch lại ứng dụng từ đầu.",
+      "Stage runtime tự sửa mọi lỗi logic trong mã đã build.",
+      "Hai stage làm các dịch vụ dùng chung bộ nhớ như một tiến trình."
+    ],
+    "correct": 0,
+    "explanation": "Multi-stage build cho phép dùng môi trường SDK ở bước xây dựng rồi chỉ chuyển đầu ra cần thiết sang image chạy. Điều này tách công cụ build khỏi runtime, không biến container thành cơ chế sửa lỗi nghiệp vụ hay chia sẻ bộ nhớ.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 9, mục 8.2.3.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 9, mục 8.2.3."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Trong Compose, service api gọi http://localhost:8080 để tới service worker và bị lỗi. Hai service ở hai container riêng, cùng mạng; worker lắng nghe cổng 8080. Địa chỉ nào phù hợp hơn?",
+    "options": [
+      "http://localhost:8080 vì localhost luôn đại diện cho mọi container.",
+      "Địa chỉ IP trình duyệt của người học, vì trình duyệt là DNS của Compose.",
+      "http://worker:8080, dùng tên service và cổng mà worker lắng nghe trong mạng container.",
+      "Tên tệp Dockerfile, vì mọi tên tệp đều được đăng ký thành host."
+    ],
+    "correct": 2,
+    "explanation": "localhost bên trong api trỏ về chính container api. Các service cùng mạng Compose có thể gọi nhau bằng tên service; cần dùng đúng cổng lắng nghe của dịch vụ đích trong mạng đó.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 9–10, mục 8.2.4–8.2.5.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 9–10, mục 8.2.4–8.2.5."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Endpoint health trả thành công nhưng một yêu cầu nghiệp vụ vẫn thất bại ở bước gọi backend. Cách quan sát nào bổ sung được thông tin còn thiếu?",
+    "options": [
+      "Coi health thành công là bằng chứng mọi nghiệp vụ luôn đúng.",
+      "Xóa log để chỉ giữ kết quả health gọn hơn.",
+      "Xem log có cấu trúc của luồng yêu cầu và lỗi phụ thuộc, thay vì chỉ dựa vào trạng thái health tổng quát.",
+      "Đổi mã lỗi nghiệp vụ thành thành công để nhất quán với health."
+    ],
+    "correct": 2,
+    "explanation": "Health check phản ánh điều kiện được thiết kế để kiểm tra, không tự bao phủ mọi đường đi nghiệp vụ. Log có cấu trúc giúp truy vết bước gọi và lỗi cụ thể, bổ sung khả năng chẩn đoán thay vì che lỗi.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 11, mục 8.2.6.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 11, mục 8.2.6."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Khi nhận yêu cầu dừng, worker còn một tác vụ đang xử lý. Cách dừng nào phù hợp với graceful shutdown?",
+    "options": [
+      "Ngừng nhận việc mới và phối hợp hoàn tất hoặc hủy tác vụ đang chạy trong thời hạn cho phép.",
+      "Nhận thêm việc vô hạn để luôn giữ worker bận.",
+      "Ack mọi công việc chưa xử lý rồi thoát ngay.",
+      "Bỏ qua mọi tín hiệu dừng và chỉ thoát khi bị cưỡng chế."
+    ],
+    "correct": 0,
+    "explanation": "Graceful shutdown cho phép dịch vụ dọn dẹp tài nguyên và xử lý công việc đang dang dở có kiểm soát. Nhận thêm việc mãi hoặc ack công việc chưa làm làm tăng rủi ro; thời hạn dừng cần phù hợp cấu hình vận hành.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 12, mục 8.2.7.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 12, mục 8.2.7."
+  },
+  {
+    "tier": "extra",
+    "prompt": "Nhóm muốn kiểm tra cơ chế chịu lỗi khi backend tạm dừng. Bằng chứng nào có giá trị nhất ngoài việc ứng dụng khởi động thành công?",
+    "options": [
+      "Chỉ xem image đã build xong mà không thực hiện yêu cầu nào.",
+      "Chỉ kiểm tra tên container có đúng quy ước đặt tên.",
+      "Chỉ tăng timeout lên rất lớn rồi coi mọi lỗi đã được xử lý.",
+      "Chủ động dừng backend và quan sát timeout, retry có giới hạn, log lỗi và khả năng phục hồi khi backend chạy lại."
+    ],
+    "correct": 3,
+    "explanation": "Khả năng chịu lỗi cần được quan sát trong tình huống lỗi thực tế, gồm phản ứng trong lúc phụ thuộc ngừng và sau khi hồi phục. Build thành công hoặc tên container đúng không kiểm chứng chính sách timeout, retry và phục hồi.\n\nNguồn đối chiếu: chapter08.pdf, trang PDF 12, 18, mục 8.2.7, 8.3.3.",
+    "sources": [
+      "ae47b216-cd2d-5639-a5cd-d76ddbc1cb02"
+    ],
+    "from": "Biên soạn nâng cao từ chapter08.pdf, trang PDF 12, 18, mục 8.2.7, 8.3.3."
+  }
+]
